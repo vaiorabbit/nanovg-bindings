@@ -39,24 +39,6 @@ key = GLFW::create_callback(:GLFWkeyfun) do |window, key, scancode, action, mods
   end
 end
 
-def drawWidths(vg, x, y, width)
-  nvgSave(vg)
-
-  nvgStrokeColor(vg, nvgRGBA(0,0,0,255))
-
-  20.times do |i|
-    w = (i+0.5)*0.1
-    nvgStrokeWidth(vg, w)
-    nvgBeginPath(vg)
-    nvgMoveTo(vg, x,y)
-    nvgLineTo(vg, x+width,y+width*0.3)
-    nvgStroke(vg)
-    y += 10
-  end
-
-  nvgRestore(vg)
-end
-
 if __FILE__ == $0
   data = DemoData.new
   fps = PerfGraph.new(PerfGraph::GRAPH_RENDER_FPS, "Frame Time")
@@ -112,7 +94,7 @@ if __FILE__ == $0
     glfwGetWindowSize(window, winWidth_buf, winHeight_buf)
     glfwGetFramebufferSize(window, fbWidth_buf, fbHeight_buf)
     mx = mx_buf.unpack('D')[0]
-    my = mx_buf.unpack('D')[0]
+    my = my_buf.unpack('D')[0]
     winWidth = winWidth_buf.unpack('L')[0]
     winHeight = winHeight_buf.unpack('L')[0]
     fbWidth = fbWidth_buf.unpack('L')[0]
@@ -130,8 +112,7 @@ if __FILE__ == $0
 
     nvgBeginFrame(vg, winWidth, winHeight, pxRatio)
 
-    drawWidths(vg, 10, 50, 30)
-    data.render(vg, my, my, winWidth, winHeight, t, $blowup)
+    data.render(vg, mx, my, winWidth, winHeight, t, $blowup)
     fps.render(vg, 5, 5)
     nvgEndFrame(vg)
 
