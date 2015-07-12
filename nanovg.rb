@@ -161,6 +161,7 @@ module NanoVG
     attach_function :nvgImageSize, :nvgImageSize, [:pointer, :int32, :pointer, :pointer], :void
     attach_function :nvgDeleteImage, :nvgDeleteImage, [:pointer, :int32], :void
 
+    attach_function :nvgLinearGradient, :nvgLinearGradient, [:pointer, :float, :float, :float, :float, NVGcolor.by_value, NVGcolor.by_value], NVGpaint.by_value
     attach_function :nvgBoxGradient, :nvgBoxGradient, [:pointer, :float, :float, :float, :float, :float, :float, NVGcolor.by_value, NVGcolor.by_value], NVGpaint.by_value
     attach_function :nvgRadialGradient, :nvgRadialGradient, [:pointer, :float, :float, :float, :float, NVGcolor.by_value, NVGcolor.by_value], NVGpaint.by_value
     attach_function :nvgImagePattern, :nvgImagePattern, [:pointer, :float, :float, :float, :float, :float, :int32, :float], NVGpaint.by_value
