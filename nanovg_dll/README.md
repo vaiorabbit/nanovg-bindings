@@ -21,7 +21,7 @@ $ ls -l ../../demo/*dylib
 
 -------------------------------------------------------------------------------
 
-## libnanovg_gl2.dylib ¤Î¥Ó¥ë¥ÉÊıË¡ ##
+## libnanovg_gl2.dylib ã®ãƒ“ãƒ«ãƒ‰æ–¹æ³• ##
 
 $ premake4 --cc=gcc --os=macosx gmake
 	Building configurations...
