@@ -4,6 +4,8 @@
 require 'opengl'
 require 'glfw'
 require_relative '../nanovg'
+require_relative 'perf'
+require_relative 'demo_data'
 
 OpenGL.load_dll()
 GLFW.load_dll()
@@ -56,6 +58,8 @@ def drawWidths(vg, x, y, width)
 end
 
 if __FILE__ == $0
+  data = DemoData.new
+  fps = PerfGraph.new(PerfGraph::GRAPH_RENDER_FPS, "Frame Time")
   prevt = 0.0
 
   if glfwInit() == GL_FALSE
@@ -84,6 +88,10 @@ if __FILE__ == $0
     exit
   end
 
+  if data.load(vg) == -1
+    exit
+  end
+
   glfwSwapInterval(0)
   glfwSetTime(0)
   prevt = glfwGetTime()
@@ -98,6 +106,7 @@ if __FILE__ == $0
     t = glfwGetTime()
     dt = t - prevt
     prevt = t
+    fps.update(dt)
 
     glfwGetCursorPos(window, mx_buf, my_buf)
     glfwGetWindowSize(window, winWidth_buf, winHeight_buf)
@@ -120,7 +129,10 @@ if __FILE__ == $0
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT)
 
     nvgBeginFrame(vg, winWidth, winHeight, pxRatio)
+
     drawWidths(vg, 10, 50, 30)
+    data.render(vg, my, my, winWidth, winHeight, t, $blowup)
+    fps.render(vg, 5, 5)
     nvgEndFrame(vg)
 
     if $screenshot
@@ -130,6 +142,8 @@ if __FILE__ == $0
     glfwSwapBuffers( window )
     glfwPollEvents()
   end
+
+  data.free(vg)
 
   nvgDeleteGL2(vg)
 
