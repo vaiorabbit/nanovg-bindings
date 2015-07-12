@@ -15,6 +15,20 @@ class DemoData
   ICON_LOGIN = 0xE740
   ICON_TRASH = 0xE729
 
+  def maxf(a, b)
+    return a > b ? a : b
+  end
+  private :maxf
+
+  def mini(a, b)
+    return a < b ? a : b
+  end
+
+  def clampf(a, mn, mx)
+    return a < mn ? mn : (a > mx ? mx : a)
+  end
+  private :clampf
+
   def isBlack(col)
     color = col[:rgba].to_a
     if color[0] == 0.0 && color[1] == 0.0 && color[2] == 0.0 && color[3] == 0.0
@@ -23,6 +37,7 @@ class DemoData
       return false
     end
   end
+  private :isBlack
 
   def drawWindow(vg, title, x, y, w, h)
     cornerRadius = 3.0
@@ -426,6 +441,417 @@ class DemoData
     nvgStrokeWidth(vg, 1.0)
   end
 
+  def drawSpinner(vg, cx, cy, r, t)
+    a0 = 0.0 + t*6
+    a1 = Math::PI + t*6
+    r0 = r
+    r1 = r * 0.75
+
+    nvgSave(vg)
+
+    nvgBeginPath(vg)
+    nvgArc(vg, cx,cy, r0, a0, a1, NVG_CW)
+    nvgArc(vg, cx,cy, r1, a1, a0, NVG_CCW)
+    nvgClosePath(vg)
+    ax = cx + Math.cos(a0) * (r0+r1)*0.5
+    ay = cy + Math.sin(a0) * (r0+r1)*0.5
+    bx = cx + Math.cos(a1) * (r0+r1)*0.5
+    by = cy + Math.sin(a1) * (r0+r1)*0.5
+    paint = nvgLinearGradient(vg, ax,ay, bx,by, nvgRGBA(0,0,0,0), nvgRGBA(0,0,0,128))
+    nvgFillPaint(vg, paint)
+    nvgFill(vg)
+
+    nvgRestore(vg)
+  end
+
+  def drawThumbnails(vg, x, y, w, h, images, nimages, t)
+    cornerRadius = 3.0
+    thumb = 60.0
+    arry = 30.5
+    stackh = (nimages/2) * (thumb+10) + 10
+
+    u = (1+Math.cos(t*0.5))*0.5
+    u2 = (1-Math.cos(t*0.2))*0.5
+
+    nvgSave(vg)
+
+    #  Drop shadow
+    shadowPaint = nvgBoxGradient(vg, x,y+4, w,h, cornerRadius*2, 20, nvgRGBA(0,0,0,128), nvgRGBA(0,0,0,0))
+    nvgBeginPath(vg)
+    nvgRect(vg, x-10,y-10, w+20,h+30)
+    nvgRoundedRect(vg, x,y, w,h, cornerRadius)
+    nvgPathWinding(vg, NVG_HOLE)
+    nvgFillPaint(vg, shadowPaint)
+    nvgFill(vg)
+
+    #  Window
+    nvgBeginPath(vg)
+    nvgRoundedRect(vg, x,y, w,h, cornerRadius)
+    nvgMoveTo(vg, x-10,y+arry)
+    nvgLineTo(vg, x+1,y+arry-11)
+    nvgLineTo(vg, x+1,y+arry+11)
+    nvgFillColor(vg, nvgRGBA(200,200,200,255))
+    nvgFill(vg)
+
+    nvgSave(vg)
+    nvgScissor(vg, x,y,w,h)
+    nvgTranslate(vg, 0, -(stackh - h)*u)
+
+    dv = 1.0 / (nimages-1).to_f
+
+    imgw_buf = '    '
+    imgh_buf = '    '
+    nimages.times do |i|
+      tx = x+10
+      ty = y+10
+      tx += (i%2) * (thumb+10)
+      ty += (i/2) * (thumb+10)
+      nvgImageSize(vg, images[i], imgw_buf, imgh_buf)
+      imgw = imgw_buf.unpack('L')[0]
+      imgh = imgh_buf.unpack('L')[0]
+      if imgw < imgh
+        iw = thumb
+        ih = iw * imgh.to_f/imgw.to_f
+        ix = 0
+        iy = -(ih-thumb)*0.5
+      else 
+        ih = thumb
+        iw = ih * imgw.to_f/imgh.to_f
+        ix = -(iw-thumb)*0.5
+        iy = 0
+      end
+
+      v = i * dv
+      a = clampf((u2-v) / dv, 0, 1)
+
+      if (a < 1.0)
+        drawSpinner(vg, tx+thumb/2,ty+thumb/2, thumb*0.25, t)
+      end
+      imgPaint = nvgImagePattern(vg, tx+ix, ty+iy, iw,ih, 0.0/180.0*Math::PI, images[i], a)
+      nvgBeginPath(vg)
+      nvgRoundedRect(vg, tx,ty, thumb,thumb, 5)
+      nvgFillPaint(vg, imgPaint)
+      nvgFill(vg)
+
+      shadowPaint = nvgBoxGradient(vg, tx-1,ty, thumb+2,thumb+2, 5, 3, nvgRGBA(0,0,0,128), nvgRGBA(0,0,0,0))
+      nvgBeginPath(vg)
+      nvgRect(vg, tx-5,ty-5, thumb+10,thumb+10)
+      nvgRoundedRect(vg, tx,ty, thumb,thumb, 6)
+      nvgPathWinding(vg, NVG_HOLE)
+      nvgFillPaint(vg, shadowPaint)
+      nvgFill(vg)
+
+      nvgBeginPath(vg)
+      nvgRoundedRect(vg, tx+0.5,ty+0.5, thumb-1,thumb-1, 4-0.5)
+      nvgStrokeWidth(vg,1.0)
+      nvgStrokeColor(vg, nvgRGBA(255,255,255,192))
+      nvgStroke(vg)
+    end
+    nvgRestore(vg)
+
+    #  Hide fades
+    fadePaint = nvgLinearGradient(vg, x,y,x,y+6, nvgRGBA(200,200,200,255), nvgRGBA(200,200,200,0))
+    nvgBeginPath(vg)
+    nvgRect(vg, x+4,y,w-8,6)
+    nvgFillPaint(vg, fadePaint)
+    nvgFill(vg)
+
+    fadePaint = nvgLinearGradient(vg, x,y+h,x,y+h-6, nvgRGBA(200,200,200,255), nvgRGBA(200,200,200,0))
+    nvgBeginPath(vg)
+    nvgRect(vg, x+4,y+h-6,w-8,6)
+    nvgFillPaint(vg, fadePaint)
+    nvgFill(vg)
+
+    #  Scroll bar
+    shadowPaint = nvgBoxGradient(vg, x+w-12+1,y+4+1, 8,h-8, 3,4, nvgRGBA(0,0,0,32), nvgRGBA(0,0,0,92))
+    nvgBeginPath(vg)
+    nvgRoundedRect(vg, x+w-12,y+4, 8,h-8, 3)
+    nvgFillPaint(vg, shadowPaint)
+    nvgFill(vg)
+
+    scrollh = (h/stackh) * (h-8)
+    shadowPaint = nvgBoxGradient(vg, x+w-12-1,y+4+(h-8-scrollh)*u-1, 8,scrollh, 3,4, nvgRGBA(220,220,220,255), nvgRGBA(128,128,128,255))
+    nvgBeginPath(vg)
+    nvgRoundedRect(vg, x+w-12+1,y+4+1 + (h-8-scrollh)*u, 8-2,scrollh-2, 2)
+    nvgFillPaint(vg, shadowPaint)
+    nvgFill(vg)
+
+    nvgRestore(vg)
+  end
+
+  def drawColorwheel(vg, x, y, w, h, t)
+    hue = Math.sin(t * 0.12)
+
+    nvgSave(vg)
+
+    cx = x + w*0.5
+    cy = y + h*0.5
+    r1 = (w < h ? w : h) * 0.5 - 5.0
+    r0 = r1 - 20.0
+    aeps = 0.5 / r1   #  half a pixel arc length in radians (2pi cancels out).
+
+    6.times do |i|
+      a0 = i.to_f / 6.0 * Math::PI * 2.0 - aeps
+      a1 = (i+1.0).to_f / 6.0 * Math::PI * 2.0 + aeps
+      nvgBeginPath(vg)
+      nvgArc(vg, cx,cy, r0, a0, a1, NVG_CW)
+      nvgArc(vg, cx,cy, r1, a1, a0, NVG_CCW)
+      nvgClosePath(vg)
+      ax = cx + Math.cos(a0) * (r0+r1)*0.5
+      ay = cy + Math.sin(a0) * (r0+r1)*0.5
+      bx = cx + Math.cos(a1) * (r0+r1)*0.5
+      by = cy + Math.sin(a1) * (r0+r1)*0.5
+      paint = nvgLinearGradient(vg, ax,ay, bx,by, nvgHSLA(a0/(Math::PI*2),1.0,0.55,255), nvgHSLA(a1/(Math::PI*2),1.0,0.55,255))
+      nvgFillPaint(vg, paint)
+      nvgFill(vg)
+    end
+
+    nvgBeginPath(vg)
+    nvgCircle(vg, cx,cy, r0-0.5)
+    nvgCircle(vg, cx,cy, r1+0.5)
+    nvgStrokeColor(vg, nvgRGBA(0,0,0,64))
+    nvgStrokeWidth(vg, 1.0)
+    nvgStroke(vg)
+
+    #  Selector
+    nvgSave(vg)
+    nvgTranslate(vg, cx,cy)
+    nvgRotate(vg, hue*Math::PI*2)
+
+    #  Marker on
+    nvgStrokeWidth(vg, 2.0)
+    nvgBeginPath(vg)
+    nvgRect(vg, r0-1,-3,r1-r0+2,6)
+    nvgStrokeColor(vg, nvgRGBA(255,255,255,192))
+    nvgStroke(vg)
+
+    paint = nvgBoxGradient(vg, r0-3,-5,r1-r0+6,10, 2,4, nvgRGBA(0,0,0,128), nvgRGBA(0,0,0,0))
+    nvgBeginPath(vg)
+    nvgRect(vg, r0-2-10,-4-10,r1-r0+4+20,8+20)
+    nvgRect(vg, r0-2,-4,r1-r0+4,8)
+    nvgPathWinding(vg, NVG_HOLE)
+    nvgFillPaint(vg, paint)
+    nvgFill(vg)
+
+    #  Center triangle
+    r = r0 - 6
+    ax = Math.cos(120.0/180.0*Math::PI) * r
+    ay = Math.sin(120.0/180.0*Math::PI) * r
+    bx = Math.cos(-120.0/180.0*Math::PI) * r
+    by = Math.sin(-120.0/180.0*Math::PI) * r
+    nvgBeginPath(vg)
+    nvgMoveTo(vg, r,0)
+    nvgLineTo(vg, ax,ay)
+    nvgLineTo(vg, bx,by)
+    nvgClosePath(vg)
+    paint = nvgLinearGradient(vg, r,0, ax,ay, nvgHSLA(hue,1.0,0.5,255), nvgRGBA(255,255,255,255))
+    nvgFillPaint(vg, paint)
+    nvgFill(vg)
+    paint = nvgLinearGradient(vg, (r+ax)*0.5,(0+ay)*0.5, bx,by, nvgRGBA(0,0,0,0), nvgRGBA(0,0,0,255))
+    nvgFillPaint(vg, paint)
+    nvgFill(vg)
+    nvgStrokeColor(vg, nvgRGBA(0,0,0,64))
+    nvgStroke(vg)
+
+    #  Select circle on triangle
+    ax = Math.cos(120.0/180.0*Math::PI) * r*0.3
+    ay = Math.sin(120.0/180.0*Math::PI) * r*0.4
+    nvgStrokeWidth(vg, 2.0)
+    nvgBeginPath(vg)
+    nvgCircle(vg, ax,ay,5)
+    nvgStrokeColor(vg, nvgRGBA(255,255,255,192))
+    nvgStroke(vg)
+
+    paint = nvgRadialGradient(vg, ax,ay, 7,9, nvgRGBA(0,0,0,64), nvgRGBA(0,0,0,0))
+    nvgBeginPath(vg)
+    nvgRect(vg, ax-20,ay-20,40,40)
+    nvgCircle(vg, ax,ay,7)
+    nvgPathWinding(vg, NVG_HOLE)
+    nvgFillPaint(vg, paint)
+    nvgFill(vg)
+
+    nvgRestore(vg)
+
+    nvgRestore(vg)
+  end
+
+  def drawLines(vg, x, y, w, h, t)
+    pad = 5.0
+    s = w/9.0 - pad*2
+    pts = Array.new(4*2) { 0.0 }
+    joins = [NVG_MITER, NVG_ROUND, NVG_BEVEL]
+    caps = [NVG_BUTT, NVG_ROUND, NVG_SQUARE]
+
+    nvgSave(vg)
+    pts[0] = -s*0.25 + Math.cos(t*0.3) * s*0.5
+    pts[1] = Math.sin(t*0.3) * s*0.5
+    pts[2] = -s*0.25
+    pts[3] = 0
+    pts[4] = s*0.25
+    pts[5] = 0
+    pts[6] = s*0.25 + Math.cos(-t*0.3) * s*0.5
+    pts[7] = Math.sin(-t*0.3) * s*0.5
+
+    3.times do |i|
+      3.times do |j|
+        fx = x + s*0.5 + (i*3+j)/9.0*w + pad
+        fy = y - s*0.5 + pad
+
+        nvgLineCap(vg, caps[i])
+        nvgLineJoin(vg, joins[j])
+
+        nvgStrokeWidth(vg, s*0.3)
+        nvgStrokeColor(vg, nvgRGBA(0,0,0,160))
+        nvgBeginPath(vg)
+        nvgMoveTo(vg, fx+pts[0], fy+pts[1])
+        nvgLineTo(vg, fx+pts[2], fy+pts[3])
+        nvgLineTo(vg, fx+pts[4], fy+pts[5])
+        nvgLineTo(vg, fx+pts[6], fy+pts[7])
+        nvgStroke(vg)
+
+        nvgLineCap(vg, NVG_BUTT)
+        nvgLineJoin(vg, NVG_BEVEL)
+
+        nvgStrokeWidth(vg, 1.0)
+        nvgStrokeColor(vg, nvgRGBA(0,192,255,255))
+        nvgBeginPath(vg)
+        nvgMoveTo(vg, fx+pts[0], fy+pts[1])
+        nvgLineTo(vg, fx+pts[2], fy+pts[3])
+        nvgLineTo(vg, fx+pts[4], fy+pts[5])
+        nvgLineTo(vg, fx+pts[6], fy+pts[7])
+        nvgStroke(vg)
+      end
+    end
+
+    nvgRestore(vg)
+  end
+
+  def drawParagraph(vg, x, y, width, height, mx, my)
+    rows_buf = FFI::MemoryPointer.new(NVGtextRow, 3) # Ref.: https://github.com/ffi/ffi/wiki/Structs
+    glyphs_buf = FFI::MemoryPointer.new(NVGglyphPosition, 100)
+    text = "This is longer chunk of text.\n  \n  Would have used lorem ipsum but she    was busy jumping over the lazy dog with the fox and all the men who came to the aid of the party."
+    lnum = 0
+    lineh_buf = '        '
+    lineh = 0.0
+    gx = 0.0
+    gy = 0.0
+    gutter = 0
+
+    nvgSave(vg)
+
+    nvgFontSize(vg, 18.0)
+    nvgFontFace(vg, "sans")
+    nvgTextAlign(vg, NVG_ALIGN_LEFT|NVG_ALIGN_TOP)
+    nvgTextMetrics(vg, nil, nil, lineh_buf)
+    lineh = lineh_buf.unpack('F')[0]
+
+    #  The text break API can be used to fill a large buffer of rows,
+    #  or to iterate over the text just few lines (or just one) at a time.
+    #  The "next" variable of the last returned item tells where to continue.
+    text_start = text
+    text_end = nil # text + text.length
+    while ((nrows = nvgTextBreakLines(vg, text_start, text_end, width, rows_buf, 3)))
+      rows = nrows.times.collect do |i|
+        NVGtextRow.new(rows_buf + i * NVGtextRow.size) # Ref.: https://github.com/ffi/ffi/wiki/Structs
+      end
+      nrows.times do |i|
+        row = rows[i]
+        hit = mx > x && mx < (x+width) && my >= y && my < (y+lineh)
+
+        nvgBeginPath(vg)
+        nvgFillColor(vg, nvgRGBA(255,255,255, (hit ? 64 : 16)))
+        nvgRect(vg, x, y, row[:width], lineh)
+        nvgFill(vg)
+
+        nvgFillColor(vg, nvgRGBA(255,255,255,255))
+        nvgText(vg, x, y, row[:start], row[:end])
+
+        if hit
+          caretx = (mx < x+row[:width]/2) ? x : x+row[:width]
+          px = x
+          nglyphs = nvgTextGlyphPositions(vg, x, y, row[:start], row[:end], glyphs_buf, 100)
+          glyphs = nglyphs.times.collect do |i|
+            NVGglyphPosition.new(glyphs_buf + i * NVGglyphPosition.size)
+          end
+          nglyphs.times do |j|
+            x0 = glyphs[j][:x]
+            x1 = (j+1 < nglyphs) ? glyphs[j+1][:x] : x+row[:width]
+            gx = x0 * 0.3 + x1 * 0.7
+            if mx >= px && mx < gx
+              caretx = glyphs[j][:x]
+            end
+            px = gx
+          end
+          nvgBeginPath(vg)
+          nvgFillColor(vg, nvgRGBA(255,192,0,255))
+          nvgRect(vg, caretx, y, 1, lineh)
+          nvgFill(vg)
+
+          gutter = lnum+1
+          gx = x - 10
+          gy = y + lineh/2
+        end
+        lnum = lnum + 1
+        y += lineh
+      end
+      #  Keep going...
+      if rows.length > 0
+        text_start = rows[nrows-1][:next]
+      else
+        break
+      end
+    end
+
+    bounds_buf = '                                '
+    if gutter
+      txt = sprintf("%d", gutter)
+      nvgFontSize(vg, 13.0)
+      nvgTextAlign(vg, NVG_ALIGN_RIGHT|NVG_ALIGN_MIDDLE)
+
+      nvgTextBounds(vg, gx, gy, txt, nil, bounds_buf)
+      bounds = bounds_buf.unpack('F4')
+
+      nvgBeginPath(vg)
+      nvgFillColor(vg, nvgRGBA(255,192,0,255))
+      nvgRoundedRect(vg, bounds[0].to_i-4,bounds[1].to_i-2, (bounds[2]-bounds[0]).to_i+8, (bounds[3]-bounds[1]).to_i+4, ((bounds[3]-bounds[1]).to_i+4)/2-1)
+      nvgFill(vg)
+
+      nvgFillColor(vg, nvgRGBA(32,32,32,255))
+      nvgText(vg, gx,gy, txt, nil)
+    end
+
+    y += 20.0
+
+    nvgFontSize(vg, 13.0)
+    nvgTextAlign(vg, NVG_ALIGN_LEFT|NVG_ALIGN_TOP)
+    nvgTextLineHeight(vg, 1.2)
+
+    nvgTextBoxBounds(vg, x,y, 150, "Hover your mouse over the text to see calculated caret position.", nil, bounds_buf)
+    bounds = bounds_buf.unpack('F4')
+
+    #  Fade the tooltip out when close to it.
+    gx = ((mx - (bounds[0]+bounds[2])*0.5) / (bounds[0] - bounds[2])).abs
+    gy = ((my - (bounds[1]+bounds[3])*0.5) / (bounds[1] - bounds[3])).abs
+    a = maxf(gx, gy) - 0.5
+    a = clampf(a, 0, 1)
+    nvgGlobalAlpha(vg, a)
+
+    nvgBeginPath(vg)
+    nvgFillColor(vg, nvgRGBA(220,220,220,255))
+    nvgRoundedRect(vg, bounds[0]-2,bounds[1]-2, (bounds[2]-bounds[0]).to_i+4, (bounds[3]-bounds[1]).to_i+4, 3)
+    px = ((bounds[2]+bounds[0])/2).to_i
+    nvgMoveTo(vg, px,bounds[1] - 10)
+    nvgLineTo(vg, px+7,bounds[1]+1)
+    nvgLineTo(vg, px-7,bounds[1]+1)
+    nvgFill(vg)
+
+    nvgFillColor(vg, nvgRGBA(0,0,0,220))
+    nvgTextBox(vg, x,y, 150, "Hover your mouse over the text to see calculated caret position.", nil)
+
+    nvgRestore(vg)
+  end
+
+
   def drawWidths(vg, x, y, width)
     nvgSave(vg)
 
@@ -473,6 +899,41 @@ class DemoData
     nvgRestore(vg)
   end
 
+  def drawScissor(vg, x, y, t)
+    nvgSave(vg)
+
+    #  Draw first rect and set scissor to it's area.
+    nvgTranslate(vg, x, y)
+    nvgRotate(vg, nvgDegToRad(5))
+    nvgBeginPath(vg)
+    nvgRect(vg, -20,-20,60,40)
+    nvgFillColor(vg, nvgRGBA(255,0,0,255))
+    nvgFill(vg)
+    nvgScissor(vg, -20,-20,60,40)
+
+    #  Draw second rectangle with offset and rotation.
+    nvgTranslate(vg, 40,0)
+    nvgRotate(vg, t)
+
+    #  Draw the intended second rectangle without any scissoring.
+    nvgSave(vg)
+    nvgResetScissor(vg)
+    nvgBeginPath(vg)
+    nvgRect(vg, -20,-10,60,30)
+    nvgFillColor(vg, nvgRGBA(255,128,0,64))
+    nvgFill(vg)
+    nvgRestore(vg)
+
+    #  Draw second rectangle with combined scissoring.
+    nvgIntersectScissor(vg, -20,-10,60,30)
+    nvgBeginPath(vg)
+    nvgRect(vg, -20,-10,60,30)
+    nvgFillColor(vg, nvgRGBA(255,128,0,255))
+    nvgFill(vg)
+
+    nvgRestore(vg)
+  end
+
   def load(vg)
     return -1 if vg == nil
 
@@ -513,14 +974,25 @@ class DemoData
 
   def render(vg, mx, my, width, height, t, blowup)
     drawEyes(vg, width - 250, 50, 150, 100, mx, my, t)
-    drawGraph(vg, 0, height/2, width, height/2, t);
+    drawParagraph(vg, width - 450, 50, 150, 100, mx, my)
+    drawGraph(vg, 0, height/2, width, height/2, t)
+    drawColorwheel(vg, width - 300, height - 300, 250.0, 250.0, t)
 
+    drawLines(vg, 120, height-50, 600, 50, t)
     drawWidths(vg, 10, 50, 30)
     drawCaps(vg, 10, 300, 30)
+    drawScissor(vg, 50, height-80, t)
+
+    nvgSave(vg)
+    if blowup
+      nvgRotate(vg, Math.sin(t*0.3)*5.0/180.0*Math::PI)
+      nvgScale(vg, 2.0, 2.0)
+    end
 
     #  Widgets
     drawWindow(vg, "Widgets `n Stuff", 50, 50, 300, 400)
-    x = 60; y = 95;
+    x = 60
+    y = 95
     drawSearchBox(vg, "Search", x,y,280,25)
     y += 40
     drawDropDown(vg, "Effects", x,y,280,28)
@@ -547,8 +1019,35 @@ class DemoData
 
     drawButton(vg, ICON_TRASH, "Delete", x, y, 160, 28, nvgRGBA(128,16,8,255))
     drawButton(vg, 0, "Cancel", x+170, y, 110, 28, nvgRGBA(0,0,0,0))
+
+    #  Thumbnails box
+    drawThumbnails(vg, 365, popy-30, 160, 300, @images, 12, t)
+
+    nvgRestore(vg)
   end
 
-  def save_screenshot(w, h, premult, name)
+  # Saves as .tga
+  def save_screenshot(w, h, name)
+    image = FFI::MemoryPointer.new(:uint8, w*h*4)
+    return if image == nil
+
+    glReadPixels(0, 0, w, h, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, image)
+
+    File.open( name, 'wb' ) do |fout|
+      fout.write [0].pack('c')      # identsize
+      fout.write [0].pack('c')      # colourmaptype
+      fout.write [2].pack('c')      # imagetype
+      fout.write [0].pack('s')      # colourmapstart
+      fout.write [0].pack('s')      # colourmaplength
+      fout.write [0].pack('c')      # colourmapbits
+      fout.write [0].pack('s')      # xstart
+      fout.write [0].pack('s')      # ystart
+      fout.write [w].pack('s')      # image_width
+      fout.write [h].pack('s')      # image_height
+      fout.write [8 * 4].pack('c')  # image_bits_per_pixel
+      fout.write [8].pack('c')      # descriptor
+
+      fout.write image.get_bytes(0, w*h*4)
+    end
   end
 end

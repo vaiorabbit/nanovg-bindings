@@ -19,9 +19,8 @@ errorcb = GLFW::create_callback(:GLFWerrorfun) do |error, desc|
   printf("GLFW error %d: %s\n", error, desc)
 end
 
-$blowup = 0
+$blowup = false
 $screenshot = false
-$premult = false
 
 # Press ESC to exit.
 key = GLFW::create_callback(:GLFWkeyfun) do |window, key, scancode, action, mods|
@@ -33,9 +32,6 @@ key = GLFW::create_callback(:GLFWkeyfun) do |window, key, scancode, action, mods
   end
   if key == GLFW_KEY_S && action == GLFW_PRESS
     $screenshot = true
-  end
-  if key == GLFW_KEY_P && action == GLFW_PRESS
-    $premult = !$premult
   end
 end
 
@@ -103,11 +99,7 @@ if __FILE__ == $0
     pxRatio = fbWidth.to_f / winWidth.to_f
 
     glViewport(0, 0, fbWidth, fbHeight)
-    if $premult
-      glClearColor(0,0,0,0)
-    else
-      glClearColor(0.3, 0.3, 0.32, 1.0)
-    end
+    glClearColor(0.3, 0.3, 0.32, 1.0)
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT)
 
     nvgBeginFrame(vg, winWidth, winHeight, pxRatio)
@@ -118,6 +110,7 @@ if __FILE__ == $0
 
     if $screenshot
       $screenshot = false
+      data.save_screenshot(fbWidth, fbHeight, "dump.tga");
     end
 
     glfwSwapBuffers( window )
