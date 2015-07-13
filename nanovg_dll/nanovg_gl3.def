@@ -97,3 +97,4 @@ EXPORTS
 	nvgDeleteGL3
 	nvglCreateImageFromHandle
 	nvglImageHandle
+	nvgSetupGL3 ; nanovg-bindings original

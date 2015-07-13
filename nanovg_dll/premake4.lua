@@ -17,7 +17,7 @@ solution "nanovg"
 
 		configuration "windows"
 			files { "nanovg_gl2.def" }
-			defines { "_CRT_SECURE_NO_WARNINGS", "GL_GLEXT_PROTOTYPES" }
+			defines { "_CRT_SECURE_NO_WARNINGS" }
 			includedirs { homepath .. "/Libraries/glext/", homepath .. "/Libraries/glew-1.12.0/include/" }
 			libdirs { homepath .. "/Libraries/glew-1.12.0/lib/Release/x64" }
 			postbuildcommands { "copy nanovg_gl2.dll ..\\..\\demo" }
@@ -50,7 +50,7 @@ solution "nanovg"
 
 		configuration "windows"
 			files { "nanovg_gl3.def" }
-			defines { "_CRT_SECURE_NO_WARNINGS", "GL_GLEXT_PROTOTYPES" }
+			defines { "_CRT_SECURE_NO_WARNINGS" }
 			includedirs { homepath .. "/Libraries/glext/", homepath .. "/Libraries/glew-1.12.0/include/" }
 			libdirs { homepath .. "/Libraries/glew-1.12.0/lib/Release/x64" }
 			postbuildcommands { "copy nanovg_gl3.dll ..\\..\\demo" }

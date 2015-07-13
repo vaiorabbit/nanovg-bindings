@@ -210,6 +210,8 @@ module NanoVG
     if render_backend == :gl2
       attach_function :nvgCreateGL2, :nvgCreateGL2, [:int32], :pointer
       attach_function :nvgDeleteGL2, :nvgDeleteGL2, [:pointer], :void
+
+      attach_function :nvgSetupGL2, :nvgSetupGL2, [], :void
     end
 
     #
