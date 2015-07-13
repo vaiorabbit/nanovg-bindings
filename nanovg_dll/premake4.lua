@@ -3,7 +3,7 @@ local action = _ACTION or ""
 
 solution "nanovg"
 	location ( "build" )
-	configurations { "ReleaseDLL" }
+	configurations { "Release", "ReleaseDLL" }
 	platforms {"native", "x64", "x32"}
 
 	local homepath = os.getenv("HOME")
@@ -16,6 +16,7 @@ solution "nanovg"
 		defines { "NANOVG_GL2_IMPLEMENTATION" }
 
 		configuration "windows"
+			files { "nanovg_gl2.def" }
 			defines { "_CRT_SECURE_NO_WARNINGS", "GL_GLEXT_PROTOTYPES" }
 			includedirs { homepath .. "/Libraries/glext/", homepath .. "/Libraries/glew-1.12.0/include/" }
 			libdirs { homepath .. "/Libraries/glew-1.12.0/lib/Release/x64" }
@@ -30,6 +31,11 @@ solution "nanovg"
 			postbuildcommands { "cp libnanovg_gl2.so ../../demo" }
 			links { "GL" }
 
+		configuration "Release"
+			kind "StaticLib"
+			defines { "NDEBUG", "NANOVG_DLL_BUILD" }
+			flags { "Optimize", "ExtraWarnings" }
+
 		configuration "ReleaseDLL"
 			kind "SharedLib"
 			defines { "NDEBUG", "NANOVG_DLL_BUILD" }
@@ -43,6 +49,7 @@ solution "nanovg"
 		defines { "NANOVG_GL3_IMPLEMENTATION" }
 
 		configuration "windows"
+			files { "nanovg_gl3.def" }
 			defines { "_CRT_SECURE_NO_WARNINGS", "GL_GLEXT_PROTOTYPES" }
 			includedirs { homepath .. "/Libraries/glext/", homepath .. "/Libraries/glew-1.12.0/include/" }
 			libdirs { homepath .. "/Libraries/glew-1.12.0/lib/Release/x64" }
@@ -56,6 +63,11 @@ solution "nanovg"
 		configuration "linux"
 			postbuildcommands { "cp libnanovg_gl3.so ../../demo" }
 			links { "GL" }
+
+		configuration "Release"
+			kind "StaticLib"
+			defines { "NDEBUG", "NANOVG_DLL_BUILD" }
+			flags { "Optimize", "ExtraWarnings" }
 
 		configuration "ReleaseDLL"
 			kind "SharedLib"
