@@ -35,6 +35,15 @@ PFNGLUNIFORM2FVPROC                glUniform2fv                 = NULL;
 PFNGLUNIFORM4FVPROC                glUniform4fv                 = NULL;
 PFNGLUSEPROGRAMPROC                glUseProgram                 = NULL;
 PFNGLVERTEXATTRIBPOINTERPROC       glVertexAttribPointer        = NULL;
+
+PFNGLBINDBUFFERRANGEPROC        glBindBufferRange       = NULL;
+PFNGLBINDVERTEXARRAYPROC        glBindVertexArray       = NULL;
+PFNGLDELETEVERTEXARRAYSPROC     glDeleteVertexArrays    = NULL;
+PFNGLGENERATEMIPMAPPROC         glGenerateMipmap        = NULL;
+PFNGLGENVERTEXARRAYSPROC        glGenVertexArrays       = NULL;
+PFNGLGETUNIFORMBLOCKINDEXPROC   glGetUniformBlockIndex  = NULL;
+PFNGLUNIFORMBLOCKBINDINGPROC    glUniformBlockBinding   = NULL;
+
 #endif // defined(_WIN32)
 
 void nvgSetupGL2()
@@ -67,6 +76,20 @@ void nvgSetupGL2()
     glUniform4fv               = (PFNGLUNIFORM4FVPROC)wglGetProcAddress("glUniform4fv");
     glUseProgram               = (PFNGLUSEPROGRAMPROC)wglGetProcAddress("glUseProgram");
     glVertexAttribPointer      = (PFNGLVERTEXATTRIBPOINTERPROC)wglGetProcAddress("glVertexAttribPointer");
+#endif // defined(_WIN32)
+}
+
+void nvgSetupGL3()
+{
+#if defined(_WIN32)
+    nvgSetupGL2();
+    glBindBufferRange = (PFNGLBINDBUFFERRANGEPROC)wglGetProcAddress("glBindBufferRange");
+    glBindVertexArray = (PFNGLBINDVERTEXARRAYPROC)wglGetProcAddress("glBindVertexArray");
+    glDeleteVertexArrays = (PFNGLDELETEVERTEXARRAYSPROC)wglGetProcAddress("glDeleteVertexArrays");
+    glGenerateMipmap = (PFNGLGENERATEMIPMAPPROC)wglGetProcAddress("glGenerateMipmap");
+    glGenVertexArrays = (PFNGLGENVERTEXARRAYSPROC)wglGetProcAddress("glGenVertexArrays");
+    glGetUniformBlockIndex = (PFNGLGETUNIFORMBLOCKINDEXPROC)wglGetProcAddress("glGetUniformBlockIndex");
+    glUniformBlockBinding = (PFNGLUNIFORMBLOCKBINDINGPROC)wglGetProcAddress("glUniformBlockBinding");
 #endif // defined(_WIN32)
 }
 

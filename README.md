@@ -3,7 +3,7 @@
 Provides NanoVG ( https://github.com/memononen/nanovg ) interfaces for ruby (MRI).
 
 *   Created : 2015-07-12
-*   Last modified : 2015-07-12
+*   Last modified : 2015-07-13
 
 ## Prerequisites ##
 
@@ -24,6 +24,9 @@ Provides NanoVG ( https://github.com/memononen/nanovg ) interfaces for ruby (MRI
 
 3. Load shared library
 	*   ex.) NanoVG.load_dll('libnanovg_gl2.dylib', render_backend: :gl2)
+
+4. Setup OpenGL
+	*   nvgSetupGL2() / nvgSetupGL3
 
 See demo/example.rb for details.
 

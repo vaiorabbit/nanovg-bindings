@@ -10,6 +10,7 @@ require_relative 'demo_data'
 OpenGL.load_dll()
 GLFW.load_dll()
 NanoVG.load_dll('libnanovg_gl2.dylib')
+#NanoVG.load_dll('./nanovg_gl2.dll', render_backend: :gl2)
 
 include OpenGL
 include GLFW
@@ -60,6 +61,7 @@ if __FILE__ == $0
 
   glfwMakeContextCurrent( window )
 
+  nvgSetupGL2()
   vg = nvgCreateGL2(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG)
   if vg == nil
     puts("Could not init nanovg.")

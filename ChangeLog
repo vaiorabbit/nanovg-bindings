@@ -1,3 +1,8 @@
+2015-07-13  vaiorabbit
+
+	* nanovg.rb, nanovg_dll.c (nvgSetupGL2, nvgSetupGL3): Minimal OpenGL proc-address setup function (mainly for Windows)
+	* nanovg_dll (nanovg_gl2.def, nanovg_gl3.def): Module definition file to build DLLs on Visual Studio.
+
 2015-07-12  vaiorabbit
 
 	* First release.
