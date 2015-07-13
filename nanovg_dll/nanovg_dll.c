@@ -1,7 +1,7 @@
 #if defined(__APPLE__)
 #include <OpenGL/gl.h>
-#else
-#include <GL/gl.h>
+#elif defined(_MSC_VER)
+#include <GL/glew.h>
 #endif
 
 #include "nanovg.h"

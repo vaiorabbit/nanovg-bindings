@@ -7,6 +7,14 @@ Please install it before proceed.
 
 	$ brew install premake # for Mac OS X
 
+### GLEW ###
+
+Windows version depends on GLEW.
+*   You can download pre-built libraries at http://glew.sourceforge.net/ .
+*   Then fix paths in premake4.lua:
+    *   includedirs, and
+    *   libdirs.
+
 ### Steps ###
 
 	$ premake4 --cc=gcc --os=macosx gmake
@@ -38,6 +46,14 @@ Please install it before proceed.
 持っていない場合は先にインストールしておいてください.
 
 	$ brew install premake # for Mac OS X
+
+### GLEW ###
+
+Windows版は GLEW に依存しています。
+*   ビルド済みのライブラリはこちらから入手できます: http://glew.sourceforge.net/
+*   premake4.lua にある下記のパスに関する項目を修正してください:
+    *   includedirs
+    *   libdirs
 
 ### 手順 ###
 
