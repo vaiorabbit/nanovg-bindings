@@ -14,7 +14,7 @@ class PerfGraph
   end
 
   def update(frameTime)
-    @head = (@head + 1) & GRAPH_HISTORY_COUNT
+    @head = (@head + 1) % GRAPH_HISTORY_COUNT
     @values[@head] = frameTime
   end
 
