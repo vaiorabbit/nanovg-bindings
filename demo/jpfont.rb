@@ -102,13 +102,14 @@ if __FILE__ == $0
 
   glfwMakeContextCurrent( window )
 
+  nvgSetupGL2()
   vg = nvgCreateGL2(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG)
   if vg == nil
     puts("Could not init nanovg.")
     exit
   end
 
-  font_load(vg, "sans", ttf == nil ? "./jpfont/GenShinGothic-Bold.ttf" : ttf)
+  font_load(vg, "sans", ttf == nil ? "./jpfont/GenShinGothic-Normal.ttf" : ttf)
 
   glfwSwapInterval(0)
   glfwSetTime(0)
