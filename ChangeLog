@@ -1,3 +1,7 @@
+2015-07-16  vaiorabbit
+
+	* demo/qrc.rb: Added.
+
 2015-07-13  vaiorabbit
 
 	* nanovg.rb, nanovg_dll.c (nvgSetupGL2, nvgSetupGL3): Minimal OpenGL proc-address setup function (mainly for Windows)
