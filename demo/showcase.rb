@@ -17,8 +17,41 @@ $showcase = nil
 # Press ESC to exit.
 key = GLFW::create_callback(:GLFWkeyfun) do |window, key, scancode, action, mods|
   glfwSetWindowShouldClose(window, GL_TRUE) if key == GLFW_KEY_ESCAPE && action == GLFW_PRESS
-  $showcase.next_scene if key == GLFW_KEY_N && action == GLFW_PRESS
-  $showcase.prev_scene if key == GLFW_KEY_P && action == GLFW_PRESS
+  if key == GLFW_KEY_N && action == GLFW_PRESS
+    $showcase.next_scene
+    glfwSetWindowTitle(window, "Ruby-NanoVG : #{$showcase.scene_name}")
+  end
+  if key == GLFW_KEY_P && action == GLFW_PRESS
+    $showcase.prev_scene
+    glfwSetWindowTitle(window, "Ruby-NanoVG : #{$showcase.scene_name}")
+  end
+end
+
+# Saves as .tga
+$ss_name = "ss0000.tga"
+$ss_id = 0
+def save_screenshot(w, h, name)
+  image = FFI::MemoryPointer.new(:uint8, w*h*4)
+  return if image == nil
+
+  glReadPixels(0, 0, w, h, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, image)
+
+  File.open( name, 'wb' ) do |fout|
+    fout.write [0].pack('c')      # identsize
+    fout.write [0].pack('c')      # colourmaptype
+    fout.write [2].pack('c')      # imagetype
+    fout.write [0].pack('s')      # colourmapstart
+    fout.write [0].pack('s')      # colourmaplength
+    fout.write [0].pack('c')      # colourmapbits
+    fout.write [0].pack('s')      # xstart
+    fout.write [0].pack('s')      # ystart
+    fout.write [w].pack('s')      # image_width
+    fout.write [h].pack('s')      # image_height
+    fout.write [8 * 4].pack('c')  # image_bits_per_pixel
+    fout.write [8].pack('c')      # descriptor
+
+    fout.write image.get_bytes(0, w*h*4)
+  end
 end
 
 if __FILE__ == $0
@@ -38,6 +71,7 @@ if __FILE__ == $0
   vg = nvgCreateGL2(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG)
 
   $showcase = Showcase.new
+  glfwSetWindowTitle(window, "Ruby-NanoVG : #{$showcase.scene_name}")
 
   glfwSwapInterval(0)
   glfwSetTime(0)
@@ -78,6 +112,14 @@ if __FILE__ == $0
 
     glfwSwapBuffers( window )
     glfwPollEvents()
+=begin
+    if $showcase.current_scene.should_save
+      $ss_name = sprintf("ss%05d.tga", $ss_id)
+      save_screenshot(fbWidth, fbHeight, $ss_name)
+      $ss_id += 1
+      $showcase.current_scene.should_save = false
+    end
+=end
   end
 
   nvgDeleteGL2(vg)

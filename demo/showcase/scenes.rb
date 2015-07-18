@@ -6,6 +6,8 @@ class Scene
   def render(vg, width, height, dt = 0.0); end
 end
 
+################################################################################
+
 class GridScene < Scene
 
   def initialize(name)
@@ -43,6 +45,8 @@ class GridScene < Scene
   end
 
 end
+
+################################################################################
 
 class TriangleScene < Scene
 
@@ -92,6 +96,7 @@ class TriangleScene < Scene
 
 end
 
+################################################################################
 
 module Arrow
 
@@ -230,6 +235,110 @@ class ArrowScene < Scene
 
 end
 
+################################################################################
+
+class DragonCurve
+
+  attr_accessor :base_x, :base_y
+
+  def initialize(base_x = 0, base_y = 0)
+    @base_x = base_x
+    @base_y = base_y
+  end
+
+  def split(vg, order, dx, dy, sign)
+    if order == 0
+      nvgLineTo(vg, @base_x+dx, @base_y+dy)
+      @base_x += dx
+      @base_y += dy
+    else
+      split(vg, order-1, (dx-sign*dy)/2.0, (dy+sign*dx)/2.0,  1.0)
+      split(vg, order-1, (dx+sign*dy)/2.0, (dy-sign*dx)/2.0, -1.0)
+    end
+  end
+
+end
+
+class DragonCurveScene < Scene
+
+  # attr_accessor :should_save
+
+  def initialize(name)
+    super
+    @time = 0.0
+    @dc = DragonCurve.new
+    @order = 0
+    @order_max = 17
+    @ascending = true
+    # @should_save = true
+  end
+
+  def render(vg, width, height, dt = 0.0)
+    @time += dt
+    x = width - width/2.0
+    y = height - height/2.0
+
+    nvgSave(vg)
+
+    src_x = 250
+    src_y = 200
+    dx = 600
+    dy = 0
+
+    if @time > 0.50
+      # @should_save = true
+      @order += @ascending ? 1 : -1
+      if @order > @order_max
+        @order = @order_max
+        @ascending = false
+      elsif @order < 0
+        @order = 0
+        @ascending = true
+      end
+      @time = 0.0
+    end
+
+    @dc.base_x = src_x
+    @dc.base_y = src_y
+
+    nvgBeginPath(vg)
+    nvgMoveTo(vg, @dc.base_x, @dc.base_y)
+    @dc.split(vg, @order, dx, dy, 1.0)
+
+    # Outer Line
+    order_crit = 9
+    w_max = 4.0
+    w_min = 1.0
+    width = if @order >= order_crit
+              t = (@order - order_crit) * (w_min - w_max) / (@order_max - order_crit) + w_max
+            else
+              w_max
+            end
+    nvgStrokeWidth(vg, width)
+    nvgStrokeColor(vg, nvgRGBA(160,192,255,255))
+    nvgStroke(vg)
+
+    # Start
+    nvgBeginPath(vg)
+    nvgCircle(vg, src_x,src_y, 10.0)
+    paint = nvgRadialGradient(vg, src_x,src_y, 0.1,10, nvgRGBA(0,255,0,192), nvgRGBA(0,255,0,0))
+    nvgFillPaint(vg, paint)
+    nvgFill(vg)
+
+    # End
+    nvgBeginPath(vg)
+    nvgCircle(vg, src_x+dx,src_y+dy, 10.0)
+    paint = nvgRadialGradient(vg, src_x+dx,src_y+dy, 0.1,10, nvgRGBA(255,0,0,192), nvgRGBA(255,0,0,0))
+    nvgFillPaint(vg, paint)
+    nvgFill(vg)
+
+    nvgRestore(vg)
+  end
+
+end
+
+################################################################################
+
 class Showcase
 
   def set_viewport_size(w, h)
@@ -242,10 +351,19 @@ class Showcase
     @height = 0
     @scene_id = 0
     @scenes = [
+      DragonCurveScene.new("Dragon Curve Scene"),
       TriangleScene.new("Triangle Scene"),
       ArrowScene.new("Arrow Scene"),
       GridScene.new("Grid Scene"),
     ]
+  end
+
+  def current_scene
+    @scenes[@scene_id]
+  end
+
+  def scene_name()
+    @scenes[@scene_id].name
   end
 
   def render(vg, dt)
