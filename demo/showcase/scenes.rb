@@ -339,6 +339,184 @@ end
 
 ################################################################################
 
+class HilbertCurve
+
+  attr_accessor :base_x, :base_y, :width, :order
+
+  DIR_UP    = 0
+  DIR_LEFT  = 1
+  DIR_DOWN  = 2
+  DIR_RIGHT = 3
+
+  def initialize(base_x = 0, base_y = 0, width = 100, order = 0)
+    @base_x = base_x
+    @base_y = base_y
+    @current_x = base_x
+    @current_y = base_y
+    @width = width
+    @order = order
+  end
+
+  # Ref.: http://www.compuphase.com/hilbert.htm
+  #       http://math.stackexchange.com/questions/53089/hilbert-curve-understanding-the-original-article
+  def split(vg, stack = @order, dir = DIR_UP)
+    len = (@width / 2.0) * 2.0**(-@order)
+    if stack == @order
+      case dir
+      when DIR_UP, DIR_LEFT
+        @current_x = @base_x + len*0.5
+        @current_y = @base_y + len*0.5
+      when DIR_DOWN, DIR_RIGHT
+        @current_x = @base_x + len*1.5
+        @current_y = @base_y + len*1.5
+      end
+      nvgMoveTo(vg, @current_x, @current_y)
+    end
+
+    if stack == 0
+      case dir
+      when DIR_LEFT
+        nvgLineTo(vg, @current_x+len, @current_y); @current_x += len # R
+        nvgLineTo(vg, @current_x, @current_y+len); @current_y += len # D
+        nvgLineTo(vg, @current_x-len, @current_y); @current_x -= len # L
+      when DIR_RIGHT
+        nvgLineTo(vg, @current_x-len, @current_y); @current_x -= len # L
+        nvgLineTo(vg, @current_x, @current_y-len); @current_y -= len # U
+        nvgLineTo(vg, @current_x+len, @current_y); @current_x += len # R
+      when DIR_UP
+        nvgLineTo(vg, @current_x, @current_y+len); @current_y += len # D
+        nvgLineTo(vg, @current_x+len, @current_y); @current_x += len # R
+        nvgLineTo(vg, @current_x, @current_y-len); @current_y -= len # U
+      when DIR_DOWN
+        nvgLineTo(vg, @current_x, @current_y-len); @current_y -= len # U
+        nvgLineTo(vg, @current_x-len, @current_y); @current_x -= len # L
+        nvgLineTo(vg, @current_x, @current_y+len); @current_y += len # D
+      end
+    else
+      case dir
+      when DIR_LEFT
+        split(vg, stack-1, DIR_UP)
+        nvgLineTo(vg, @current_x+len, @current_y); @current_x += len # R
+        split(vg, stack-1, DIR_LEFT)
+        nvgLineTo(vg, @current_x, @current_y+len); @current_y += len # D
+        split(vg, stack-1, DIR_LEFT)
+        nvgLineTo(vg, @current_x-len, @current_y); @current_x -= len # L
+        split(vg, stack-1, DIR_DOWN)
+      when DIR_RIGHT
+        split(vg, stack-1, DIR_DOWN)
+        nvgLineTo(vg, @current_x-len, @current_y); @current_x -= len # L
+        split(vg, stack-1, DIR_RIGHT)
+        nvgLineTo(vg, @current_x, @current_y-len); @current_y -= len # U
+        split(vg, stack-1, DIR_RIGHT)
+        nvgLineTo(vg, @current_x+len, @current_y); @current_x += len # R
+        split(vg, stack-1, DIR_UP)
+      when DIR_UP
+        split(vg, stack-1, DIR_LEFT)
+        nvgLineTo(vg, @current_x, @current_y+len); @current_y += len # D
+        split(vg, stack-1, DIR_UP)
+        nvgLineTo(vg, @current_x+len, @current_y); @current_x += len # R
+        split(vg, stack-1, DIR_UP)
+        nvgLineTo(vg, @current_x, @current_y-len); @current_y -= len # U
+        split(vg, stack-1, DIR_RIGHT)
+      when DIR_DOWN
+        split(vg, stack-1, DIR_RIGHT)
+        nvgLineTo(vg, @current_x, @current_y-len); @current_y -= len # U
+        split(vg, stack-1, DIR_DOWN)
+        nvgLineTo(vg, @current_x-len, @current_y); @current_x -= len # L
+        split(vg, stack-1, DIR_DOWN)
+        nvgLineTo(vg, @current_x, @current_y+len); @current_y += len # D
+        split(vg, stack-1, DIR_LEFT)
+      end
+    end
+  end
+
+end
+
+class HilbertCurveScene < Scene
+
+  # attr_accessor :should_save
+
+  def initialize(name)
+    super
+    @time = 0.0
+    @hc = HilbertCurve.new
+    @order = 0
+    @order_max = 8
+    @ascending = true
+    # @should_save = true
+  end
+
+  def render(vg, width, height, dt = 0.0)
+    @time += dt
+
+    src_x = 220
+    src_y = 20
+    wh = 560
+
+    if @time > 1.0
+      # @should_save = true
+      @order += @ascending ? 1 : -1
+      if @order > @order_max
+        @order = @order_max
+        @ascending = false
+      elsif @order < 0
+        @order = 0
+        @ascending = true
+      end
+      @time = 0.0
+    end
+
+    @hc.base_x = src_x
+    @hc.base_y = src_y
+    @hc.order = @order
+    @hc.width = wh
+
+    nvgSave(vg)
+
+    nvgBeginPath(vg)
+    @hc.split(vg)
+
+    # Outer Line
+    order_crit = 3
+    w_max = 6.0
+    w_min = 1.5
+    width = if @order >= order_crit
+              t = (@order - order_crit) * (w_min - w_max) / (@order_max - order_crit) + w_max
+            else
+              w_max
+            end
+    nvgStrokeWidth(vg, width)
+    nvgLineCap(vg, NVG_SQUARE)
+    nvgStrokeColor(vg, nvgRGBA(160,192,255,255))
+    nvgStroke(vg)
+
+    # Filling area
+    nvgBeginPath(vg)
+    nvgRect(vg, @hc.base_x,@hc.base_y, @hc.width, @hc.width)
+    nvgFillColor(vg, nvgRGBA(255,255,255,16))
+    nvgFill(vg)
+
+    # Start
+    nvgBeginPath(vg)
+    nvgCircle(vg, @hc.base_x,@hc.base_y, 10.0)
+    paint = nvgRadialGradient(vg, @hc.base_x,@hc.base_y, 0.1,10, nvgRGBA(0,255,0,192), nvgRGBA(0,255,0,0))
+    nvgFillPaint(vg, paint)
+    nvgFill(vg)
+
+    # End
+    nvgBeginPath(vg)
+    nvgCircle(vg, @hc.base_x+@hc.width,@hc.base_y+@hc.width, 10.0)
+    paint = nvgRadialGradient(vg, @hc.base_x+@hc.width,@hc.base_y+@hc.width, 0.1,10, nvgRGBA(255,0,0,192), nvgRGBA(255,0,0,0))
+    nvgFillPaint(vg, paint)
+    nvgFill(vg)
+
+    nvgRestore(vg)
+  end
+
+end
+
+################################################################################
+
 class Showcase
 
   def set_viewport_size(w, h)
@@ -351,6 +529,7 @@ class Showcase
     @height = 0
     @scene_id = 0
     @scenes = [
+      HilbertCurveScene.new("Hilbert Curve Scene"),
       DragonCurveScene.new("Dragon Curve Scene"),
       TriangleScene.new("Triangle Scene"),
       ArrowScene.new("Arrow Scene"),
