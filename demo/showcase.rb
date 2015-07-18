@@ -17,8 +17,8 @@ $showcase = nil
 # Press ESC to exit.
 key = GLFW::create_callback(:GLFWkeyfun) do |window, key, scancode, action, mods|
   glfwSetWindowShouldClose(window, GL_TRUE) if key == GLFW_KEY_ESCAPE && action == GLFW_PRESS
-  $showcase.set_next_scene if key == GLFW_KEY_N && action == GLFW_PRESS
-  $showcase.set_prev_scene if key == GLFW_KEY_P && action == GLFW_PRESS
+  $showcase.next_scene if key == GLFW_KEY_N && action == GLFW_PRESS
+  $showcase.prev_scene if key == GLFW_KEY_P && action == GLFW_PRESS
 end
 
 if __FILE__ == $0
