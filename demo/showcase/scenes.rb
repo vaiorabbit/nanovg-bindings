@@ -517,6 +517,142 @@ end
 
 ################################################################################
 
+class ZOrderCurve
+
+  attr_accessor :base_x, :base_y, :width, :cell_count
+
+  def initialize(base_x = 0, base_y = 0, width = 100, cell_count = 0)
+    @base_x = base_x
+    @base_y = base_y
+    @line_base_x = base_x
+    @line_base_y = base_y
+    @width = width
+    @cell_count = cell_count
+  end
+
+  # Ref. : Real-Time Collision Detection, Chapter 7.3.5
+  def encode_2d(n)
+    n = (n ^ (n <<  8)) & 0x00ff00ff
+    n = (n ^ (n <<  4)) & 0x0f0f0f0f
+    n = (n ^ (n <<  2)) & 0x33333333
+    n = (n ^ (n <<  1)) & 0x55555555
+    return n
+  end
+
+  def decode_2d(n)
+    n &= 0x55555555
+    n = (n ^ (n >>  1)) & 0x33333333
+    n = (n ^ (n >>  2)) & 0x0f0f0f0f
+    n = (n ^ (n >>  4)) & 0x00ff00ff
+    n = (n ^ (n >>  8)) & 0x0000ffff
+    return n
+  end
+
+  def morton_encode_2d(x, y)
+    (encode_2d(y) << 1) + encode_2d(x)
+  end
+
+  def morton_decode_2d(m)
+    return decode_2d(m), decode_2d(m >> 1)
+  end
+
+  def split(vg)
+    segment_wh = width / @cell_count.to_f
+    @line_base_x = base_x + segment_wh/2
+    @line_base_y = base_y + segment_wh/2
+    nvgMoveTo(vg, @line_base_x, @line_base_y)
+    n = (4 ** Math.log2(@cell_count).to_i).to_i # ex.) @cell_count==3 -> log2(2**3)==3 -> 4**3 -> n==64
+    n.times do |m|
+      x, y = morton_decode_2d(m)
+      nvgLineTo(vg, @line_base_x+x*segment_wh, @line_base_y+y*segment_wh)
+    end
+
+  end
+
+end
+
+class ZOrderCurveScene < Scene
+
+  # attr_accessor :should_save
+
+  def initialize(name)
+    super
+    @time = 0.0
+    @zc = ZOrderCurve.new
+    @cell_order = 1
+    @cell_order_max = 9
+    @ascending = true
+    # @should_save = true
+  end
+
+  def render(vg, width, height, dt = 0.0)
+    @time += dt
+
+    src_x = 220
+    src_y = 20
+    wh = 560
+
+    if @time > 0.2
+      # @should_save = true
+      @cell_order += @ascending ? 1 : -1
+      if @cell_order > @cell_order_max
+        @cell_order = @cell_order_max
+        @ascending = false
+      elsif @cell_order <= 0
+        @cell_order = 1
+        @ascending = true
+      end
+      @time = 0.0
+    end
+
+    @zc.base_x = src_x
+    @zc.base_y = src_y
+    @zc.cell_count = 2**@cell_order
+    @zc.width = wh
+
+    nvgSave(vg)
+
+    nvgBeginPath(vg)
+    @zc.split(vg)
+
+    # Outer Line
+    cell_order_crit = 4
+    w_max = 6.0
+    w_min = 1.0
+    width = @cell_order >= cell_order_crit ? w_min : w_max
+
+    nvgStrokeWidth(vg, width)
+    nvgLineCap(vg, NVG_SQUARE)
+    nvgStrokeColor(vg, nvgRGBA(160,192,255,255))
+    nvgStroke(vg)
+
+    # Filling area
+    nvgBeginPath(vg)
+    nvgRect(vg, @zc.base_x,@zc.base_y, @zc.width, @zc.width)
+    nvgFillColor(vg, nvgRGBA(255,255,255,16))
+    nvgFill(vg)
+
+    # Start
+    nvgBeginPath(vg)
+    nvgCircle(vg, @zc.base_x,@zc.base_y, 10.0)
+    paint = nvgRadialGradient(vg, @zc.base_x,@zc.base_y, 0.1,10, nvgRGBA(0,255,0,192), nvgRGBA(0,255,0,0))
+    nvgFillPaint(vg, paint)
+    nvgFill(vg)
+
+    # End
+    nvgBeginPath(vg)
+    nvgCircle(vg, @zc.base_x+@zc.width,@zc.base_y+@zc.width, 10.0)
+    paint = nvgRadialGradient(vg, @zc.base_x+@zc.width,@zc.base_y+@zc.width, 0.1,10, nvgRGBA(255,0,0,192), nvgRGBA(255,0,0,0))
+    nvgFillPaint(vg, paint)
+    nvgFill(vg)
+
+    nvgRestore(vg)
+  end
+
+end
+
+################################################################################
+
 class Showcase
 
   def set_viewport_size(w, h)
@@ -529,6 +665,7 @@ class Showcase
     @height = 0
     @scene_id = 0
     @scenes = [
+      ZOrderCurveScene.new("ZOrder Curve Scene"),
       HilbertCurveScene.new("Hilbert Curve Scene"),
       DragonCurveScene.new("Dragon Curve Scene"),
       TriangleScene.new("Triangle Scene"),
