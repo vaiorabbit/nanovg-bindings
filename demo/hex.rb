@@ -5,6 +5,7 @@
 class Hex
 
   attr_accessor :q, :r, :s
+  attr_accessor :data
 
   def initialize(q, r, s = -q - r)
     @q = q
@@ -28,14 +29,30 @@ class Hex
     Hex.new(a.q * k, a.r * k, a.s * k)
   end
 
+  @@neighbor_direction_indices = [
+    [1, 0, -1],
+    [1, -1, 0],
+    [0, -1, 1],
+    [-1, 0, 1],
+    [-1, 1, 0],
+    [0, 1, -1],
+  ]
 
   @@directions = [
+    Hex.new(*@@neighbor_direction_indices[0]),
+    Hex.new(*@@neighbor_direction_indices[1]),
+    Hex.new(*@@neighbor_direction_indices[2]),
+    Hex.new(*@@neighbor_direction_indices[3]),
+    Hex.new(*@@neighbor_direction_indices[4]),
+    Hex.new(*@@neighbor_direction_indices[5])
+=begin
     Hex.new(1, 0, -1),
     Hex.new(1, -1, 0),
     Hex.new(0, -1, 1),
     Hex.new(-1, 0, 1),
     Hex.new(-1, 1, 0),
     Hex.new(0, 1, -1)
+=end
   ]
 
   def self.direction(dir)
@@ -44,6 +61,10 @@ class Hex
 
   def neighbor(dir)
     Hex.add(self, Hex.direction(dir))
+  end
+
+  def neighbor_index(dir)
+    @@neighbor_direction_indices[dir]
   end
 
   @@diagonals = [
@@ -124,26 +145,39 @@ class OffsetCoord
     (a.col == b.col) && (a.row == b.row)
   end
 
-  def self.qoffset_from_cube(offset, h) # h : Hex
+  def self.qoffset_from_cube(offset, h) # offset : EVEN or ODD, h : Hex
     col = h.q
     row = h.r + ((h.q + offset * (h.q & 1)) / 2).to_i
     OffsetCoord.new(col, row)
   end
 
-  def self.qoffset_to_cube(offset, h) # h : OffsetCoord
+  def self.qoffset_from_cube_coord(offset, q, r) # offset : EVEN or ODD
+    col = q
+    row = r + ((q + offset * (q & 1)) / 2).to_i
+    return col, row
+  end
+
+  def self.qoffset_to_cube(offset, h) # offset : EVEN or ODD, h : OffsetCoord
     q = h.col
     r = h.row - ((h.col + offset * (h.col & 1)) / 2).to_i
     s = -q - r
     Hex.new(q, r, s)
   end
 
-  def self.roffset_from_cube(offset, h) # h : Hex
+  def self.qoffset_to_cube_coord(offset, col, row) # offset : EVEN or ODD
+    q = col
+    r = row - ((col + offset * (col & 1)) / 2).to_i
+    s = -q - r
+    return q, r, s
+  end
+
+  def self.roffset_from_cube(offset, h) # offset : EVEN or ODD, h : Hex
     col = h.q + ((h.r + offset * (h.r & 1)) / 2).to_i
     row = h.r
     OffsetCoord.new(col, row)
   end
 
-  def self.roffset_to_cube(offset, h) # h : OffsetCoord
+  def self.roffset_to_cube(offset, h) # offset : EVEN or ODD, h : OffsetCoord
     q = h.col - ((h.row + offset * (h.row & 1)) / 2).to_i
     r = h.row
     s = -q - r
