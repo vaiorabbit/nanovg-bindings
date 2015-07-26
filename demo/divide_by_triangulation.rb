@@ -25,6 +25,7 @@ class Graph
   def initialize
     @nodes = []
     @undo_insert_index = -1
+    @node_radius = 10.0
   end
 
   def add_node(x, y)
@@ -77,8 +78,17 @@ class Graph
     end
   end
 
-  def remove_node(n)
-    @nodes.remove(n)
+  def remove_nearest_node(point_x, point_y)
+    distances = Array.new(@nodes.length) { -Float::MAX }
+    @nodes.each_with_index do |node_current, index|
+      distances[index] = (node_current.x - point_x)**2 + (node_current.y - point_y)**2
+    end
+    minimum_distance = distances.min_by {|d| d}
+    if minimum_distance <= @node_radius ** 2
+      nearest_node_index = distances.find_index( minimum_distance )
+      @nodes.delete_at(nearest_node_index)
+      @undo_insert_index = -1
+    end
   end
 
   def clear
@@ -86,11 +96,10 @@ class Graph
   end
 
   def render(vg)
-    r = 10.0
     # Edges
     if @nodes.length >= 2
       color = nvgRGBA(192,128,192, 255)
-      lw = r * 0.5
+      lw = @node_radius * 0.5
       nvgLineCap(vg, NVG_ROUND)
       nvgLineJoin(vg, NVG_ROUND)
       nvgBeginPath(vg)
@@ -112,7 +121,7 @@ class Graph
       color = nvgRGBA(128,192,192, 255)
       nvgBeginPath(vg)
       @nodes.each do |node|
-        nvgCircle(vg, node.x, node.y, r)
+        nvgCircle(vg, node.x, node.y, @node_radius)
         nvgFillColor(vg, color)
       end
       nvgFill(vg)
@@ -141,7 +150,11 @@ mouse = GLFW::create_callback(:GLFWmousebuttonfun) do |window_handle, button, ac
     glfwGetCursorPos(window_handle, mx_buf, my_buf)
     mx = mx_buf.unpack('D')[0]
     my = my_buf.unpack('D')[0]
-    $graph.insert_node(mx, my)
+    if (mods & GLFW_MOD_SHIFT) != 0
+      $graph.remove_nearest_node(mx, my)
+    else
+      $graph.insert_node(mx, my)
+    end
   end
 end
 
