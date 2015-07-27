@@ -41,6 +41,7 @@ class Graph
     # Ref. : http://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
     distances = Array.new(@nodes.length) { -Float::MAX }
     @nodes.each_with_index do |node_current, index|
+#      print "edge[#{index}] : node[#{index}] - node[#{(index + 1) % @nodes.length}]\t"
       node_next = @nodes[(index + 1) % @nodes.length]
       edge_dir_x = node_next.x - node_current.x
       edge_dir_y = node_next.y - node_current.y
@@ -61,11 +62,64 @@ class Graph
         projection_y = node_current.y + t * edge_dir_y
         distances[index] = Math.sqrt((projection_x - point_x)**2 + (projection_y - point_y)**2)
       end
+#      puts "distance=#{distances[index]}"
     end
 
     # Find nearest edge and insert new Node as a dividing point.
-    minimum_distance = distances.min_by {|d| d}
-    nearest_edge_index = distances.find_index( minimum_distance )
+    minimum_distances = distances.min_by(2) {|d| d}
+    nearest_edge_index = if minimum_distances[0] != minimum_distances[1]
+                           distances.find_index( minimum_distances[0] )
+                         else
+                           edge_node_indices = []
+                           distances.each_with_index do |d, i|
+                             edge_node_indices << [i, (i + 1) % nodes.length] if d == minimum_distances[0]
+                             break if edge_node_indices.length == 2
+                           end
+                           nearest_node_index = (edge_node_indices[0] & edge_node_indices[1])[0]
+
+                           other_node_index = nearest_node_index == edge_node_indices[0][0] ? edge_node_indices[0][1] : edge_node_indices[0][0]
+                           edge0_x = @nodes[nearest_node_index].x - @nodes[other_node_index].x
+                           edge0_y = @nodes[nearest_node_index].y - @nodes[other_node_index].y
+                           edge0_length = Math.sqrt(edge0_x**2 + edge0_y**2)
+
+                           edge0_x /= edge0_length
+                           edge0_y /= edge0_length
+
+                           edge0_to_point_x = point_x - @nodes[other_node_index].x
+                           edge0_to_point_y = point_y - @nodes[other_node_index].y
+                           edge0_to_point_length = Math.sqrt(edge0_to_point_x**2 + edge0_to_point_y**2)
+
+                           edge0_to_point_x /= edge0_to_point_length
+                           edge0_to_point_y /= edge0_to_point_length
+
+
+                           other_node_index = nearest_node_index == edge_node_indices[1][0] ? edge_node_indices[1][1] : edge_node_indices[1][0]
+                           edge1_x = @nodes[nearest_node_index].x - @nodes[other_node_index].x
+                           edge1_y = @nodes[nearest_node_index].y - @nodes[other_node_index].y
+                           edge1_length = Math.sqrt(edge1_x**2 + edge1_y**2)
+
+                           edge1_x /= edge1_length
+                           edge1_y /= edge1_length
+
+                           edge1_to_point_x = point_x - @nodes[other_node_index].x
+                           edge1_to_point_y = point_y - @nodes[other_node_index].y
+                           edge1_to_point_length = Math.sqrt(edge1_to_point_x**2 + edge1_to_point_y**2)
+
+                           edge1_to_point_x /= edge1_to_point_length
+                           edge1_to_point_y /= edge1_to_point_length
+
+                           dot_0 = edge0_x * edge0_to_point_x + edge0_y * edge0_to_point_y
+                           dot_1 = edge1_x * edge1_to_point_x + edge1_y * edge1_to_point_y
+
+#                           puts "#{dot_0}, #{dot_1}"
+                           if dot_0 < dot_1
+#                             p edge_node_indices[0]
+                             edge_node_indices[0][0]
+                           else
+#                             p edge_node_indices[1]
+                             edge_node_indices[1][0]
+                           end
+                         end
 
     @nodes.insert( nearest_edge_index + 1, Node.new(point_x, point_y) )
     @undo_insert_index = nearest_edge_index + 1
@@ -187,8 +241,6 @@ if __FILE__ == $0
     exit
   end
 
-  mx_buf = '        '
-  my_buf = '        '
   winWidth_buf  = '        '
   winHeight_buf = '        '
   fbWidth_buf  = '        '
@@ -207,11 +259,8 @@ if __FILE__ == $0
     prevt = t
     total_time += dt
 
-    glfwGetCursorPos(window, mx_buf, my_buf)
     glfwGetWindowSize(window, winWidth_buf, winHeight_buf)
     glfwGetFramebufferSize(window, fbWidth_buf, fbHeight_buf)
-    mx = mx_buf.unpack('D')[0]
-    my = my_buf.unpack('D')[0]
     winWidth = winWidth_buf.unpack('L')[0]
     winHeight = winHeight_buf.unpack('L')[0]
     fbWidth = fbWidth_buf.unpack('L')[0]
