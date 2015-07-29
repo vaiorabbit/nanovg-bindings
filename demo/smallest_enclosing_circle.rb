@@ -187,8 +187,10 @@ class Graph
       vec_ob = b - o
       r = vec_oa.getLength * vec_ob.getLength * (vec_oa - vec_ob).getLength / (2.0 * RVec2.cross(vec_oa, vec_ob)).abs
       denominator = 2.0 * (RVec2.cross(vec_oa, vec_ob) ** 2)
-      vec_o = (vec_oa.getLengthSq * vec_ob - vec_ob.getLengthSq * vec_oa) * RVec2.cross(vec_oa, vec_ob)
-      vec_o.x, vec_o.y = vec_o.y, -vec_o.x
+      axb = RVec2.cross(vec_oa, vec_ob)
+      vec_o = (vec_oa.getLengthSq * vec_ob - vec_ob.getLengthSq * vec_oa) 
+      vec_o.x, vec_o.y = axb * vec_o.y, -axb * vec_o.x # virtual cross product with (0, 0, |a x b|)
+
       vec_o = vec_o * (1.0 / denominator)
       c = o + vec_o
       return r, c
@@ -208,6 +210,7 @@ class Graph
   end
   private :sec_recurse
 
+  # Ref.: http://www.flipcode.com/archives/Smallest_Enclosing_Spheres.shtml
   def smallest_enclosing_circle
     @miniball_radius = -1.0
     @miniball_center_x = 0.0
