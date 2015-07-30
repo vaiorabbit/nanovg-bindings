@@ -32,7 +32,7 @@ class Graph
   def initialize
     @nodes = []
     @undo_insert_index = -1
-    @node_radius = 10.0
+    @node_radius = 5.0
 
     @miniball_radius = -1.0
     @miniball_center_x = 0.0
@@ -280,9 +280,22 @@ key = GLFW::create_callback(:GLFWkeyfun) do |window, key, scancode, action, mods
   end
 end
 
+$spiral_theta = 0.0
+$spiral_radius = Float::EPSILON
+
 mouse = GLFW::create_callback(:GLFWmousebuttonfun) do |window_handle, button, action, mods|
   # p "GLFWmousebuttonfun called.", window_handle, button, action, mods
   if button == GLFW_MOUSE_BUTTON_LEFT && action == 0
+    sx = $spiral_radius * Math.cos($spiral_theta)
+    sy = $spiral_radius * Math.sin($spiral_theta)
+    sx += 1280 * 0.5
+    sy += 720 * 0.5
+    $graph.insert_node(sx, sy)
+    $graph.smallest_enclosing_circle
+    $spiral_theta += 10.0 * Math::PI/180
+    $spiral_radius += 2.0
+    return
+
     mx_buf = ' ' * 8
     my_buf = ' ' * 8
     glfwGetCursorPos(window_handle, mx_buf, my_buf)
@@ -308,7 +321,7 @@ if __FILE__ == $0
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2)
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0)
 
-  window = glfwCreateWindow( 1280, 720, "Triangulation", nil, nil )
+  window = glfwCreateWindow( 1280, 720, "Smallest Enclosing Circle", nil, nil )
   if window == 0
     glfwTerminate()
     exit
