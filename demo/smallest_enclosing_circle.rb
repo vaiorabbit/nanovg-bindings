@@ -12,6 +12,33 @@ include GLFW
 include NanoVG
 include RMath3D
 
+# Saves as .tga
+$ss_name = "ss0000.tga"
+$ss_id = 0
+def save_screenshot(w, h, name)
+  image = FFI::MemoryPointer.new(:uint8, w*h*4)
+  return if image == nil
+
+  glReadPixels(0, 0, w, h, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, image)
+
+  File.open( name, 'wb' ) do |fout|
+    fout.write [0].pack('c')      # identsize
+    fout.write [0].pack('c')      # colourmaptype
+    fout.write [2].pack('c')      # imagetype
+    fout.write [0].pack('s')      # colourmapstart
+    fout.write [0].pack('s')      # colourmaplength
+    fout.write [0].pack('c')      # colourmapbits
+    fout.write [0].pack('s')      # xstart
+    fout.write [0].pack('s')      # ystart
+    fout.write [w].pack('s')      # image_width
+    fout.write [h].pack('s')      # image_height
+    fout.write [8 * 4].pack('c')  # image_bits_per_pixel
+    fout.write [8].pack('c')      # descriptor
+
+    fout.write image.get_bytes(0, w*h*4)
+  end
+end
+
 class Node
   attr_accessor :x, :y
 
@@ -216,7 +243,7 @@ class Graph
     @miniball_center_x = 0.0
     @miniball_center_y = 0.0
 
-    @P = @nodes.dup
+    @P = @nodes.dup.shuffle! # randomization for faster computation
     r, c = sec_recurse(0 ,@P.length, 0)
     @miniball_radius = r
     @miniball_center_x = c.x
@@ -247,7 +274,7 @@ class Graph
 
     # Nodes
     if render_node and @nodes.length > 0
-      color = nvgRGBA(128,192,192, 255)
+      color = nvgRGBA(0,192,255, 255)
       nvgBeginPath(vg)
       @nodes.each do |node|
         nvgCircle(vg, node.x, node.y, @node_radius)
@@ -258,7 +285,7 @@ class Graph
 
     # Smallest Enclosing Circle
     if @miniball_radius > 0
-      color = nvgRGBA(255,0,0, 24)
+      color = nvgRGBA(255,0,0, 64)
       nvgBeginPath(vg)
       nvgCircle(vg, @miniball_center_x, @miniball_center_y, @miniball_radius)
       nvgFillColor(vg, color)
@@ -380,6 +407,16 @@ if __FILE__ == $0
 
     glfwSwapBuffers( window )
     glfwPollEvents()
+
+    if total_time > 0.1
+      mouse.call(window, 0, 0, 0)
+      total_time = 0
+=begin
+      $ss_name = sprintf("ss%05d.tga", $ss_id)
+      save_screenshot(fbWidth, fbHeight, $ss_name)
+      $ss_id += 1
+=end
+    end
 
   end
 
