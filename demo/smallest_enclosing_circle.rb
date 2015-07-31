@@ -316,7 +316,7 @@ mouse = GLFW::create_callback(:GLFWmousebuttonfun) do |window_handle, button, ac
     sy = $spiral_radius * Math.sin($spiral_theta)
     sx += 1280 * 0.5
     sy += 720 * 0.5
-    $graph.insert_node(sx, sy)
+    $graph.add_node(sx, sy) # insert_node(sx, sy)
     $graph.smallest_enclosing_circle
     $spiral_theta += 10.0 * Math::PI/180
     $spiral_radius += 2.0
