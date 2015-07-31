@@ -1,6 +1,8 @@
+# Usage:
+# $ ruby smallest_enclosing_circle.rb [-plot_spiral]
 require 'opengl'
 require 'glfw'
-require 'rmath3d/rmath3d_plain'
+require 'rmath3d/rmath3d'
 require_relative '../nanovg'
 
 OpenGL.load_dll()
@@ -11,6 +13,8 @@ include OpenGL
 include GLFW
 include NanoVG
 include RMath3D
+
+$plot_spiral = false
 
 # Saves as .tga
 $ss_name = "ss0000.tga"
@@ -239,10 +243,6 @@ class Graph
 
   # Ref.: http://www.flipcode.com/archives/Smallest_Enclosing_Spheres.shtml
   def smallest_enclosing_circle
-    @miniball_radius = -1.0
-    @miniball_center_x = 0.0
-    @miniball_center_y = 0.0
-
     @P = @nodes.dup.shuffle! # randomization for faster computation
     r, c = sec_recurse(0 ,@P.length, 0)
     @miniball_radius = r
@@ -311,8 +311,7 @@ $spiral_theta = 0.0
 $spiral_radius = Float::EPSILON
 
 mouse = GLFW::create_callback(:GLFWmousebuttonfun) do |window_handle, button, action, mods|
-  # p "GLFWmousebuttonfun called.", window_handle, button, action, mods
-  if button == GLFW_MOUSE_BUTTON_LEFT && action == 0
+  if $plot_spiral
     sx = $spiral_radius * Math.cos($spiral_theta)
     sy = $spiral_radius * Math.sin($spiral_theta)
     sx += 1280 * 0.5
@@ -322,7 +321,9 @@ mouse = GLFW::create_callback(:GLFWmousebuttonfun) do |window_handle, button, ac
     $spiral_theta += 10.0 * Math::PI/180
     $spiral_radius += 2.0
     return
+  end
 
+  if button == GLFW_MOUSE_BUTTON_LEFT && action == 0
     mx_buf = ' ' * 8
     my_buf = ' ' * 8
     glfwGetCursorPos(window_handle, mx_buf, my_buf)
@@ -339,6 +340,8 @@ end
 
 
 if __FILE__ == $0
+
+  $plot_spiral = ARGV[0] == "-plot_spiral"
 
   if glfwInit() == GL_FALSE
     puts("Failed to init GLFW.")
@@ -408,7 +411,7 @@ if __FILE__ == $0
     glfwSwapBuffers( window )
     glfwPollEvents()
 
-    if total_time > 0.1
+    if $plot_spiral && total_time > 0.1
       mouse.call(window, 0, 0, 0)
       total_time = 0
 =begin
