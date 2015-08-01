@@ -1,8 +1,9 @@
 # Usage:
+# $ gem install rmath3d_plain
 # $ ruby smallest_enclosing_circle.rb [-plot_spiral]
 require 'opengl'
 require 'glfw'
-require 'rmath3d/rmath3d'
+require 'rmath3d/rmath3d_plain'
 require_relative '../nanovg'
 
 OpenGL.load_dll()
@@ -43,19 +44,6 @@ def save_screenshot(w, h, name)
   end
 end
 
-class Node
-  attr_accessor :x, :y
-
-  def initialize(x, y)
-    @x = x
-    @y = y
-  end
-
-  def to_vec
-    RVec2.new(x, y)
-  end
-end
-
 class Graph
   attr_accessor :nodes
   attr_reader :miniball_radius, :miniball_center_x, :miniball_center_y
@@ -71,40 +59,36 @@ class Graph
   end
 
   def add_node(x, y)
-    @nodes << Node.new(x, y)
+    @nodes << RVec2.new(x, y)
   end
 
   def insert_node(point_x, point_y)
     if @nodes.length < 3
       return add_node(point_x, point_y)
     end
+    point = RVec2.new(point_x, point_y)
 
     # Calculate distance from point to all edges.
     # Ref. : http://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
     distances = Array.new(@nodes.length) { -Float::MAX }
     @nodes.each_with_index do |node_current, index|
-#      print "edge[#{index}] : node[#{index}] - node[#{(index + 1) % @nodes.length}]\t"
       node_next = @nodes[(index + 1) % @nodes.length]
-      edge_dir_x = node_next.x - node_current.x
-      edge_dir_y = node_next.y - node_current.y
-      edge_squared_length = edge_dir_x ** 2 + edge_dir_y ** 2
+      edge_dir = node_next - node_current
+      edge_squared_length = edge_dir.getLengthSq
       if edge_squared_length < Float::EPSILON
-        distances[index] = Math.sqrt((node_current.x - point_x)**2 + (node_current.y - point_y)**2)
+        distances[index] = (node_current - point).getLength
         next
       end
-      edge_start_to_point_x = point_x - node_current.x
-      edge_start_to_point_y = point_y - node_current.y
-      t = (edge_start_to_point_x * edge_dir_x + edge_start_to_point_y * edge_dir_y) / edge_squared_length
+      edge_start_to_point = point - node_current
+      t = RVec2.dot(edge_start_to_point, edge_dir) / edge_squared_length
       if t < 0
-        distances[index] = Math.sqrt((node_current.x - point_x)**2 + (node_current.y - point_y)**2)
+        distances[index] = (node_current - point).getLength
       elsif t > 1
-        distances[index] = Math.sqrt((node_next.x - point_x)**2 + (node_next.y - point_y)**2)
+        distances[index] = (node_next - point).getLength
       else
-        projection_x = node_current.x + t * edge_dir_x
-        projection_y = node_current.y + t * edge_dir_y
-        distances[index] = Math.sqrt((projection_x - point_x)**2 + (projection_y - point_y)**2)
+        projection = node_current + t * edge_dir
+        distances[index] = (projection - point).getLength
       end
-#      puts "distance=#{distances[index]}"
     end
 
     # Find nearest edge and insert new Node as a dividing point.
@@ -121,50 +105,31 @@ class Graph
                            nearest_node_index = (edge_node_indices[0] & edge_node_indices[1])[0]
 
                            other_node_index = nearest_node_index == edge_node_indices[0][0] ? edge_node_indices[0][1] : edge_node_indices[0][0]
-                           edge0_x = @nodes[nearest_node_index].x - @nodes[other_node_index].x
-                           edge0_y = @nodes[nearest_node_index].y - @nodes[other_node_index].y
-                           edge0_length = Math.sqrt(edge0_x**2 + edge0_y**2)
+                           edge0 = @nodes[nearest_node_index] - @nodes[other_node_index]
+                           edge0.normalize!
 
-                           edge0_x /= edge0_length
-                           edge0_y /= edge0_length
-
-                           edge0_to_point_x = point_x - @nodes[other_node_index].x
-                           edge0_to_point_y = point_y - @nodes[other_node_index].y
-                           edge0_to_point_length = Math.sqrt(edge0_to_point_x**2 + edge0_to_point_y**2)
-
-                           edge0_to_point_x /= edge0_to_point_length
-                           edge0_to_point_y /= edge0_to_point_length
+                           edge0_to_point = point - @nodes[other_node_index]
+                           edge0_to_point.normalize!
 
 
                            other_node_index = nearest_node_index == edge_node_indices[1][0] ? edge_node_indices[1][1] : edge_node_indices[1][0]
-                           edge1_x = @nodes[nearest_node_index].x - @nodes[other_node_index].x
-                           edge1_y = @nodes[nearest_node_index].y - @nodes[other_node_index].y
-                           edge1_length = Math.sqrt(edge1_x**2 + edge1_y**2)
+                           edge1 = @nodes[nearest_node_index] - @nodes[other_node_index]
+                           edge1.normalize!
 
-                           edge1_x /= edge1_length
-                           edge1_y /= edge1_length
+                           edge1_to_point = point - @nodes[other_node_index]
+                           edge1_to_point.normalize!
 
-                           edge1_to_point_x = point_x - @nodes[other_node_index].x
-                           edge1_to_point_y = point_y - @nodes[other_node_index].y
-                           edge1_to_point_length = Math.sqrt(edge1_to_point_x**2 + edge1_to_point_y**2)
+                           dot_0 = RVec2.dot(edge0, edge0_to_point)
+                           dot_1 = RVec2.dot(edge1, edge1_to_point)
 
-                           edge1_to_point_x /= edge1_to_point_length
-                           edge1_to_point_y /= edge1_to_point_length
-
-                           dot_0 = edge0_x * edge0_to_point_x + edge0_y * edge0_to_point_y
-                           dot_1 = edge1_x * edge1_to_point_x + edge1_y * edge1_to_point_y
-
-#                           puts "#{dot_0}, #{dot_1}"
                            if dot_0 < dot_1
-#                             p edge_node_indices[0]
                              edge_node_indices[0][0]
                            else
-#                             p edge_node_indices[1]
                              edge_node_indices[1][0]
                            end
                          end
 
-    @nodes.insert( nearest_edge_index + 1, Node.new(point_x, point_y) )
+    @nodes.insert( nearest_edge_index + 1, RVec2.new(point_x, point_y) )
     @undo_insert_index = nearest_edge_index + 1
   end
 
@@ -190,6 +155,9 @@ class Graph
 
   def clear
     @nodes.clear
+    @miniball_radius = -1.0
+    @miniball_center_x = 0.0
+    @miniball_center_y = 0.0
   end
 
   def sec_recurse(head, p, b)
@@ -201,19 +169,19 @@ class Graph
       r = -1.0
     when 1
       r = Float::EPSILON
-      c = @P[head-1].to_vec
+      c = @P[head-1]
     when 2
-      o = @P[head-1].to_vec
-      a = @P[head-2].to_vec
+      o = @P[head-1]
+      a = @P[head-2]
       vec_oa = a - o
       vec_o = 0.5 * vec_oa
       r = vec_o.getLength
       c = o + vec_o
     when 3
       # https://en.wikipedia.org/wiki/Circumscribed_circle
-      o = @P[head-1].to_vec
-      a = @P[head-2].to_vec
-      b = @P[head-3].to_vec
+      o = @P[head-1]
+      a = @P[head-2]
+      b = @P[head-3]
       vec_oa = a - o
       vec_ob = b - o
       r = vec_oa.getLength * vec_ob.getLength * (vec_oa - vec_ob).getLength / (2.0 * RVec2.cross(vec_oa, vec_ob)).abs
@@ -228,7 +196,7 @@ class Graph
     end
 
     for i in 0 ... p
-      p_i = @P[head+i].to_vec
+      p_i = @P[head+i]
       if (p_i - c).getLengthSq - r*r > 0
         i.step(to: 1, by: -1) do |j|
           @P[head+j], @P[head+j-1] = @P[head+j-1], @P[head+j]
@@ -251,7 +219,7 @@ class Graph
     return r, c
   end
 
-  def render(vg, render_edge: false, render_node: true)
+  def render(vg, render_edge: true, render_node: true)
     # Edges
     if render_edge and @nodes.length >= 2
       color = nvgRGBA(192,128,192, 255)
