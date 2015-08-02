@@ -1,10 +1,11 @@
 # Usage:
 # $ gem install rmath3d_plain
-# $ ruby divide_by_triangulation.rb
+# $ ruby triangulation.rb
 require 'opengl'
 require 'glfw'
 require 'rmath3d/rmath3d_plain'
 require_relative '../nanovg'
+require_relative './delaunay'
 
 OpenGL.load_dll()
 GLFW.load_dll()
@@ -15,13 +16,17 @@ include GLFW
 include NanoVG
 include RMath3D
 
+$plot_spiral = false
+$plot_random = false
+
 class Graph
-  attr_accessor :nodes
+  attr_accessor :nodes, :triangle_indices
 
   def initialize
     @nodes = []
     @undo_insert_index = -1
     @node_radius = 10.0
+    @triangle_indices = []
   end
 
   def add_node(x, y)
@@ -119,13 +124,41 @@ class Graph
     end
   end
 
-  def clear
-    @nodes.clear
+  def triangulate
+    return if @nodes.length < 3
+    @triangle_indices = Triangulation.calculate(@nodes)
   end
 
-  def render(vg)
+  def clear
+    @nodes.clear
+    @triangle_indices.clear
+  end
+
+  def render(vg, render_edge: false, render_node: true)
+    # Triangues
+    if @triangle_indices.length > 0
+      color = nvgRGBA(0,255,0, 255)
+      lw = @node_radius * 0.5
+      @triangle_indices.each do |indices|
+        nvgLineCap(vg, NVG_ROUND)
+        nvgLineJoin(vg, NVG_ROUND)
+        nvgBeginPath(vg)
+        nvgMoveTo(vg, @nodes[indices[0]].x, @nodes[indices[0]].y)
+        nvgLineTo(vg, @nodes[indices[1]].x, @nodes[indices[1]].y)
+        nvgLineTo(vg, @nodes[indices[2]].x, @nodes[indices[2]].y)
+        nvgClosePath(vg)
+        color = nvgRGBA(0,255,0, 64)
+        nvgFillColor(vg, color)
+        nvgFill(vg)
+        color = nvgRGBA(255,128,0, 255)
+        nvgStrokeColor(vg, color)
+        nvgStrokeWidth(vg, lw)
+        nvgStroke(vg)
+      end
+    end
+
     # Edges
-    if @nodes.length >= 2
+    if render_edge and @nodes.length >= 2
       color = nvgRGBA(255,128,0, 255)
       lw = @node_radius * 0.5
       nvgLineCap(vg, NVG_ROUND)
@@ -145,7 +178,7 @@ class Graph
     end
 
     # Nodes
-    if @nodes.length > 0
+    if render_node and @nodes.length > 0
       color = nvgRGBA(0,192,255, 255)
       nvgBeginPath(vg)
       @nodes.each do |node|
@@ -165,13 +198,37 @@ key = GLFW::create_callback(:GLFWkeyfun) do |window, key, scancode, action, mods
     glfwSetWindowShouldClose(window, GL_TRUE)
   elsif key == GLFW_KEY_R && action == GLFW_PRESS # Press 'R' to clear graph.
     $graph.clear
+  elsif key == GLFW_KEY_T && action == GLFW_PRESS # Press 'T' to triangulate graph.
+    $graph.triangulate
   elsif key == GLFW_KEY_Z && action == GLFW_PRESS && (mods & GLFW_MOD_CONTROL != 0) # Remove the last node your added by Ctrl-Z.
     $graph.undo_insert
   end
 end
 
+$spiral_theta = 0.0
+$spiral_radius = Float::EPSILON
+
 mouse = GLFW::create_callback(:GLFWmousebuttonfun) do |window_handle, button, action, mods|
-  # p "GLFWmousebuttonfun called.", window_handle, button, action, mods
+  if $plot_spiral
+    sx = $spiral_radius * Math.cos($spiral_theta)
+    sy = $spiral_radius * Math.sin($spiral_theta)
+    sx += 1280 * 0.5
+    sy += 720 * 0.5
+    $graph.add_node(sx, sy) # insert_node(sx, sy)
+    $graph.triangulate
+    $spiral_theta += 30.0 * Math::PI/180
+    $spiral_radius += 10.0
+    return
+  end
+
+  if $plot_random
+    sx = rand(1280.0)
+    sy = rand(720.0)
+    $graph.add_node(sx, sy) # insert_node(sx, sy)
+    $graph.triangulate
+    return
+  end
+
   if button == GLFW_MOUSE_BUTTON_LEFT && action == 0
     mx_buf = ' ' * 8
     my_buf = ' ' * 8
@@ -181,13 +238,17 @@ mouse = GLFW::create_callback(:GLFWmousebuttonfun) do |window_handle, button, ac
     if (mods & GLFW_MOD_SHIFT) != 0
       $graph.remove_nearest_node(mx, my)
     else
-      $graph.insert_node(mx, my)
+      $graph.add_node(mx, my) # insert_node(mx, my)
+      $graph.triangulate
     end
   end
 end
 
 
 if __FILE__ == $0
+
+  $plot_spiral = ARGV[0] == "-plot_spiral"
+  $plot_random = ARGV[0] == "-plot_random"
 
   if glfwInit() == GL_FALSE
     puts("Failed to init GLFW.")
@@ -257,6 +318,15 @@ if __FILE__ == $0
     glfwSwapBuffers( window )
     glfwPollEvents()
 
+    if ($plot_spiral || $plot_random) && total_time > 0.01
+      mouse.call(window, 0, 0, 0)
+      total_time = 0
+=begin
+      $ss_name = sprintf("ss%05d.tga", $ss_id)
+      save_screenshot(fbWidth, fbHeight, $ss_name)
+      $ss_id += 1
+=end
+    end
   end
 
   nvgDeleteGL2(vg)
