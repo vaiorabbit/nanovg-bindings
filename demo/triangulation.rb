@@ -26,6 +26,11 @@ class Graph
     @nodes = []
     @undo_insert_index = -1
     @node_radius = 10.0
+
+    @miniball_radius = -1.0
+    @miniball_center_x = 0.0
+    @miniball_center_y = 0.0
+
     @triangle_indices = []
   end
 
@@ -124,18 +129,28 @@ class Graph
     end
   end
 
+  def smallest_enclosing_circle
+    r, c = SmallestEnclosingCircle.calculate(@nodes)
+    @miniball_radius = r
+    @miniball_center_x = c.x
+    @miniball_center_y = c.y
+  end
+
   def triangulate
     return if @nodes.length < 3
-    @triangle_indices = Triangulation.calculate(@nodes)
+    @triangle_indices, @triangles = Triangulation.calculate(@nodes)
   end
 
   def clear
     @nodes.clear
+    @miniball_radius = -1.0
+    @miniball_center_x = 0.0
+    @miniball_center_y = 0.0
     @triangle_indices.clear
   end
 
   def render(vg, render_edge: false, render_node: true)
-    # Triangues
+    # Triangles
     if @triangle_indices.length > 0
       color = nvgRGBA(0,255,0, 255)
       lw = @node_radius * 0.5
@@ -154,6 +169,17 @@ class Graph
         nvgStrokeColor(vg, color)
         nvgStrokeWidth(vg, lw)
         nvgStroke(vg)
+      end
+    end
+
+    if @triangles != nil && @triangles.length > 0
+      color = nvgRGBA(255,0,0, 8)
+      lw = @node_radius * 0.5
+      @triangles.each do |tri|
+        nvgBeginPath(vg)
+        nvgCircle(vg, tri.cc.x, tri.cc.y, tri.cr)
+        nvgFillColor(vg, color)
+        nvgFill(vg)
       end
     end
 
@@ -187,6 +213,17 @@ class Graph
       end
       nvgFill(vg)
     end
+
+    # Smallest Enclosing Circle
+=begin
+    if @miniball_radius > 0
+      color = nvgRGBA(255,0,0, 64)
+      nvgBeginPath(vg)
+      nvgCircle(vg, @miniball_center_x, @miniball_center_y, @miniball_radius)
+      nvgFillColor(vg, color)
+      nvgFill(vg)
+    end
+=end
   end
 end
 
@@ -216,8 +253,9 @@ mouse = GLFW::create_callback(:GLFWmousebuttonfun) do |window_handle, button, ac
     sy += 720 * 0.5
     $graph.add_node(sx, sy) # insert_node(sx, sy)
     $graph.triangulate
-    $spiral_theta += 30.0 * Math::PI/180
-    $spiral_radius += 10.0
+    $graph.smallest_enclosing_circle
+    $spiral_theta += 30.0 * Math::PI/180 # Math::PI * (3 - Math.sqrt(5)) # golden angle in radian
+    $spiral_radius += 5.0
     return
   end
 
@@ -240,6 +278,7 @@ mouse = GLFW::create_callback(:GLFWmousebuttonfun) do |window_handle, button, ac
     else
       $graph.add_node(mx, my) # insert_node(mx, my)
       $graph.triangulate
+      $graph.smallest_enclosing_circle
     end
   end
 end
