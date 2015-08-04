@@ -19,6 +19,33 @@ include RMath3D
 $plot_spiral = false
 $plot_random = false
 
+# Saves as .tga
+$ss_name = "ss0000.tga"
+$ss_id = 0
+def save_screenshot(w, h, name)
+  image = FFI::MemoryPointer.new(:uint8, w*h*4)
+  return if image == nil
+
+  glReadPixels(0, 0, w, h, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, image)
+
+  File.open( name, 'wb' ) do |fout|
+    fout.write [0].pack('c')      # identsize
+    fout.write [0].pack('c')      # colourmaptype
+    fout.write [2].pack('c')      # imagetype
+    fout.write [0].pack('s')      # colourmapstart
+    fout.write [0].pack('s')      # colourmaplength
+    fout.write [0].pack('c')      # colourmapbits
+    fout.write [0].pack('s')      # xstart
+    fout.write [0].pack('s')      # ystart
+    fout.write [w].pack('s')      # image_width
+    fout.write [h].pack('s')      # image_height
+    fout.write [8 * 4].pack('c')  # image_bits_per_pixel
+    fout.write [8].pack('c')      # descriptor
+
+    fout.write image.get_bytes(0, w*h*4)
+  end
+end
+
 class Graph
   attr_accessor :nodes, :triangle_indices
 
@@ -254,8 +281,8 @@ mouse = GLFW::create_callback(:GLFWmousebuttonfun) do |window_handle, button, ac
     $graph.add_node(sx, sy) # insert_node(sx, sy)
     $graph.triangulate
     $graph.smallest_enclosing_circle
-    $spiral_theta += 30.0 * Math::PI/180 # Math::PI * (3 - Math.sqrt(5)) # golden angle in radian
-    $spiral_radius += 5.0
+    $spiral_theta += 22.0 * Math::PI/180 # Math::PI * (3 - Math.sqrt(5)) # golden angle in radian
+    $spiral_radius += 4.0
     return
   end
 
@@ -275,6 +302,8 @@ mouse = GLFW::create_callback(:GLFWmousebuttonfun) do |window_handle, button, ac
     my = my_buf.unpack('D')[0]
     if (mods & GLFW_MOD_SHIFT) != 0
       $graph.remove_nearest_node(mx, my)
+      $graph.triangulate
+      $graph.smallest_enclosing_circle
     else
       $graph.add_node(mx, my) # insert_node(mx, my)
       $graph.triangulate
