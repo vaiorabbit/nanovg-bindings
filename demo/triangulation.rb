@@ -174,6 +174,7 @@ class Graph
     @miniball_center_x = 0.0
     @miniball_center_y = 0.0
     @triangle_indices.clear
+    @triangles.clear
   end
 
   def render(vg, render_edge: false, render_node: true)
@@ -200,13 +201,16 @@ class Graph
     end
 
     if @triangles != nil && @triangles.length > 0
-      color = nvgRGBA(255,0,0, 8)
-      lw = @node_radius * 0.5
+      color = nvgRGBA(255,0,0, 64)
+      lw = @node_radius * 0.1
       @triangles.each do |tri|
         nvgBeginPath(vg)
         nvgCircle(vg, tri.cc.x, tri.cc.y, tri.cr)
-        nvgFillColor(vg, color)
-        nvgFill(vg)
+#        nvgFillColor(vg, color)
+#        nvgFill(vg)
+        nvgStrokeColor(vg, color)
+        nvgStrokeWidth(vg, lw)
+        nvgStroke(vg)
       end
     end
 
