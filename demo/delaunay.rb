@@ -6,6 +6,7 @@ include RMath3D
 require_relative 'minicircle'
 
 class Triangle
+
   attr_accessor :vertex, :edge
   attr_reader :cr, :cc
 
@@ -61,6 +62,7 @@ class Triangle
   def circumcircle_contains(point)
     return (point - @cc).getLengthSq < @cr**2
   end
+
 end
 
 
