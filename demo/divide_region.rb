@@ -261,10 +261,20 @@ class Graph
         end
       end
       nvgClosePath(vg)
-      color = nvgRGBA(0,0,255, 255)
+      color = nvgRGBA(64,32,192, 255)
       nvgStrokeColor(vg, color)
       nvgStrokeWidth(vg, lw)
       nvgStroke(vg)
+
+      @hull_indices.each do |hull_index|
+        nvgBeginPath(vg)
+        sc = 1.5
+        sc2 = sc * 2
+        wh = @node_radius * sc2
+        nvgRoundedRect(vg, @nodes[hull_index].x - @node_radius * sc, @nodes[hull_index].y - @node_radius * sc, wh, wh, @node_radius * 0.75)
+        nvgFillColor(vg, color)
+        nvgFill(vg)
+      end
     end
 
     # Nodes
@@ -314,7 +324,6 @@ mouse = GLFW::create_callback(:GLFWmousebuttonfun) do |window_handle, button, ac
     sy += 720 * 0.5
     $graph.add_node(sx, sy) # insert_node(sx, sy)
     $graph.triangulate
-    $graph.smallest_enclosing_circle
     $spiral_theta += 22.0 * Math::PI/180 # Math::PI * (3 - Math.sqrt(5)) # golden angle in radian
     $spiral_radius += 4.0
     return

@@ -9,9 +9,7 @@ module ConvexHull
     points = points_original.dup
     points_count = points.length
     hull_index, indices = self.calculate_PackageWrapping(points, points_count)
-#    p points[0..hull_index]
-#    p indices[0..hull_index]
-    return indices[0..hull_index] # points[0..hull_index]
+    return indices[0..hull_index]
   end
 
   # +1 : counterclockwise / collinear (p0 is in between p1 and p2).
