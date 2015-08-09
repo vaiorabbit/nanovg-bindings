@@ -1,15 +1,14 @@
 # coding: utf-8
-# Ref.: Sedgewick, Algorithms in C++
 require 'rmath3d/rmath3d_plain'
 include RMath3D
 
 module ConvexHull
 
   def self.calculate(points_original)
-    points = points_original.dup
-    points_count = points.length
-    hull_index, indices = self.calculate_PackageWrapping(points, points_count)
-    return indices[0..hull_index]
+    return nil if points_original.length <= 2
+
+    # return self.calculate_PackageWrapping(points_original.dup)
+    return self.calculate_AndrewsConvexHullScan(points_original.dup)
   end
 
   # +1 : counterclockwise / collinear (p0 is in between p1 and p2).
@@ -41,7 +40,9 @@ module ConvexHull
     return t * 90.0
   end
 
-  def self.calculate_PackageWrapping(points, n)
+  # Ref.: Sedgewick, Algorithms in C++
+  def self.calculate_PackageWrapping(points)
+    n = points.length
     p_min = points.min_by {|p| p.y}
     min_index = points.find_index(p_min)
     points[n] = points[min_index] # sentinel
@@ -63,13 +64,52 @@ module ConvexHull
           th = t
         end
       end
-      return m, indices if min_index == n
+      if min_index == n
+        return indices[0..m]
+      end
     end
   end
 
-  def self.calculate_GrahamScan(points)
-    indices = []
-    return indices
+  # Ref.: Heineman et al., Algorithms in a Nutshell
+  def self.calculate_AndrewsConvexHullScan(points)
+    n = points.length
+
+    indices = (0...points.length).to_a
+    indices.sort! do |i, j| # x -> y sorter
+      r = 0
+      dx = points[i].x - points[j].x
+      r = -1 if dx < 0
+      r = +1 if dx > 0
+      if r == 0
+        dy = points[i].y - points[j].y
+        r = -1 if dy < 0
+        r = +1 if dy > 0
+      end
+      r
+    end
+
+    # partial hull (upper)
+    upper = [indices[0], indices[1]]
+    for i in 2...n do
+      upper << indices[i]
+      # remove middle of the last three points if they form a concave curve.
+      while upper.length >= 3 && ccw(points[upper[upper.length-3]], points[upper[upper.length-2]], points[upper[upper.length-1]]) > 0
+        upper.delete_at(upper.length-2)
+      end
+    end
+
+    # patial hull (lower)
+    lower = [indices[n-1], indices[n-2]]
+    (n-3).downto(0) do |i|
+      lower << indices[i]
+      # remove middle of the last three points if they form a concave curve.
+      while lower.length >= 3 && ccw(points[lower[lower.length-3]], points[lower[lower.length-2]], points[lower[lower.length-1]]) > 0
+        lower.delete_at(lower.length-2)
+      end
+    end
+
+    # merge two partial hulls.
+    return (upper + lower).uniq!
   end
 
 end

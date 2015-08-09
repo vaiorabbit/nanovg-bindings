@@ -324,6 +324,7 @@ mouse = GLFW::create_callback(:GLFWmousebuttonfun) do |window_handle, button, ac
     sy += 720 * 0.5
     $graph.add_node(sx, sy) # insert_node(sx, sy)
     $graph.triangulate
+    $graph.convex_hull
     $spiral_theta += 22.0 * Math::PI/180 # Math::PI * (3 - Math.sqrt(5)) # golden angle in radian
     $spiral_radius += 4.0
     return
@@ -334,6 +335,7 @@ mouse = GLFW::create_callback(:GLFWmousebuttonfun) do |window_handle, button, ac
     sy = rand(720.0)
     $graph.add_node(sx, sy) # insert_node(sx, sy)
     $graph.triangulate
+    $graph.convex_hull
     return
   end
 
