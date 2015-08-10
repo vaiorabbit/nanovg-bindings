@@ -7,6 +7,7 @@ require 'rmath3d/rmath3d_plain'
 require_relative '../nanovg'
 require_relative './delaunay'
 require_relative './convex_hull'
+require_relative './voronoi'
 
 OpenGL.load_lib()
 GLFW.load_lib()
@@ -61,6 +62,9 @@ class Graph
 
     @triangle_indices = []
     @hull_indices = []
+
+    @voronoi_cells = []
+    @voronoi_vertices = []
   end
 
   def add_node(x, y)
@@ -175,6 +179,11 @@ class Graph
     @hull_indices = ConvexHull.calculate(@nodes)
   end
 
+  def voronoi_diagram
+    return if @nodes.length < 3
+    @voronoi_cells, @voronoi_vertices = VoronoiDiagram.calculate(@nodes)
+  end
+
   def clear
     @nodes.clear
     @miniball_radius = -1.0
@@ -183,6 +192,8 @@ class Graph
     @triangle_indices.clear if @triangle_indices != nil
     @triangles.clear if @triangles != nil
     @hull_indices.clear if @hull_indices != nil
+    @voronoi_cells.clear
+    @voronoi_vertices.clear
   end
 
   def render(vg, render_edge: false, render_node: true)
@@ -277,6 +288,30 @@ class Graph
       end
     end
 
+    # Voronoi Diagram
+    if @voronoi_cells.length > 0
+      @voronoi_cells.each do |vc|
+        if vc.bounded
+          lw = @node_radius * 0.75
+          nvgLineCap(vg, NVG_ROUND)
+          nvgLineJoin(vg, NVG_ROUND)
+          nvgBeginPath(vg)
+          vc.vertex_indices.each_with_index do |vertex_index, i|
+            if i == 0
+              nvgMoveTo(vg, @voronoi_vertices[vertex_index].x, @voronoi_vertices[vertex_index].y)
+            else
+              nvgLineTo(vg, @voronoi_vertices[vertex_index].x, @voronoi_vertices[vertex_index].y)
+            end
+          end
+          nvgClosePath(vg)
+          color = nvgRGBA(255,255,255, 192)
+          nvgStrokeColor(vg, color)
+          nvgStrokeWidth(vg, lw)
+          nvgStroke(vg)
+        end
+      end
+    end
+
     # Nodes
     if render_node and @nodes.length > 0
       color = nvgRGBA(0,192,255, 255)
@@ -353,12 +388,14 @@ mouse = GLFW::create_callback(:GLFWmousebuttonfun) do |window_handle, button, ac
         $graph.triangulate
         $graph.smallest_enclosing_circle
         $graph.convex_hull
+        $graph.voronoi_diagram
       end
     else
       $graph.add_node(mx, my) # insert_node(mx, my)
       $graph.triangulate
       $graph.smallest_enclosing_circle
       $graph.convex_hull
+      $graph.voronoi_diagram
     end
   end
 end
