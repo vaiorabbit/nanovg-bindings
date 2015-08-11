@@ -38,6 +38,11 @@ module VoronoiDiagram
     hull_indices.length.times do |i|
       hull_edges << [points[hull_indices[i]], points[hull_indices[(i+1) % hull_indices.length]]]
     end
+    # hull_center = RVec2.new(0.0, 0.0)
+    # hull_indices.length.times do |i|
+    #   hull_center.x += points[hull_indices[i]].x / hull_indices.length
+    #   hull_center.y += points[hull_indices[i]].y / hull_indices.length
+    # end
 
     tv_indices, triangles = Triangulation.calculate(points)
     triangle_indices = (0...triangles.length).to_a
@@ -60,39 +65,67 @@ module VoronoiDiagram
       end
 
       is_hull_vertex = hull_indices.include?(point_index)
-      if is_hull_vertex
-        vc.bounded = false
-        edges.each do |edge|
-          is_hull_edge = hull_edges.any? { |hull_edge|
-            (hull_edge[0] == edge[0] && hull_edge[1] == edge[1]) || (hull_edge[1] == edge[0] && hull_edge[0] == edge[1])
-          }
-          if is_hull_edge
-            tri = triangles.select { |t| t.has_edge(edge) }.first
-            vc.ray_origin_indices << triangles.find_index(tri)
-            vc.ray_directions << RVec2.new(1.0, 0.0) # TODO : calculate outward direction
-          else
-            tris = triangles.select { |t| t.has_edge(edge) } # length == 2
-            ti0 = triangles.find_index(tris[0])
-            ti1 = triangles.find_index(tris[1])
-            vc.vertex_indices << ti0 << ti1
-          end
-        end
-        vc.vertex_indices.uniq!
-      else
+      if is_hull_vertex == false
+        vc.bounded = true
         tis.each do |ti|
           vc.vertex_indices << ti
         end
+      else
+        vc.bounded = false
+        vertices_link = []
+        edges.each do |edge|
+          tris = triangles.select { |t| t.has_edge(edge) } # length == 2
+          is_hull_edge = hull_edges.any? { |hull_edge| (hull_edge[0] == edge[0] && hull_edge[1] == edge[1]) || (hull_edge[1] == edge[0] && hull_edge[0] == edge[1]) }
+          if is_hull_edge
+            tri = tris.first
+            # calculate outward ray direction
+            edge_dir = (edge[1] - edge[0]).normalize!
+            ray_dir = RVec2.new(edge_dir.y, -edge_dir.x)
+
+            #  ov = tri.non_edge_vertex(edge)
+            #  flip_ray_dir = RVec2.dot(ray_dir, (ov - tri.cc).normalize!) >= 0 ? true : false
+            #  flip_ray_dir = RVec2.dot(ray_dir, (hull_center - tri.cc).normalize!) < 0 ? true : false
+            #  ray_dir *= -1.0 if flip_ray_dir
+            #  ray_dir *= -1.0 if ConvexHull.ccw(edge[0], tri.cc, edge[1]) >= 0
+
+            vc.ray_origin_indices << triangles.find_index(tri)
+            vc.ray_directions << ray_dir
+          else
+            ti0 = triangles.find_index(tris[0])
+            ti1 = triangles.find_index(tris[1])
+            # vc.vertex_indices << ti0 << ti1
+            vertices_link << (ti0 < ti1 ? [ti0, ti1] : [ti1, ti0])
+          end
+        end
+
+        # link edge chain
+        vc.vertex_indices.clear
+        vertices_link.uniq!
+        vi_current = vc.ray_origin_indices[0]
+        vi_next = -1
+        until vertices_link.empty? do
+          link_current = vertices_link.select { |vl| vl[0] == vi_current || vl[1] == vi_current }.first
+          vi_next = link_current[0] == vi_current ? link_current[1] : link_current[0]
+          vc.vertex_indices.push(vi_current)
+          vi_current = vi_next
+          vertices_link.delete(link_current)
+        end
+        vc.vertex_indices.push(vi_next)
       end
       voronoi_cells << vc
     end
 
     # clockwise sort http://stackoverflow.com/questions/6989100/sort-points-in-clockwise-order
     voronoi_cells.each do |vc|
-      center = RVec2.new(0.0, 0.0)
-      vc.vertex_indices.each do |vi|
-        center += triangles[vi].cc
-      end
-      center *= 1.0 / vc.vertex_indices.length
+      next if vc.vertex_indices.length == 0 || vc.bounded == false
+
+      # center = RVec2.new(0.0, 0.0)
+      # vc.vertex_indices.each do |vi|
+      #   center += triangles[vi].cc
+      # end
+      # center *= 1.0 / vc.vertex_indices.length
+      center = points[vc.center_index]
+
       vc.vertex_indices.sort! do |i, j|
         r = 0
         pnt_i = triangles[i].cc
@@ -115,7 +148,7 @@ module VoronoiDiagram
         if r == 0
           d1 = (pnt_i - center.x).getLengthSq
           d2 = (pnt_j - center.x).getLengthSq
-          r = d1 > d2 ? +1 : -2
+          r = d1 > d2 ? +1 : -1
         end
         r
       end

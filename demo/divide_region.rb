@@ -49,7 +49,7 @@ def save_screenshot(w, h, name)
 end
 
 class Graph
-  attr_accessor :nodes, :triangle_indices, :hull_indices
+  attr_accessor :nodes, :triangle_indices, :hull_indices, :voronoi_cells, :voronoi_vertices
 
   def initialize
     @nodes = []
@@ -290,11 +290,13 @@ class Graph
 
     # Voronoi Diagram
     if @voronoi_cells.length > 0
-      @voronoi_cells.each do |vc|
+      @voronoi_cells.each_with_index do |vc, vc_index|
+
+        lw = @node_radius * 0.25
+        nvgLineCap(vg, NVG_ROUND)
+        nvgLineJoin(vg, NVG_ROUND)
         if vc.bounded
-          lw = @node_radius * 0.75
-          nvgLineCap(vg, NVG_ROUND)
-          nvgLineJoin(vg, NVG_ROUND)
+
           nvgBeginPath(vg)
           vc.vertex_indices.each_with_index do |vertex_index, i|
             if i == 0
@@ -304,10 +306,41 @@ class Graph
             end
           end
           nvgClosePath(vg)
-          color = nvgRGBA(255,255,255, 192)
+          color = nvgRGBA(255,255,255, 128)
           nvgStrokeColor(vg, color)
           nvgStrokeWidth(vg, lw)
           nvgStroke(vg)
+
+        else # vc.bounded == false
+
+          if vc.vertex_indices.length > 0
+            nvgBeginPath(vg)
+            vc.vertex_indices.each_with_index do |vertex_index, i|
+              if i == 0
+                nvgMoveTo(vg, @voronoi_vertices[vertex_index].x, @voronoi_vertices[vertex_index].y)
+              else
+                nvgLineTo(vg, @voronoi_vertices[vertex_index].x, @voronoi_vertices[vertex_index].y)
+              end
+            end
+            color = nvgRGBA(255,255,255, 128)
+            nvgStrokeColor(vg, color)
+            nvgStrokeWidth(vg, lw)
+            nvgStroke(vg)
+          end
+
+          vc.ray_origin_indices.each_with_index do |vertex_index, i|
+            nvgBeginPath(vg)
+            ray_x = @voronoi_vertices[vertex_index].x + 10000.0 * vc.ray_directions[i].x
+            ray_y = @voronoi_vertices[vertex_index].y + 10000.0 * vc.ray_directions[i].y
+            nvgMoveTo(vg, @voronoi_vertices[vertex_index].x, @voronoi_vertices[vertex_index].y)
+            nvgLineTo(vg, ray_x, ray_y)
+            nvgClosePath(vg)
+            color = nvgRGBA(255,0,255, 128)
+            nvgStrokeColor(vg, color)
+            nvgStrokeWidth(vg, lw)
+            nvgStroke(vg)
+          end
+
         end
       end
     end
@@ -360,6 +393,7 @@ mouse = GLFW::create_callback(:GLFWmousebuttonfun) do |window_handle, button, ac
     $graph.add_node(sx, sy) # insert_node(sx, sy)
     $graph.triangulate
     $graph.convex_hull
+    $graph.voronoi_diagram
     $spiral_theta += 22.0 * Math::PI/180 # Math::PI * (3 - Math.sqrt(5)) # golden angle in radian
     $spiral_radius += 4.0
     return
@@ -371,6 +405,7 @@ mouse = GLFW::create_callback(:GLFWmousebuttonfun) do |window_handle, button, ac
     $graph.add_node(sx, sy) # insert_node(sx, sy)
     $graph.triangulate
     $graph.convex_hull
+    $graph.voronoi_diagram
     return
   end
 
@@ -421,7 +456,9 @@ if __FILE__ == $0
   end
 
   glfwSetKeyCallback( window, key )
-  glfwSetMouseButtonCallback( window, mouse )
+  if $plot_spiral == false && $plot_random == false
+    glfwSetMouseButtonCallback( window, mouse )
+  end
 
   glfwMakeContextCurrent( window )
 
