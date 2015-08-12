@@ -44,7 +44,7 @@ module VoronoiDiagram
     #   hull_center.y += points[hull_indices[i]].y / hull_indices.length
     # end
 
-    tv_indices, triangles = Triangulation.calculate(points)
+    tv_indices, triangles = DelaunayTriangulation.calculate(points)
     triangle_indices = (0...triangles.length).to_a
 
     voronoi_cells = []
@@ -111,9 +111,12 @@ module VoronoiDiagram
           vertices_link.delete(link_current)
         end
         vc.vertex_indices.push(vi_next)
+
       end
+
       voronoi_cells << vc
-    end
+
+    end # End : for point_index in 0...points.length do
 
     # clockwise sort http://stackoverflow.com/questions/6989100/sort-points-in-clockwise-order
     voronoi_cells.each do |vc|
@@ -160,7 +163,8 @@ module VoronoiDiagram
     end
 
     return voronoi_cells, voronoi_vertices
-  end
+
+  end # End : calculate_VDBDT
 
 end
 

@@ -7,8 +7,8 @@ require 'rmath3d/rmath3d_plain'
 require_relative '../nanovg'
 require_relative './delaunay'
 
-OpenGL.load_dll()
-GLFW.load_dll()
+OpenGL.load_lib()
+GLFW.load_lib()
 NanoVG.load_dll('libnanovg_gl2.dylib')
 
 include OpenGL
@@ -165,7 +165,7 @@ class Graph
 
   def triangulate
     return if @nodes.length < 3
-    @triangle_indices, @triangles = Triangulation.calculate(@nodes)
+    @triangle_indices, @triangles = DelaunayTriangulation.calculate(@nodes)
   end
 
   def clear

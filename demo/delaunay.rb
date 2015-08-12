@@ -66,7 +66,7 @@ class Triangle
 end
 
 
-module Triangulation
+module DelaunayTriangulation
 
   def self.calculate(points_original)
     points = points_original.dup
@@ -134,7 +134,7 @@ if __FILE__ == $0
   points << RVec2.new(0.0, 1.0)
   points << RVec2.new(0.0, -1.0)
 
-  tri_indices = Triangulation.calculate(points)
+  tri_indices = DelaunayTriangulation.calculate(points)
   tri_indices.each_with_index do |indices, i|
     puts "Triangle(#{i}) : (#{points[indices[0]]}, #{points[indices[1]]}, #{points[indices[2]]})\t"
   end

@@ -3,8 +3,8 @@ require 'glfw'
 require_relative '../nanovg'
 require_relative './showcase/scenes'
 
-OpenGL.load_dll()
-GLFW.load_dll()
+OpenGL.load_lib()
+GLFW.load_lib()
 NanoVG.load_dll('libnanovg_gl2.dylib')
 #NanoVG.load_dll('./nanovg_gl2.dll', render_backend: :gl2)
 
@@ -112,14 +112,14 @@ if __FILE__ == $0
 
     glfwSwapBuffers( window )
     glfwPollEvents()
-=begin
+
     if $showcase.current_scene.should_save
       $ss_name = sprintf("ss%05d.tga", $ss_id)
       save_screenshot(fbWidth, fbHeight, $ss_name)
       $ss_id += 1
       $showcase.current_scene.should_save = false
     end
-=end
+
   end
 
   nvgDeleteGL2(vg)

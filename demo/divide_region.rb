@@ -171,7 +171,7 @@ class Graph
 
   def triangulate
     return if @nodes.length < 3
-    @triangle_indices, @triangles = Triangulation.calculate(@nodes)
+    @triangle_indices, @triangles = DelaunayTriangulation.calculate(@nodes)
   end
 
   def convex_hull

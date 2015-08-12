@@ -7,8 +7,8 @@ require 'rmath3d/rmath3d_plain'
 require_relative '../nanovg'
 require_relative './minicircle'
 
-OpenGL.load_dll()
-GLFW.load_dll()
+OpenGL.load_lib()
+GLFW.load_lib()
 NanoVG.load_dll('libnanovg_gl2.dylib')
 
 include OpenGL

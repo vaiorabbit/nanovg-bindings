@@ -5,8 +5,8 @@ require 'glfw'
 require_relative '../nanovg'
 require_relative 'hex'
 
-OpenGL.load_dll()
-GLFW.load_dll()
+OpenGL.load_lib()
+GLFW.load_lib()
 NanoVG.load_dll('libnanovg_gl2.dylib')
 
 include OpenGL

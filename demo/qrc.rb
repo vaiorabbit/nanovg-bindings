@@ -1,4 +1,4 @@
-# coding: utf-8
+# coding: cp932
 # Usage :
 # $ gem install rqrcode
 # $ ruby qrc.rb [String to encode into QR code]
@@ -7,8 +7,8 @@ require 'opengl'
 require 'glfw'
 require_relative '../nanovg'
 
-OpenGL.load_dll()
-GLFW.load_dll()
+OpenGL.load_lib()
+GLFW.load_lib()
 NanoVG.load_dll('libnanovg_gl2.dylib')
 
 include RQRCode
@@ -108,5 +108,5 @@ if __FILE__ == $0
 
   glfwTerminate()
 
-  # puts qrc.to_s(:true => 'â– ', :false => 'â–¡')
+  # puts qrc.to_s(:true => '¡', :false => ' ')
 end

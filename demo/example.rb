@@ -7,8 +7,8 @@ require_relative '../nanovg'
 require_relative 'perf'
 require_relative 'demo_data'
 
-OpenGL.load_dll()
-GLFW.load_dll()
+OpenGL.load_lib()
+GLFW.load_lib()
 NanoVG.load_dll('libnanovg_gl2.dylib')
 #NanoVG.load_dll('./nanovg_gl2.dll', render_backend: :gl2)
 
