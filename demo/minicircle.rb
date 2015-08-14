@@ -16,6 +16,7 @@ module SmallestEnclosingCircle
   end
 
   # Ref.: http://www.flipcode.com/archives/Smallest_Enclosing_Spheres.shtml
+  #       Christer Ericson, Real-Time Collision Detection, Ch 4.3.5
   def self.calculate(nodes)
     points = nodes.dup.shuffle! # randomization for faster computation
     return self.sec_recurse(0, points, points.length, 0)

@@ -4,67 +4,7 @@ require 'rmath3d/rmath3d_plain'
 include RMath3D
 
 require_relative 'minicircle'
-
-class Triangle
-
-  attr_accessor :vertex, :edge
-  attr_reader :cr, :cc
-
-  def initialize(vtx)
-    @vertex = vtx
-    @edge = [[@vertex[0], @vertex[1]],
-             [@vertex[1], @vertex[2]],
-             [@vertex[2], @vertex[0]]]
-    r, c = SmallestEnclosingCircle.circumcircle(@vertex[0], @vertex[1], @vertex[2])
-    @cr = r
-    @cc = c
-  end
-
-  def same_edge(idx, other_edge)
-    if ( ((@edge[idx][0] - other_edge[0]).getLengthSq <= Float::EPSILON &&
-          (@edge[idx][1] - other_edge[1]).getLengthSq <= Float::EPSILON ) ||
-         ((@edge[idx][1] - other_edge[0]).getLengthSq <= Float::EPSILON &&
-          (@edge[idx][0] - other_edge[1]).getLengthSq <= Float::EPSILON ) )
-      return true
-    end
-    return false
-  end
-
-  def has_edge(other_edge)
-    3.times do |idx|
-      return true if same_edge(idx, other_edge)
-    end
-    return false
-  end
-
-  def has_vertex(pnt)
-    @vertex.each do |vtx|
-      return true if (vtx - pnt).getLengthSq <= Float::EPSILON
-    end
-    return false
-  end
-
-  def ==(other_tri)
-    return false if other_tri == nil
-    @vertex.each do |vtx|
-      return false unless other_tri.has_vertex(vtx)
-    end
-    return true
-  end
-
-  def non_edge_vertex(edge)
-    @vertex.each do |vtx|
-      return vtx if vtx != edge[0] && vtx != edge[1]
-    end
-    return nil
-  end
-
-  def circumcircle_contains(point)
-    return (point - @cc).getLengthSq < @cr**2
-  end
-
-end
-
+require_relative 'triangle'
 
 module DelaunayTriangulation
 
