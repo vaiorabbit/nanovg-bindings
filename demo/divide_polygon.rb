@@ -1,12 +1,13 @@
 # Usage:
 # $ gem install rmath3d_plain
 # $ ruby divide_polygon.rb
+require 'pp'
 require 'opengl'
 require 'glfw'
 require 'rmath3d/rmath3d_plain'
 require_relative '../nanovg'
 require_relative './convex_partitioning'
-
+require_relative './segment_intersection'
 
 
 OpenGL.load_lib()
@@ -99,13 +100,35 @@ class Graph
                            distances.find_index( minimum_distances[0] )
                          else
                            # If the input point is in vertex Voronoi region, choose appropriate edge.
+                           segment_indices = []
                            edge_node_indices = []
                            distances.each_with_index do |d, i|
-                             edge_node_indices << [i, (i + 1) % nodes.length] if d == minimum_distances[0]
-                             break if edge_node_indices.length == 2
+                             indices = [i, (i + 1) % @nodes.length]
+                             segment_indices << indices
+                             if edge_node_indices.length < 2 && d == minimum_distances[0]
+                               edge_node_indices << indices
+                             end
                            end
                            nearest_node_index = (edge_node_indices[0] & edge_node_indices[1])[0]
 
+#pp segment_indices, edge_node_indices, segment_indices - [edge_node_indices[0]]
+#pp @nodes, @nodes + [point]
+#pp segment_indices + [[edge_node_indices[0][0], @nodes.length], [@nodes.length, edge_node_indices[0][1]]]
+#                           pp SegmentIntersection.check(@nodes, segment_indices)
+                           e0_self_intersect = SegmentIntersection.check(@nodes + [point], segment_indices - [edge_node_indices[0]] + [[edge_node_indices[0][0], @nodes.length], [@nodes.length, edge_node_indices[0][1]]])
+                           e1_self_intersect = SegmentIntersection.check(@nodes + [point], segment_indices - [edge_node_indices[1]] + [[edge_node_indices[1][0], @nodes.length], [@nodes.length, edge_node_indices[1][1]]])
+print "e0_int=#{e0_self_intersect}, e1_int=#{e1_self_intersect} => "
+
+                           if e0_self_intersect
+                             puts "Take e1"
+                             edge_node_indices[0][1]
+                           else
+                             puts "Take e0"
+                             edge_node_indices[0][0]
+                           end
+
+                           ####################
+=begin
                            other_node_index = nearest_node_index == edge_node_indices[0][0] ? edge_node_indices[0][1] : edge_node_indices[0][0]
                            edge0 = @nodes[nearest_node_index] - @nodes[other_node_index]
                            edge0.normalize!
@@ -125,10 +148,13 @@ class Graph
                            dot_1 = RVec2.dot(edge1, edge1_to_point)
 
                            if dot_0 < dot_1
+                             puts "Take e0"
                              edge_node_indices[0][0]
                            else
+                             puts "Take e1"
                              edge_node_indices[1][0]
                            end
+=end
                          end
 
     @nodes.insert( nearest_edge_index + 1, RVec2.new(point_x, point_y) )
@@ -142,6 +168,23 @@ class Graph
     end
   end
 
+  def node_removable?(node_index)
+    segment_indices = []
+    new_edge_index = []
+    @nodes.length.times do |i|
+      if i == node_index 
+        new_edge_index << (i + 1) % @nodes.length
+        next
+      end
+      if (i + 1) % @nodes.length == node_index
+        new_edge_index << i
+        next
+      end
+      segment_indices << [i, (i + 1) % @nodes.length]
+    end
+    return SegmentIntersection.check(@nodes, segment_indices + [new_edge_index]) == false
+  end
+
   def remove_nearest_node(point_x, point_y)
     distances = Array.new(@nodes.length) { -Float::MAX }
     @nodes.each_with_index do |node_current, index|
@@ -150,8 +193,12 @@ class Graph
     minimum_distance = distances.min_by {|d| d}
     if minimum_distance <= @node_radius ** 2
       nearest_node_index = distances.find_index( minimum_distance )
-      @nodes.delete_at(nearest_node_index)
       @undo_insert_index = -1
+      if node_removable?(nearest_node_index)
+        @nodes.delete_at(nearest_node_index)
+      else
+        puts "[WARN] remove_nearest_node : Failed. Removing the node #{nearest_node_index} will make self-intersecting polygon."
+      end
     end
   end
 
