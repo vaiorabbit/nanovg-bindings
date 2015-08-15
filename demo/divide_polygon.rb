@@ -67,7 +67,11 @@ class Graph
 
   def insert_node(point_x, point_y)
     if @nodes.length < 3
-      return add_node(point_x, point_y)
+      add_node(point_x, point_y)
+      if @nodes.length == 3 && Triangle.ccw(@nodes[0], @nodes[1], @nodes[2]) > 0
+        @nodes[1], @nodes[2] = @nodes[2], @nodes[1]
+      end
+      return
     end
     point = RVec2.new(point_x, point_y)
 
@@ -117,13 +121,18 @@ class Graph
 #                           pp SegmentIntersection.check(@nodes, segment_indices)
                            e0_self_intersect = SegmentIntersection.check(@nodes + [point], segment_indices - [edge_node_indices[0]] + [[edge_node_indices[0][0], @nodes.length], [@nodes.length, edge_node_indices[0][1]]])
                            e1_self_intersect = SegmentIntersection.check(@nodes + [point], segment_indices - [edge_node_indices[1]] + [[edge_node_indices[1][0], @nodes.length], [@nodes.length, edge_node_indices[1][1]]])
-print "e0_int=#{e0_self_intersect}, e1_int=#{e1_self_intersect} => "
+# print "e0_int=#{e0_self_intersect}, e1_int=#{e1_self_intersect} => "
+
+                           if e0_self_intersect && e1_self_intersect
+#                             puts "e0_self_intersect && e1_self_intersect"
+                             return
+                           end
 
                            if e0_self_intersect
-                             puts "Take e1"
-                             edge_node_indices[0][1]
+#                             puts "Take edge 1"
+                             edge_node_indices[1][0]
                            else
-                             puts "Take e0"
+#                             puts "Take edge 0"
                              edge_node_indices[0][0]
                            end
 
@@ -165,6 +174,11 @@ print "e0_int=#{e0_self_intersect}, e1_int=#{e1_self_intersect} => "
     if @undo_insert_index >= 0
       @nodes.delete_at(@undo_insert_index)
       @undo_insert_index = -1
+      if $graph.nodes.length <= 2
+        $graph.clear
+      else
+        $graph.triangulate
+      end
     end
   end
 
@@ -277,6 +291,8 @@ key = GLFW::create_callback(:GLFWkeyfun) do |window, key, scancode, action, mods
     glfwSetWindowShouldClose(window, GL_TRUE)
   elsif key == GLFW_KEY_R && action == GLFW_PRESS # Press 'R' to clear graph.
     $graph.clear
+  elsif key == GLFW_KEY_Z && action == GLFW_PRESS && (mods & GLFW_MOD_CONTROL != 0) # Remove the last node your added by Ctrl-Z.
+    $graph.undo_insert
   end
 end
 
