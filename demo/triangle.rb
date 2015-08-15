@@ -123,6 +123,7 @@ class Triangle
     return a + ab * v + ac * w, [1-v-w, v, w]
   end
 
+  # returns 2x signed area of a triangle abc
   def self.signed_area(a, b, c)
     return (a.x - c.x) * (b.y - c.y) - (a.y - c.y) * (b.x - c.x)
   end

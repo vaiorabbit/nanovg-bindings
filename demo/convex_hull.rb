@@ -8,7 +8,7 @@ module ConvexHull
     return nil if points_original.length <= 2
 
     # return self.calculate_PackageWrapping(points_original.dup)
-    return self.calculate_AndrewsConvexHullScan(points_original.dup)
+    return self.calculate_AndrewsConvexHullScan(points_original)
   end
 
   # +1 : counterclockwise / collinear (p0 is in between p1 and p2).
