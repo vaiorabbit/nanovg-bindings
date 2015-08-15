@@ -115,24 +115,19 @@ class Graph
                            end
                            nearest_node_index = (edge_node_indices[0] & edge_node_indices[1])[0]
 
-#pp segment_indices, edge_node_indices, segment_indices - [edge_node_indices[0]]
-#pp @nodes, @nodes + [point]
-#pp segment_indices + [[edge_node_indices[0][0], @nodes.length], [@nodes.length, edge_node_indices[0][1]]]
-#                           pp SegmentIntersection.check(@nodes, segment_indices)
                            e0_self_intersect = SegmentIntersection.check(@nodes + [point], segment_indices - [edge_node_indices[0]] + [[edge_node_indices[0][0], @nodes.length], [@nodes.length, edge_node_indices[0][1]]])
                            e1_self_intersect = SegmentIntersection.check(@nodes + [point], segment_indices - [edge_node_indices[1]] + [[edge_node_indices[1][0], @nodes.length], [@nodes.length, edge_node_indices[1][1]]])
-# print "e0_int=#{e0_self_intersect}, e1_int=#{e1_self_intersect} => "
 
                            if e0_self_intersect && e1_self_intersect
-#                             puts "e0_self_intersect && e1_self_intersect"
+                             # puts "e0_self_intersect && e1_self_intersect"
                              return
                            end
 
                            if e0_self_intersect
-#                             puts "Take edge 1"
+                             # puts "Take edge 1"
                              edge_node_indices[1][0]
                            else
-#                             puts "Take edge 0"
+                             # puts "Take edge 0"
                              edge_node_indices[0][0]
                            end
 
