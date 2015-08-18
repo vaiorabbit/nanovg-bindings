@@ -99,7 +99,37 @@ class Graph
     end
 
     # Find nearest edge and insert new Node as a dividing point.
+    segment_indices = []
+    @nodes.length.times do |i|
+      segment_indices << [i, (i + 1) % @nodes.length]
+    end
+
     minimum_distances = distances.min_by(2) {|d| d}
+    nearest_edge_index = -1
+#p minimum_distances
+    if minimum_distances[0] != minimum_distances[1]
+      i = distances.find_index( minimum_distances[0] )
+      edge_node_indices = segment_indices.select { |segment_index| segment_index.include?(i) }
+#p edge_node_indices
+      e0_self_intersect = SegmentIntersection.check(@nodes + [point], segment_indices - [edge_node_indices[0]] + [[edge_node_indices[0][0], @nodes.length], [@nodes.length, edge_node_indices[0][1]]])
+      e1_self_intersect = SegmentIntersection.check(@nodes + [point], segment_indices - [edge_node_indices[1]] + [[edge_node_indices[1][0], @nodes.length], [@nodes.length, edge_node_indices[1][1]]])
+#p e0_self_intersect, e1_self_intersect
+      if e0_self_intersect && e1_self_intersect
+        #        puts "#{i} : e0_self_intersect && e1_self_intersect"
+        nearest_edge_index = -1
+      elsif e0_self_intersect
+        #        puts "Take edge 1"
+        nearest_edge_index = edge_node_indices[1][0]
+      elsif e1_self_intersect
+        #        puts "Take edge 0"
+        nearest_edge_index = edge_node_indices[0][0]
+      else
+        nearest_edge_index = i
+      end
+
+    end
+#p nearest_edge_index
+=begin
     nearest_edge_index = if minimum_distances[0] != minimum_distances[1]
                            distances.find_index( minimum_distances[0] )
                          else
@@ -119,20 +149,20 @@ class Graph
                            e1_self_intersect = SegmentIntersection.check(@nodes + [point], segment_indices - [edge_node_indices[1]] + [[edge_node_indices[1][0], @nodes.length], [@nodes.length, edge_node_indices[1][1]]])
 
                            if e0_self_intersect && e1_self_intersect
-                             # puts "e0_self_intersect && e1_self_intersect"
+#                             puts "e0_self_intersect && e1_self_intersect"
                              return
                            end
 
                            if e0_self_intersect
-                             # puts "Take edge 1"
+#                             puts "Take edge 1"
                              edge_node_indices[1][0]
                            else
-                             # puts "Take edge 0"
+#                             puts "Take edge 0"
                              edge_node_indices[0][0]
                            end
 
                            ####################
-=begin
+#=begin
                            other_node_index = nearest_node_index == edge_node_indices[0][0] ? edge_node_indices[0][1] : edge_node_indices[0][0]
                            edge0 = @nodes[nearest_node_index] - @nodes[other_node_index]
                            edge0.normalize!
@@ -158,8 +188,43 @@ class Graph
                              puts "Take e1"
                              edge_node_indices[1][0]
                            end
-=end
+#=end
                          end
+=end
+    if nearest_edge_index == -1
+
+      distances = Array.new(@nodes.length) { -Float::MAX }
+      @nodes.each_with_index do |node_current, index|
+        distances[index] = (node_current - point).getLength
+      end
+      distances.sort.each do |d|
+        i = distances.find_index(d)
+        edge_node_indices = segment_indices.select { |segment_index| segment_index.include?(i) }
+        #      p edge_node_indices
+        e0_self_intersect = SegmentIntersection.check(@nodes + [point], segment_indices - [edge_node_indices[0]] + [[edge_node_indices[0][0], @nodes.length], [@nodes.length, edge_node_indices[0][1]]])
+        e1_self_intersect = SegmentIntersection.check(@nodes + [point], segment_indices - [edge_node_indices[1]] + [[edge_node_indices[1][0], @nodes.length], [@nodes.length, edge_node_indices[1][1]]])
+        if e0_self_intersect && e1_self_intersect
+          #        puts "#{i} : e0_self_intersect && e1_self_intersect"
+          next
+        elsif e0_self_intersect
+          #        puts "Take edge 1"
+          nearest_edge_index = edge_node_indices[1][0]
+          break
+        elsif e1_self_intersect
+          #        puts "Take edge 0"
+          nearest_edge_index = edge_node_indices[0][0]
+          break
+        else
+          nearest_edge_index = i
+          break
+        end
+      end
+    end
+
+    if nearest_edge_index == -1
+      puts "fail"
+      return
+    end
 
     @nodes.insert( nearest_edge_index + 1, RVec2.new(point_x, point_y) )
     @undo_insert_index = nearest_edge_index + 1
