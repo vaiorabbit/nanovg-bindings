@@ -373,8 +373,8 @@ mouse = GLFW::create_callback(:GLFWmousebuttonfun) do |window_handle, button, ac
   end
 
   if $plot_random
-    sx = rand(1280.0)
-    sy = rand(720.0)
+    sx = rand(1280.0*0.5)
+    sy = rand(720.0*0.7)
     $graph.insert_node(sx, sy) # add_node(sx, sy)
     $graph.triangulate
     return
