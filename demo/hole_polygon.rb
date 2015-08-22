@@ -333,16 +333,19 @@ $outer_graph = Graph.new
 $inner_graph = Graph.new
 $current_graph = $outer_graph
 
+$mutual_visible_path = []
 
 key = GLFW::create_callback(:GLFWkeyfun) do |window, key, scancode, action, mods|
-  if key == GLFW_KEY_SPACE && action == GLFW_PRESS
-    $current_graph = $current_graph == $inner_graph ? $outer_graph : $inner_graph
-  end
-
   if key == GLFW_KEY_ESCAPE && action == GLFW_PRESS # Press ESC to exit.
     glfwSetWindowShouldClose(window, GL_TRUE)
+  elsif key == GLFW_KEY_SPACE && action == GLFW_PRESS
+    $current_graph = $current_graph == $inner_graph ? $outer_graph : $inner_graph
   elsif key == GLFW_KEY_R && action == GLFW_PRESS # Press 'R' to clear graph.
     $current_graph.clear
+    $mutual_visible_path.clear
+  elsif key == GLFW_KEY_M && action == GLFW_PRESS # Press 'M' to merge inner polygon.
+    index_outer, index_inner = ConvexPartitioning.find_mutually_visible_vertices($outer_graph.nodes, $inner_graph.nodes)
+    $mutual_visible_path = [index_outer, index_inner]
   elsif key == GLFW_KEY_Z && action == GLFW_PRESS && (mods & GLFW_MOD_CONTROL != 0) # Remove the last node your added by Ctrl-Z.
     $current_graph.undo_insert
   end
@@ -441,6 +444,20 @@ if __FILE__ == $0
 
     $outer_graph.render(vg, color_scheme: :outer)
     $inner_graph.render(vg, color_scheme: :inner)
+
+    if $mutual_visible_path.length > 0
+      color = nvgRGBA(0,255,0, 255)
+      lw = 5.0
+      nvgLineCap(vg, NVG_ROUND)
+      nvgLineJoin(vg, NVG_ROUND)
+      nvgBeginPath(vg)
+      nvgMoveTo(vg, $outer_graph.nodes[$mutual_visible_path[0]].x, $outer_graph.nodes[$mutual_visible_path[0]].y)
+      nvgLineTo(vg, $inner_graph.nodes[$mutual_visible_path[1]].x, $inner_graph.nodes[$mutual_visible_path[1]].y)
+      nvgClosePath(vg)
+      nvgStrokeColor(vg, color)
+      nvgStrokeWidth(vg, lw)
+      nvgStroke(vg)
+    end
 
     $font_plane.render(vg, winWidth - 1200, 10, 1150, 700, "[MODE] #{$current_graph==$outer_graph ? 'Making Outer Polygon' : 'Making Inner Polygon'}", color: nvgRGBA(32,128,64,255))
     $font_plane.render(vg, winWidth - 1200, 60, 1150, 700, "[TRIANGULATION] #{$outer_graph.triangle_indices.length > 0 ? 'Done' : 'Not Yet'}", color: nvgRGBA(32,128,64,255))
