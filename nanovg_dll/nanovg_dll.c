@@ -1,10 +1,14 @@
 #if defined(__APPLE__)
-#include <OpenGL/gl.h>
+# if defined(NANOVG_GL3_IMPLEMENTATION)
+#  include <OpenGL/gl3.h>
+# else
+#  include <OpenGL/gl.h>
+# endif
 #elif defined(_WIN32)
-#define WIN32_LEAN_AND_MEAN
-#include "windows.h"
-#include <GL/gl.h>
-#include <GL/glext.h>
+# define WIN32_LEAN_AND_MEAN
+# include "windows.h"
+# include <GL/gl.h>
+# include <GL/glext.h>
 #endif
 
 #if defined(_WIN32)

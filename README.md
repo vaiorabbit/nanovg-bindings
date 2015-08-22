@@ -3,7 +3,7 @@
 Provides NanoVG ( https://github.com/memononen/nanovg ) interfaces for ruby (MRI).
 
 *   Created : 2015-07-12
-*   Last modified : 2015-07-16
+*   Last modified : 2015-08-22
 
 ## Prerequisites ##
 

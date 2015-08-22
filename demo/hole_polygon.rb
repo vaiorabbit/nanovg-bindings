@@ -13,7 +13,7 @@ require_relative './segment_intersection'
 
 OpenGL.load_lib()
 GLFW.load_lib()
-NanoVG.load_dll('libnanovg_gl2.dylib')
+NanoVG.load_dll('libnanovg_gl3.dylib', render_backend: :gl3)
 
 include OpenGL
 include GLFW
@@ -377,8 +377,13 @@ if __FILE__ == $0
     exit
   end
 
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2)
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0)
+  # glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2)
+  # glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0)
+    glfwDefaultWindowHints()
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE)
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE)
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4)
+    glfwWindowHint(GLFW_DECORATED, 0)
 
   window = glfwCreateWindow( 1280, 720, "Triangulation", nil, nil )
   if window == 0
@@ -391,8 +396,8 @@ if __FILE__ == $0
 
   glfwMakeContextCurrent( window )
 
-  nvgSetupGL2()
-  vg = nvgCreateGL2(NVG_ANTIALIAS | NVG_STENCIL_STROKES)
+  nvgSetupGL3()
+  vg = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES)
   if vg == nil
     puts("Could not init nanovg.")
     exit
@@ -457,7 +462,7 @@ if __FILE__ == $0
     end
   end
 
-  nvgDeleteGL2(vg)
+  nvgDeleteGL3(vg)
 
   glfwTerminate()
 end
