@@ -2,7 +2,6 @@
 # Usage:
 # $ gem install rmath3d_plain
 # $ ruby hole_polygon.rb
-require 'pp'
 require 'opengl'
 require 'glfw'
 require 'rmath3d/rmath3d_plain'
@@ -348,6 +347,7 @@ key = GLFW::create_callback(:GLFWkeyfun) do |window, key, scancode, action, mods
     $mutual_visible_path = [index_outer, index_inner]
   elsif key == GLFW_KEY_Z && action == GLFW_PRESS && (mods & GLFW_MOD_CONTROL != 0) # Remove the last node your added by Ctrl-Z.
     $current_graph.undo_insert
+    $mutual_visible_path.clear
   end
 end
 
@@ -365,9 +365,11 @@ mouse = GLFW::create_callback(:GLFWmousebuttonfun) do |window_handle, button, ac
 #      else
 #        $current_graph.triangulate
       end
+      $mutual_visible_path.clear
     else
       $current_graph.insert_node(mx, my) # add_node(mx, my)
 #      $current_graph.triangulate
+      $mutual_visible_path.clear
     end
   end
 end
@@ -468,15 +470,13 @@ if __FILE__ == $0
     glfwSwapBuffers( window )
     glfwPollEvents()
 
-    if false # ($plot_spiral || $plot_random) && total_time > 0.01
-      mouse.call(window, 0, 0, 0)
-      total_time = 0
 =begin
+    if total_time > 0.01
       $ss_name = sprintf("ss%05d.tga", $ss_id)
       save_screenshot(fbWidth, fbHeight, $ss_name)
       $ss_id += 1
-=end
     end
+=end
   end
 
   nvgDeleteGL3(vg)

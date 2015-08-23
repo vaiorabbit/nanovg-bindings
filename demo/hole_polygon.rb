@@ -340,10 +340,7 @@ key = GLFW::create_callback(:GLFWkeyfun) do |window, key, scancode, action, mods
   elsif key == GLFW_KEY_R && action == GLFW_PRESS # Press 'R' to clear graph.
     $current_graph.clear
   elsif key == GLFW_KEY_M && action == GLFW_PRESS # Press 'M' to merge inner polygon.
-    p $outer_graph.nodes
     $outer_graph.nodes = ConvexPartitioning.merge_inner_polygon($outer_graph.nodes, $inner_graph.nodes)
-    puts '↓'
-    p $outer_graph.nodes
     $outer_graph.triangulate
   elsif key == GLFW_KEY_Z && action == GLFW_PRESS && (mods & GLFW_MOD_CONTROL != 0) # Remove the last node your added by Ctrl-Z.
     $current_graph.undo_insert

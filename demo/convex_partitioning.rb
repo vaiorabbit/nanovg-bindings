@@ -1,16 +1,6 @@
 require 'rmath3d/rmath3d_plain'
 include RMath3D
 
-class RVec2
-  def ==( other )
-    if other.class == RVec2
-      return (x-other.x).abs<=Float::EPSILON && (y-other.y).abs<=Float::EPSILON
-    else
-      return false
-    end
-  end
-end
-
 require_relative 'triangle'
 
 module ConvexPartitioning
@@ -102,7 +92,7 @@ module ConvexPartitioning
       end
     end
 
-    # Search the reflex vertices of th eouter polygon.
+    # Search the reflex vertices of the outer polygon.
     vertex_R = nil
     angle_MR = Math::PI
     outer_polygon.each_with_index do |vertex_current, index|
