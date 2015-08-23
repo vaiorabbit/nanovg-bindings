@@ -129,6 +129,20 @@ module ConvexPartitioning
     return index_outer, index_inner
   end
 
+  def self.merge_inner_polygon(outer_polygon, inner_polygon)
+    index_outer, index_inner = ConvexPartitioning.find_mutually_visible_vertices(outer_polygon, inner_polygon)
+    mutually_visible_edge = [index_outer, index_inner]
+
+    merged_polygon = outer_polygon.rotate( (mutually_visible_edge[0] + 1) % outer_polygon.length )
+    append_polygon = inner_polygon.rotate( (mutually_visible_edge[1] + 1) % inner_polygon.length ).reverse!
+
+    merged_polygon.concat(append_polygon)
+    merged_polygon << merged_polygon[outer_polygon.length]
+    merged_polygon << merged_polygon[outer_polygon.length-1]
+
+    return merged_polygon
+  end
+
 end
 
 if __FILE__ == $0
