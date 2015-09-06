@@ -1,3 +1,7 @@
+2015-09-07  vaiorabbit  <http://twitter.com/vaiorabbit>
+
+	* demo: Removed some uninformative samples.
+
 2015-08-22  vaiorabbit
 
 	* nanovg_dll.c: Fixed include file name for Mac OS X.
