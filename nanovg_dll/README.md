@@ -1,3 +1,5 @@
+<!-- -*- mode:markdown; coding:utf-8; -*- -->
+
 ## Building libnanovg_gl2.dylib ##
 
 ### Premake ###
@@ -67,23 +69,23 @@ a module definition file (xxx.def) by hand and pass it to Visual Studio linker.
 
 -------------------------------------------------------------------------------
 
-## libnanovg_gl2.dylib ¤Î¥Ó¥ë¥ÉÊıË¡ ##
+## libnanovg_gl2.dylib ã®ãƒ“ãƒ«ãƒ‰æ–¹æ³• ##
 
 ### Premake ###
 
-¥Ó¥ë¥É¥¹¥¯¥ê¥×¥È¤Ï Premake ( https://premake.github.io ) ¤ÇÀ¸À®¤·¤Ş¤¹.
-»ı¤Ã¤Æ¤¤¤Ê¤¤¾ì¹ç¤ÏÀè¤Ë¥¤¥ó¥¹¥È¡¼¥ë¤·¤Æ¤ª¤¤¤Æ¤¯¤À¤µ¤¤.
+ãƒ“ãƒ«ãƒ‰ã‚¹ã‚¯ãƒªãƒ—ãƒˆã¯ Premake ( https://premake.github.io ) ã§ç”Ÿæˆã—ã¾ã™.
+æŒã£ã¦ã„ãªã„å ´åˆã¯å…ˆã«ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã—ã¦ãŠã„ã¦ãã ã•ã„.
 
 	$ brew install premake # for Mac OS X
 
 ### GLEXT ###
 
-WindowsÈÇ¤Ï glext.h ¤Ë°ÍÂ¸¤·¤Æ¤¤¤Ş¤¹¡£
-ºÇ¿·ÈÇ¤Ï¤³¤Á¤é¤«¤éÆş¼ê¤Ç¤­¤Ş¤¹: https://www.opengl.org/registry/api/GL/glext.h
-*   premake4.lua ¤Ë¤¢¤ë²¼µ­¤Î¥Ñ¥¹¤Ë´Ø¤¹¤ë¹àÌÜ¤ò½¤Àµ¤·¤Æ¤¯¤À¤µ¤¤:
+Windowsç‰ˆã¯ glext.h ã«ä¾å­˜ã—ã¦ã„ã¾ã™ã€‚
+æœ€æ–°ç‰ˆã¯ã“ã¡ã‚‰ã‹ã‚‰å…¥æ‰‹ã§ãã¾ã™: https://www.opengl.org/registry/api/GL/glext.h
+*   premake4.lua ã«ã‚ã‚‹ä¸‹è¨˜ã®ãƒ‘ã‚¹ã«é–¢ã™ã‚‹é …ç›®ã‚’ä¿®æ­£ã—ã¦ãã ã•ã„:
     *   includedirs
 
-### ¼ê½ç ###
+### æ‰‹é † ###
 
 #### Mac OS X ####
 
@@ -109,24 +111,24 @@ WindowsÈÇ¤Ï glext.h ¤Ë°ÍÂ¸¤·¤Æ¤¤¤Ş¤¹¡£
 #### Windows ####
 
 	> %home%\Programs\premake\premake4.exe vs2012
-	* build\nanovg.sln ¤ò Visual Studio ¤Ç¥ª¡¼¥×¥ó¡£
-	* nanovg_gl{2|3} ¤ò ReleaseDLL/x64 ¤È¤¤¤¦¹½À®¤Ë¤·¤Æ¥Ó¥ë¥É¡£
-	* nanovg_gl{2|3}.dll ¤¬ demo ¥Õ¥©¥ë¥À¡¼¤Ë¥³¥Ô¡¼¤µ¤ì¤Æ¤¤¤Ş¤¹¡£
+	* build\nanovg.sln ã‚’ Visual Studio ã§ã‚ªãƒ¼ãƒ—ãƒ³ã€‚
+	* nanovg_gl{2|3} ã‚’ ReleaseDLL/x64 ã¨ã„ã†æ§‹æˆã«ã—ã¦ãƒ“ãƒ«ãƒ‰ã€‚
+	* nanovg_gl{2|3}.dll ãŒ demo ãƒ•ã‚©ãƒ«ãƒ€ãƒ¼ã«ã‚³ãƒ”ãƒ¼ã•ã‚Œã¦ã„ã¾ã™ã€‚
 
-### ¥á¥â : ¥â¥¸¥å¡¼¥ëÄêµÁ¥Õ¥¡¥¤¥ë¤Î½ñ¤­Êı (nanovg_gl2.def) ###
+### ãƒ¡ãƒ¢ : ãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«å®šç¾©ãƒ•ã‚¡ã‚¤ãƒ«ã®æ›¸ãæ–¹ (nanovg_gl2.def) ###
 
-nanovg.h ¤Ç¤Ï __declspec(dllexport) ¤ò»È¤Ã¤Æ¤¤¤Ş¤»¤ó¤Î¤Ç¡¢Windows´Ä¶­¤ÇDLL²½¤¹¤ë¤¿¤á¤Ë¤Ï
-¥â¥¸¥å¡¼¥ëÄêµÁ¥Õ¥¡¥¤¥ë (xxx.def) ¤ò¼ê½ñ¤­¤·¤Æ Visual Studio ¤Î¥ê¥ó¥«¡¼¤ËÅÏ¤¹É¬Í×¤¬¤¢¤ê¤Ş¤¹¡£
+nanovg.h ã§ã¯ __declspec(dllexport) ã‚’ä½¿ã£ã¦ã„ã¾ã›ã‚“ã®ã§ã€Windowsç’°å¢ƒã§DLLåŒ–ã™ã‚‹ãŸã‚ã«ã¯
+ãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«å®šç¾©ãƒ•ã‚¡ã‚¤ãƒ« (xxx.def) ã‚’æ‰‹æ›¸ãã—ã¦ Visual Studio ã®ãƒªãƒ³ã‚«ãƒ¼ã«æ¸¡ã™å¿…è¦ãŒã‚ã‚Šã¾ã™ã€‚
 
 	> %home%\Programs\premake\premake4.exe vs2012
 
-* build\nanovg.sln ¤ò Visual Studio ¤Ç³«¤¯
-* nanovg_gl2.lib ¤ò Release/x64 ¤È¤¤¤¦¹½À®¤Ë¤·¤Æ¥Ó¥ë¥É
+* build\nanovg.sln ã‚’ Visual Studio ã§é–‹ã
+* nanovg_gl2.lib ã‚’ Release/x64 ã¨ã„ã†æ§‹æˆã«ã—ã¦ãƒ“ãƒ«ãƒ‰
 
 	> dumpbin nanovg_gl2.lib /symbols > nanovg_gl2.lib.syms
 	> grep "External" nanovg_gl2.lib.syms | grep "nvg" > nanovg_gl2_External_nvg.syms
 
-* 'nanovg_gl2_External_nvg.syms' ¤È¤¤¤¦¥Æ¥­¥¹¥È¥Õ¥¡¥¤¥ë¤Ë½Ğ¤Æ¤­¤¿¥·¥ó¥Ü¥ë¤ò nanovg_gl2.def ¤Ë¼ê½ñ¤­¤ÇÊÂ¤Ù¤ë¡£¶ñÂÎÅª¤Ë¤Ï¡§
+* 'nanovg_gl2_External_nvg.syms' ã¨ã„ã†ãƒ†ã‚­ã‚¹ãƒˆãƒ•ã‚¡ã‚¤ãƒ«ã«å‡ºã¦ããŸã‚·ãƒ³ãƒœãƒ«ã‚’ nanovg_gl2.def ã«æ‰‹æ›¸ãã§ä¸¦ã¹ã‚‹ã€‚å…·ä½“çš„ã«ã¯ï¼š
 
 	LIBRARY	nanovg_gl2
 	EXPORTS
