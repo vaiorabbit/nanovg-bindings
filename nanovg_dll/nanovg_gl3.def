@@ -3,6 +3,9 @@ EXPORTS
 	nvgBeginFrame
 	nvgCancelFrame
 	nvgEndFrame
+    nvgGlobalCompositeOperation
+    nvgGlobalCompositeBlendFunc
+    nvgGlobalCompositeBlendFuncSeparate
 	nvgRGB
 	nvgRGBf
 	nvgRGBA

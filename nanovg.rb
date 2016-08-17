@@ -33,6 +33,32 @@ module NanoVG
   NVG_ALIGN_BOTTOM   = 32
   NVG_ALIGN_BASELINE = 64
 
+  # NVGblendFactor
+  NVG_ZERO                = 1 << 0
+  NVG_ONE                 = 1 << 1
+  NVG_SRC_COLOR           = 1 << 2
+  NVG_ONE_MINUS_SRC_COLOR = 1 << 3
+  NVG_DST_COLOR           = 1 << 4
+  NVG_ONE_MINUS_DST_COLOR = 1 << 5
+  NVG_SRC_ALPHA           = 1 << 6
+  NVG_ONE_MINUS_SRC_ALPHA = 1 << 7
+  NVG_DST_ALPHA           = 1 << 8
+  NVG_ONE_MINUS_DST_ALPHA = 1 << 9
+  NVG_SRC_ALPHA_SATURATE  = 1 << 10
+
+  # NVGcompositeOperation
+  NVG_SOURCE_OVER      = 0
+  NVG_SOURCE_IN        = 1
+  NVG_SOURCE_OUT       = 2
+  NVG_ATOP             = 3
+  NVG_DESTINATION_OVER = 4
+  NVG_DESTINATION_IN   = 5
+  NVG_DESTINATION_OUT  = 6
+  NVG_DESTINATION_ATOP = 7
+  NVG_LIGHTER          = 8
+  NVG_COPY             = 9
+  NVG_XOR              = 10
+
   # NVGimageFlags
   NVG_IMAGE_GENERATE_MIPMAPS  = 1
   NVG_IMAGE_REPEATX           = 2
@@ -64,6 +90,15 @@ module NanoVG
       :innerColor,  NVGcolor,
       :outerColor,  NVGcolor,
       :image,       :int32
+    )
+  end
+
+  class NVGcompositeOperationState < FFI::Struct
+    layout(
+      :srcRGB,   :int32,
+      :dstRGB,   :int32,
+      :srcAlpha, :int32,
+      :dstAlpha, :int32
     )
   end
 
@@ -105,6 +140,10 @@ module NanoVG
     attach_function :nvgBeginFrame, :nvgBeginFrame, [:pointer, :int32, :int32, :float], :void
     attach_function :nvgCancelFrame, :nvgCancelFrame, [:pointer], :void
     attach_function :nvgEndFrame, :nvgEndFrame, [:pointer], :void
+
+    attach_function :nvgGlobalCompositeOperation, [:pointer,  :int32], :void
+    attach_function :nvgGlobalCompositeBlendFunc, [:pointer, :int32, :int32], :void
+    attach_function :nvgGlobalCompositeBlendFuncSeparate, [:pointer, :int32, :int32, :int32, :int32], :void
 
     attach_function :nvgRGB, :nvgRGB, [:uint8, :uint8, :uint8], NVGcolor.by_value
     attach_function :nvgRGBf, :nvgRGBf, [:float, :float, :float], NVGcolor.by_value
@@ -228,7 +267,7 @@ end
 
 =begin
 NanoVG-Bindings : A Ruby bindings of NanoVG
-Copyright (c) 2015 vaiorabbit
+Copyright (c) 2015-2016 vaiorabbit
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
