@@ -1,6 +1,7 @@
 2016-12-03  vaiorabbit  <http://twitter.com/vaiorabbit>
 
 	* nanovg.rb, nanovg_dll: Now compatible with the latest APIs (NanoVG Commit cacb00b852079db23c180f2e6cbff41eef673783).
+	* demo/emojifont.rb, etc.: Added.
 
 2016-08-17  vaiorabbit  <http://twitter.com/vaiorabbit>
 

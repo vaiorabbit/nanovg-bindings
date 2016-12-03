@@ -5,6 +5,7 @@ class DemoData
     @fontNormal = -1
     @fontBold = -1
     @fontIcons = -1
+    @fontEmoji = -1
     @images = Array.new(12) { -1 }
   end
 
@@ -963,6 +964,15 @@ class DemoData
       puts "Could not add font bold."
       return -1
     end
+
+    @fontEmoji = nvgCreateFont(vg, "emoji", "./data/NotoEmoji-Regular.ttf")
+    if @fontEmoji == -1
+      puts "Could not add font emoji."
+      return -1
+    end
+
+    nvgAddFallbackFontId(vg, @fontNormal, @fontEmoji)
+    nvgAddFallbackFontId(vg, @fontBold, @fontEmoji)
 
     return 0
   end
