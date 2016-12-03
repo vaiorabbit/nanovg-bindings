@@ -1,3 +1,7 @@
+2016-12-03  vaiorabbit  <http://twitter.com/vaiorabbit>
+
+	* nanovg.rb, nanovg_dll: Now compatible with the latest APIs (NanoVG Commit cacb00b852079db23c180f2e6cbff41eef673783).
+
 2016-08-17  vaiorabbit  <http://twitter.com/vaiorabbit>
 
 	* nanovg.rb, nanovg_dll: Now compatible with the latest APIs (NanoVG Commit 09dc767e3f25ec97e7398c18eca6a4c6bb3763f5).

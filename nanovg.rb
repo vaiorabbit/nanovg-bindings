@@ -220,6 +220,7 @@ module NanoVG
     attach_function :nvgArc, :nvgArc, [:pointer, :float, :float, :float, :float, :float, :int32], :void
     attach_function :nvgRect, :nvgRect, [:pointer, :float, :float, :float, :float], :void
     attach_function :nvgRoundedRect, :nvgRoundedRect, [:pointer, :float, :float, :float, :float, :float], :void
+    attach_function :nvgRoundedRectVarying, :nvgRoundedRectVarying, [:pointer, :float, :float, :float, :float, :float, :float, :float, :float], :void
     attach_function :nvgEllipse, :nvgEllipse, [:pointer, :float, :float, :float, :float], :void
     attach_function :nvgCircle, :nvgCircle, [:pointer, :float, :float, :float], :void
     attach_function :nvgFill, :nvgFill, [:pointer], :void
@@ -228,6 +229,8 @@ module NanoVG
     attach_function :nvgCreateFont, :nvgCreateFont, [:pointer, :pointer, :pointer], :int32
     attach_function :nvgCreateFontMem, :nvgCreateFontMem, [:pointer, :pointer, :pointer, :int32, :int32], :int32
     attach_function :nvgFindFont, :nvgFindFont, [:pointer, :pointer], :int32
+    attach_function :nvgAddFallbackFontId, :nvgAddFallbackFontId, [:pointer, :int32, :int32], :int32
+    attach_function :nvgAddFallbackFont, :nvgAddFallbackFont, [:pointer, :pointer, :pointer], :int32
     attach_function :nvgFontSize, :nvgFontSize, [:pointer, :float], :void
     attach_function :nvgFontBlur, :nvgFontBlur, [:pointer, :float], :void
     attach_function :nvgTextLetterSpacing, :nvgTextLetterSpacing, [:pointer, :float], :void

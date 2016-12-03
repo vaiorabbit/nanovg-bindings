@@ -71,6 +71,7 @@ EXPORTS
 	nvgArc
 	nvgRect
 	nvgRoundedRect
+	nvgRoundedRectVarying
 	nvgEllipse
 	nvgCircle
 	nvgFill
@@ -78,6 +79,8 @@ EXPORTS
 	nvgCreateFont
 	nvgCreateFontMem
 	nvgFindFont
+	nvgAddFallbackFontId
+	nvgAddFallbackFont
 	nvgFontSize
 	nvgFontBlur
 	nvgTextLetterSpacing
