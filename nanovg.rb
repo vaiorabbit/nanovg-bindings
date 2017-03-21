@@ -65,6 +65,7 @@ module NanoVG
   NVG_IMAGE_REPEATY           = 4
   NVG_IMAGE_FLIPY             = 8
   NVG_IMAGE_PREMULTIPLIED     = 16
+  NVG_IMAGE_NEAREST           = 32
 
   # NVGcreateFlags
   NVG_ANTIALIAS         = 1
