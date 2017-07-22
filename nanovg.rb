@@ -161,6 +161,7 @@ module NanoVG
     attach_function :nvgRestore, :nvgRestore, [:pointer], :void
     attach_function :nvgReset, :nvgReset, [:pointer], :void
 
+    attach_function :nvgShapeAntiAlias, :nvgShapeAntiAlias, [:pointer, NVGcolor.by_value], :void
     attach_function :nvgStrokeColor, :nvgStrokeColor, [:pointer, NVGcolor.by_value], :void
     attach_function :nvgStrokePaint, [:pointer, NVGpaint.by_value], :void
     attach_function :nvgFillColor, [:pointer, NVGcolor.by_value], :void
@@ -271,7 +272,7 @@ end
 
 =begin
 NanoVG-Bindings : A Ruby bindings of NanoVG
-Copyright (c) 2015-2016 vaiorabbit
+Copyright (c) 2015-2017 vaiorabbit
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages

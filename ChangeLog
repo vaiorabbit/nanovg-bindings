@@ -1,3 +1,7 @@
+2017-07-22  vaiorabbit  <http://twitter.com/vaiorabbit>
+
+	* nanovg.rb: Now compatible with the latest APIs (NanoVG Commit 30e1c98175b30bcfd8f979f0813a97333329dfe2 https://github.com/memononen/nanovg/commit/30e1c98175b30bcfd8f979f0813a97333329dfe2).
+
 2017-03-21  vaiorabbit  <http://twitter.com/vaiorabbit>
 
 	* nanovg.rb: Now compatible with the latest APIs (NanoVG Commit c75fc0bfcf3a72fb61dcd46df0522a60b59c6cc2 https://github.com/memononen/nanovg/commit/c75fc0bfcf3a72fb61dcd46df0522a60b59c6cc2).
