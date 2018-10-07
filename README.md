@@ -5,6 +5,9 @@ Provides NanoVG ( https://github.com/memononen/nanovg ) interfaces for ruby (MRI
 *   Created : 2015-07-12
 *   Last modified : 2017-07-22
 
+<img src="https://raw.githubusercontent.com/vaiorabbit/nanovg-bindings/master/doc/example_rb.png" width="150"> <img src="https://raw.githubusercontent.com/vaiorabbit/nanovg-bindings/master/doc/emojifont_rb.png" width="150"> <img src="https://raw.githubusercontent.com/vaiorabbit/nanovg-bindings/master/doc/hex_gol_glider5_rb.png" width="150"> <img src="https://raw.githubusercontent.com/vaiorabbit/nanovg-bindings/master/doc/jpfont_rb.png" width="150"> <img src="https://raw.githubusercontent.com/vaiorabbit/nanovg-bindings/master/doc/mandelbrot_rb.png" width="150">
+
+
 ## Prerequisites ##
 
 *   Ruby-FFI ( https://github.com/ffi/ffi )
@@ -35,7 +38,7 @@ See demo/example.rb for details.
 All source codes are available under the terms of the zlib/libpng license.
 
 	NanoVG-Bindings : A Ruby bindings of NanoVG
-	Copyright (c) 2015-2017 vaiorabbit
+	Copyright (c) 2015-2018 vaiorabbit
 	
 	This software is provided 'as-is', without any express or implied
 	warranty. In no event will the authors be held liable for any damages
