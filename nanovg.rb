@@ -138,7 +138,7 @@ module NanoVG
     #
     # Common API
     #
-    attach_function :nvgBeginFrame, :nvgBeginFrame, [:pointer, :int32, :int32, :float], :void
+    attach_function :nvgBeginFrame, :nvgBeginFrame, [:pointer, :float, :float, :float], :void
     attach_function :nvgCancelFrame, :nvgCancelFrame, [:pointer], :void
     attach_function :nvgEndFrame, :nvgEndFrame, [:pointer], :void
 
