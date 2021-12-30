@@ -1,6 +1,6 @@
 require 'opengl'
 require 'glfw'
-require_relative '../nanovg'
+require_relative '../lib/nanovg'
 require_relative './showcase/scenes'
 
 OpenGL.load_lib()
@@ -113,12 +113,12 @@ if __FILE__ == $0
     glfwSwapBuffers( window )
     glfwPollEvents()
 
-    if $showcase.current_scene.should_save
-      $ss_name = sprintf("ss%05d.tga", $ss_id)
-      save_screenshot(fbWidth, fbHeight, $ss_name)
-      $ss_id += 1
-      $showcase.current_scene.should_save = false
-    end
+    # if $showcase.current_scene.should_save
+    #   $ss_name = sprintf("ss%05d.tga", $ss_id)
+    #   save_screenshot(fbWidth, fbHeight, $ss_name)
+    #   $ss_id += 1
+    #   $showcase.current_scene.should_save = false
+    # end
 
   end
 

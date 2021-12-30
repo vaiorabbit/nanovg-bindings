@@ -1,11 +1,10 @@
-# coding: cp932
 # Usage :
 # $ gem install rqrcode
 # $ ruby qrc.rb [String to encode into QR code]
 require 'rqrcode'
 require 'opengl'
 require 'glfw'
-require_relative '../nanovg'
+require_relative '../lib/nanovg'
 
 OpenGL.load_lib()
 GLFW.load_lib()
@@ -86,7 +85,7 @@ if __FILE__ == $0
     y = y_base
     qrc.modules.each_index do |r|
       qrc.modules.each_index do |c|
-        color = qrc.is_dark(r, c) ? nvgRGBA(0,0,0, 255) : nvgRGBA(255,255,255, 255)
+        color = qrc.qrcode.checked?(r, c) ? nvgRGBA(0,0,0, 255) : nvgRGBA(255,255,255, 255)
         nvgBeginPath(vg)
         nvgFillColor(vg, color)
         nvgRect(vg, x, y, cell_wh, cell_wh)
@@ -108,5 +107,4 @@ if __FILE__ == $0
 
   glfwTerminate()
 
-  # puts qrc.to_s(:true => '¡', :false => ' ')
 end

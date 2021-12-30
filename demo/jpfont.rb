@@ -1,8 +1,8 @@
 # coding: utf-8
-# Usage : $ ruby jpfont.rb [path to .ttf (ex.)./jpfont/GenShinGothic-Normal.ttf]
+# Usage : $ ruby jpfont.rb [path to .ttf (ex.)./jpfont/x12y16pxMaruMonica.ttf]
 require 'opengl'
 require 'glfw'
-require_relative '../nanovg'
+require_relative '../lib/nanovg'
 
 OpenGL.load_lib()
 GLFW.load_lib()
@@ -42,7 +42,7 @@ def draw_paragraph(vg, x, y, width, height, text, name="sans")
 
   nvgSave(vg)
 
-  nvgFontSize(vg, 44.0)
+  nvgFontSize(vg, 38.0)
   nvgFontFace(vg, name)
   nvgTextAlign(vg, NVG_ALIGN_LEFT|NVG_ALIGN_TOP)
   nvgTextMetrics(vg, nil, nil, lineh_buf)
@@ -50,7 +50,7 @@ def draw_paragraph(vg, x, y, width, height, text, name="sans")
 
   text_start = text
   text_end = nil
-  while ((nrows = nvgTextBreakLines(vg, text_start, text_end, width, rows_buf, 3)))
+  while (nrows = nvgTextBreakLines(vg, text_start, text_end, width, rows_buf, 3))
     rows = nrows.times.collect do |i|
       NVGtextRow.new(rows_buf + i * NVGtextRow.size)
     end

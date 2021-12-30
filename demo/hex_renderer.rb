@@ -1,8 +1,8 @@
 require 'opengl'
 require 'glfw'
 # require 'set'
-require_relative '../nanovg'
-require_relative 'hex'
+require_relative '../lib/nanovg'
+require_relative 'lib/hex'
 
 OpenGL.load_lib()
 GLFW.load_lib()

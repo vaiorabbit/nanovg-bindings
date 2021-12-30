@@ -3,7 +3,7 @@
 # $ ruby mandelbrot.rb [pixel_count]
 require 'opengl'
 require 'glfw'
-require_relative '../nanovg'
+require_relative '../lib/nanovg'
 
 OpenGL.load_lib()
 GLFW.load_lib()
@@ -20,7 +20,7 @@ key = GLFW::create_callback(:GLFWkeyfun) do |window, key, scancode, action, mods
   end
 end
 
-$pixel_count = ARGV[0] == nil ? 50 : ARGV[0].to_i
+$pixel_count = ARGV[0] == nil ? 100 : ARGV[0].to_i
 $pixel_table = nil
 
 if __FILE__ == $0

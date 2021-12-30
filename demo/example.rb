@@ -3,13 +3,13 @@
 #
 require 'opengl'
 require 'glfw'
-require_relative '../nanovg'
-require_relative 'perf'
-require_relative 'demo_data'
+require_relative '../lib/nanovg'
+require_relative 'lib/perf'
+require_relative 'lib/demo_data'
 
 OpenGL.load_lib()
-GLFW.load_lib()
-NanoVG.load_dll('libnanovg_gl2.dylib')
+GLFW.load_lib('./libglfw.dylib')
+NanoVG.load_dll('./libnanovg_gl2.dylib')
 #NanoVG.load_dll('./nanovg_gl2.dll', render_backend: :gl2)
 
 include OpenGL
@@ -37,6 +37,7 @@ key = GLFW::create_callback(:GLFWkeyfun) do |window, key, scancode, action, mods
 end
 
 if __FILE__ == $0
+
   data = DemoData.new
   fps = PerfGraph.new(PerfGraph::GRAPH_RENDER_FPS, "Frame Time")
   prevt = 0.0

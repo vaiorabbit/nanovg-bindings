@@ -5,9 +5,9 @@
 require 'opengl'
 require 'glfw'
 require 'rmath3d/rmath3d_plain'
-require_relative '../nanovg'
-require_relative './convex_partitioning'
-require_relative './segment_intersection'
+require_relative '../lib/nanovg'
+require_relative 'geom/convex_partitioning'
+require_relative 'geom/segment_intersection'
 
 
 OpenGL.load_lib()

@@ -1,3 +1,3 @@
-[submodule "nanovg"]
-	path = nanovg
+[submodule "nanovg_dll/nanovg"]
+	path = nanovg_dll/nanovg
 	url = https://github.com/memononen/nanovg.git

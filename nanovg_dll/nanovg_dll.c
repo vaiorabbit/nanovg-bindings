@@ -97,13 +97,13 @@ void nvgSetupGL3()
 #endif // defined(_WIN32)
 }
 
-#include "nanovg.h"
+//#include "nanovg.h"
 #include "nanovg.c"
 #include "nanovg_gl.h"
 
 /*
 NanoVG-Bindings : A Ruby bindings of NanoVG
-Copyright (c) 2015 vaiorabbit
+Copyright (c) 2015-2022 vaiorabbit
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages

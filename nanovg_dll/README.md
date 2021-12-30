@@ -2,12 +2,12 @@
 
 ## Building libnanovg_gl2.dylib ##
 
-### Premake ###
+### CMake ###
 
-Build scripts are generated via Premake ( https://premake.github.io ).
+Build scripts are generated via CMake ( https://cmake.org ).
 Please install it before proceed.
 
-	$ brew install premake # for Mac OS X
+	$ brew install cmake # for macOS
 
 ### GLEXT ###
 
@@ -18,26 +18,10 @@ Windows version depends on glext.h.
 
 ### Steps ###
 
-#### Mac OS X ####
+#### macOS ####
 
-	$ premake4 --cc=gcc --os=macosx gmake
-		Building configurations...
-		Running action 'gmake'...
-		Generating build/Makefile...
-		Generating build/nanovg_gl2.make...
-		Generating build/nanovg_gl3.make...
-		Done.
-	
-	$ cd build
-	
-	$ make config=releasedll nanovg_gl2
-		==== Building nanovg_gl2 (releasedll) ====
-		Creating obj/ReleaseDLL/nanovg_gl2
-		nanovg_dll.c
-		Linking nanovg_gl2
-	
-	$ ls -l ../../demo/*dylib
-		-rwxr-xr-x  1 foo  bar  209780  7 12 12:16 libnanovg_gl2.dylib
+	$ ./nanovg_dll_build_gl2.sh
+	$ ./nanovg_dll_build_gl3.sh
 
 #### Windows ####
 
@@ -71,12 +55,12 @@ a module definition file (xxx.def) by hand and pass it to Visual Studio linker.
 
 ## libnanovg_gl2.dylib のビルド方法 ##
 
-### Premake ###
+### CMake ###
 
-ビルドスクリプトは Premake ( https://premake.github.io ) で生成します.
+ビルドスクリプトは CMake ( https://cmake.org ) で生成します.
 持っていない場合は先にインストールしておいてください.
 
-	$ brew install premake # for Mac OS X
+	$ brew install cmake # for macOS
 
 ### GLEXT ###
 
@@ -87,26 +71,10 @@ Windows版は glext.h に依存しています。
 
 ### 手順 ###
 
-#### Mac OS X ####
+#### macOS ####
 
-	$ premake4 --cc=gcc --os=macosx gmake
-		Building configurations...
-		Running action 'gmake'...
-		Generating build/Makefile...
-		Generating build/nanovg_gl2.make...
-		Generating build/nanovg_gl3.make...
-		Done.
-	
-	$ cd build
-	
-	$ make config=releasedll nanovg_gl2
-		==== Building nanovg_gl2 (releasedll) ====
-		Creating obj/ReleaseDLL/nanovg_gl2
-		nanovg_dll.c
-		Linking nanovg_gl2
-	
-	$ ls -l ../../demo/*dylib
-		-rwxr-xr-x  1 foo  bar  209780  7 12 12:16 libnanovg_gl2.dylib
+	$ ./nanovg_dll_build_gl2.sh
+	$ ./nanovg_dll_build_gl3.sh
 
 #### Windows ####
 

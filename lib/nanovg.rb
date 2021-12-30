@@ -272,7 +272,7 @@ end
 
 =begin
 NanoVG-Bindings : A Ruby bindings of NanoVG
-Copyright (c) 2015-2017 vaiorabbit
+Copyright (c) 2015-2022 vaiorabbit
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
