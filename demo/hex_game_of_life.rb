@@ -1,17 +1,6 @@
-require 'pp'
-require 'opengl'
-require 'glfw'
-# require 'set'
-require_relative '../lib/nanovg'
+require_relative 'util/setup_dll'
+require_relative 'util/setup_opengl_dll'
 require_relative 'lib/hex'
-
-OpenGL.load_lib()
-GLFW.load_lib()
-NanoVG.load_dll('libnanovg_gl2.dylib')
-
-include OpenGL
-include GLFW
-include NanoVG
 
 class GOLHex < Hex
   attr_accessor :neighbors

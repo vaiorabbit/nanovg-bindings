@@ -1,16 +1,6 @@
-require 'opengl'
-require 'glfw'
-require_relative '../lib/nanovg'
-require_relative './showcase/scenes'
-
-OpenGL.load_lib()
-GLFW.load_lib()
-NanoVG.load_dll('libnanovg_gl2.dylib')
-#NanoVG.load_dll('./nanovg_gl2.dll', render_backend: :gl2)
-
-include OpenGL
-include GLFW
-include NanoVG
+require_relative 'util/setup_dll'
+require_relative 'util/setup_opengl_dll'
+require_relative 'showcase/scenes'
 
 $showcase = nil
 

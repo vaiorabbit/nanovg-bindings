@@ -1,3 +1,9 @@
+2021-12-31  vaiorabbit  <http://twitter.com/vaiorabbit>
+
+	* libnanovg_gl2.dll, libnanovg_gl3.dll: Added Windows binary
+	* demo/util: Added for automatic library loading
+	* nanovg_dll/nanovg.c: Fixed for Windows build
+
 2021-12-30  vaiorabbit  <http://twitter.com/vaiorabbit>
 
 	* libnanovg_gl2.dylib, libnanovg_gl3.dylib: Built with latest nanovg ( https://github.com/memononen/nanovg/tree/645e9147a8701c98f52240257af0c9d5fa640e86 )

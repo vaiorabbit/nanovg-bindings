@@ -1,16 +1,7 @@
 # coding: utf-8
 # Usage : $ ruby jpfont.rb [path to .ttf (ex.)./jpfont/x12y16pxMaruMonica.ttf]
-require 'opengl'
-require 'glfw'
-require_relative '../lib/nanovg'
-
-OpenGL.load_lib()
-GLFW.load_lib()
-NanoVG.load_dll('libnanovg_gl2.dylib')
-
-include OpenGL
-include GLFW
-include NanoVG
+require_relative 'util/setup_dll'
+require_relative 'util/setup_opengl_dll'
 
 errorcb = GLFW::create_callback(:GLFWerrorfun) do |error, desc|
   printf("GLFW error %d: %s\n", error, desc)

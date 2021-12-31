@@ -2,18 +2,10 @@
 # $ gem install rqrcode
 # $ ruby qrc.rb [String to encode into QR code]
 require 'rqrcode'
-require 'opengl'
-require 'glfw'
-require_relative '../lib/nanovg'
-
-OpenGL.load_lib()
-GLFW.load_lib()
-NanoVG.load_dll('libnanovg_gl2.dylib')
+require_relative 'util/setup_dll'
+require_relative 'util/setup_opengl_dll'
 
 include RQRCode
-include OpenGL
-include GLFW
-include NanoVG
 
 # Press ESC to exit.
 key = GLFW::create_callback(:GLFWkeyfun) do |window, key, scancode, action, mods|

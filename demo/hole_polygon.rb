@@ -2,22 +2,11 @@
 # Usage:
 # $ gem install rmath3d_plain
 # $ ruby hole_polygon.rb
-require 'opengl'
-require 'glfw'
+require_relative 'util/setup_dll'
+require_relative 'util/setup_opengl_dll'
 require 'rmath3d/rmath3d_plain'
-require_relative '../lib/nanovg'
 require_relative 'geom/convex_partitioning'
 require_relative 'geom/segment_intersection'
-
-
-OpenGL.load_lib()
-GLFW.load_lib()
-NanoVG.load_dll('libnanovg_gl3.dylib', render_backend: :gl3)
-
-include OpenGL
-include GLFW
-include NanoVG
-include RMath3D
 
 # Saves as .tga
 $ss_name = "ss0000.tga"
@@ -376,13 +365,9 @@ if __FILE__ == $0
     exit
   end
 
-  # glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2)
-  # glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0)
-    glfwDefaultWindowHints()
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE)
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE)
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4)
-    glfwWindowHint(GLFW_DECORATED, 0)
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2)
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0)
+  glfwDefaultWindowHints()
 
   window = glfwCreateWindow( 1280, 720, "Triangulation", nil, nil )
   if window == 0
@@ -395,8 +380,8 @@ if __FILE__ == $0
 
   glfwMakeContextCurrent( window )
 
-  nvgSetupGL3()
-  vg = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES)
+  nvgSetupGL2()
+  vg = nvgCreateGL2(NVG_ANTIALIAS | NVG_STENCIL_STROKES)
   if vg == nil
     puts("Could not init nanovg.")
     exit
@@ -459,7 +444,7 @@ if __FILE__ == $0
 =end
   end
 
-  nvgDeleteGL3(vg)
+  nvgDeleteGL2(vg)
 
   glfwTerminate()
 end

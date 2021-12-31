@@ -8,7 +8,7 @@
 # define WIN32_LEAN_AND_MEAN
 # include "windows.h"
 # include <GL/gl.h>
-# include <GL/glext.h>
+# include "glext.h"
 #endif
 
 #if defined(_WIN32)
@@ -16,6 +16,7 @@ PFNGLACTIVETEXTUREPROC             glActiveTexture              = NULL;
 PFNGLATTACHSHADERPROC              glAttachShader               = NULL;
 PFNGLBINDATTRIBLOCATIONPROC        glBindAttribLocation         = NULL;
 PFNGLBINDBUFFERPROC                glBindBuffer                 = NULL;
+PFNGLBLENDFUNCSEPARATEPROC         glBlendFuncSeparate          = NULL;
 PFNGLBUFFERDATAPROC                glBufferData                 = NULL;
 PFNGLCOMPILESHADERPROC             glCompileShader              = NULL;
 PFNGLCREATEPROGRAMPROC             glCreateProgram              = NULL;
@@ -57,6 +58,7 @@ void nvgSetupGL2()
     glAttachShader             = (PFNGLATTACHSHADERPROC)wglGetProcAddress("glAttachShader");
     glBindAttribLocation       = (PFNGLBINDATTRIBLOCATIONPROC)wglGetProcAddress("glBindAttribLocation");
     glBindBuffer               = (PFNGLBINDBUFFERPROC)wglGetProcAddress("glBindBuffer");
+    glBlendFuncSeparate        = (PFNGLBLENDFUNCSEPARATEPROC)wglGetProcAddress("glBlendFuncSeparate");
     glBufferData               = (PFNGLBUFFERDATAPROC)wglGetProcAddress("glBufferData");
     glCompileShader            = (PFNGLCOMPILESHADERPROC)wglGetProcAddress("glCompileShader");
     glCreateProgram            = (PFNGLCREATEPROGRAMPROC)wglGetProcAddress("glCreateProgram");

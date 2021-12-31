@@ -128,7 +128,7 @@ module NanoVG
   #
   @@nanovg_import_done = false
 
-  def self.load_dll(libpath = './libnanovg.dylib', render_backend: :gl2)
+  def self.load_lib(libpath = './libnanovg.dylib', render_backend: :gl2)
     ffi_lib_flags :now, :global # to force FFI to access nvgCreateInternal from nvgCreateGL2
     ffi_lib libpath
     import_symbols(render_backend) unless @@nanovg_import_done
