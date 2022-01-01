@@ -1,3 +1,7 @@
+2022-01-01  vaiorabbit  <http://twitter.com/vaiorabbit>
+
+	* nanovg-bindings.gemspec: Added
+
 2021-12-31  vaiorabbit  <http://twitter.com/vaiorabbit>
 
 	* libnanovg_gl2.dll, libnanovg_gl3.dll: Added Windows binary

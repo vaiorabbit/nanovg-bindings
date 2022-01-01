@@ -28,6 +28,6 @@ cd build_%TARGET%
 
 %CMAKE_EXE% -G "MSYS Makefiles" -D CMAKE_BUILD_TYPE=Release -D BUILD_SHARED_LIBS=ON -D CMAKE_C_COMPILER=gcc ../%TARGET%
 make
-copy libnanovg_%TARGET%.dll ..\..\demo
+copy libnanovg_%TARGET%.dll ..\..\lib
 
 popd
