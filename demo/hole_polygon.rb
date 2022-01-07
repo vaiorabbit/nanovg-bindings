@@ -2,9 +2,9 @@
 # Usage:
 # $ gem install rmath3d_plain
 # $ ruby hole_polygon.rb
+require 'rmath3d/rmath3d_plain'
 require_relative 'util/setup_dll'
 require_relative 'util/setup_opengl_dll'
-require 'rmath3d/rmath3d_plain'
 require_relative 'geom/convex_partitioning'
 require_relative 'geom/segment_intersection'
 
@@ -15,9 +15,9 @@ def save_screenshot(w, h, name)
   image = FFI::MemoryPointer.new(:uint8, w*h*4)
   return if image == nil
 
-  glReadPixels(0, 0, w, h, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, image)
+  GL.ReadPixels(0, 0, w, h, GL::BGRA, GL::UNSIGNED_INT_8_8_8_8_REV, image)
 
-  File.open( name, 'wb' ) do |fout|
+  File.open(name, 'wb') do |fout|
     fout.write [0].pack('c')      # identsize
     fout.write [0].pack('c')      # colourmaptype
     fout.write [2].pack('c')      # imagetype
@@ -52,7 +52,7 @@ class FontPlane
   def render(vg, x, y, width, height, text, name: "sans", color: nvgRGBA(255,255,255,255))
     rows_buf = FFI::MemoryPointer.new(NVGtextRow, 3)
     glyphs_buf = FFI::MemoryPointer.new(NVGglyphPosition, 100)
-    lineh_buf = '        '
+    lineh_buf = ' ' * 8
     lineh = 0.0
 
     nvgSave(vg)
@@ -151,7 +151,7 @@ class Graph
     minimum_distances = distances.min_by(2) {|d| d}
     nearest_edge_index = -1
     if minimum_distances[0] != minimum_distances[1]
-      i = distances.find_index( minimum_distances[0] )
+      i = distances.find_index(minimum_distances[0])
       edge_node_indices = segment_indices.select { |segment_index| segment_index.include?(i) }
       e0_self_intersect = SegmentIntersection.check(@nodes + [point], segment_indices - [edge_node_indices[0]] + [[edge_node_indices[0][0], @nodes.length], [@nodes.length, edge_node_indices[0][1]]])
       e1_self_intersect = SegmentIntersection.check(@nodes + [point], segment_indices - [edge_node_indices[1]] + [[edge_node_indices[1][0], @nodes.length], [@nodes.length, edge_node_indices[1][1]]])
@@ -198,7 +198,7 @@ class Graph
       return
     end
 
-    @nodes.insert( nearest_edge_index + 1, RVec2.new(point_x, point_y) )
+    @nodes.insert(nearest_edge_index + 1, RVec2.new(point_x, point_y))
     @undo_insert_index = nearest_edge_index + 1
   end
 
@@ -238,7 +238,7 @@ class Graph
     end
     minimum_distance = distances.min_by {|d| d}
     if minimum_distance <= @node_radius ** 2
-      nearest_node_index = distances.find_index( minimum_distance )
+      nearest_node_index = distances.find_index(minimum_distance)
       @undo_insert_index = -1
       if node_removable?(nearest_node_index)
         @nodes.delete_at(nearest_node_index)
@@ -322,28 +322,28 @@ $inner_graph = Graph.new
 $current_graph = $outer_graph
 
 key = GLFW::create_callback(:GLFWkeyfun) do |window, key, scancode, action, mods|
-  if key == GLFW_KEY_ESCAPE && action == GLFW_PRESS # Press ESC to exit.
-    glfwSetWindowShouldClose(window, GL_TRUE)
-  elsif key == GLFW_KEY_SPACE && action == GLFW_PRESS
+  if key == GLFW::KEY_ESCAPE && action == GLFW::PRESS # Press ESC to exit.
+    GLFW.SetWindowShouldClose(window, GL::TRUE)
+  elsif key == GLFW::KEY_SPACE && action == GLFW::PRESS
     $current_graph = $current_graph == $inner_graph ? $outer_graph : $inner_graph
-  elsif key == GLFW_KEY_R && action == GLFW_PRESS # Press 'R' to clear graph.
+  elsif key == GLFW::KEY_R && action == GLFW::PRESS # Press 'R' to clear graph.
     $current_graph.clear
-  elsif key == GLFW_KEY_M && action == GLFW_PRESS # Press 'M' to merge inner polygon.
+  elsif key == GLFW::KEY_M && action == GLFW::PRESS # Press 'M' to merge inner polygon.
     $outer_graph.nodes = ConvexPartitioning.merge_inner_polygon($outer_graph.nodes, $inner_graph.nodes)
     $outer_graph.triangulate
-  elsif key == GLFW_KEY_Z && action == GLFW_PRESS && (mods & GLFW_MOD_CONTROL != 0) # Remove the last node your added by Ctrl-Z.
+  elsif key == GLFW::KEY_Z && action == GLFW::PRESS && (mods & GLFW::MOD_CONTROL != 0) # Remove the last node your added by Ctrl-Z.
     $current_graph.undo_insert
   end
 end
 
 mouse = GLFW::create_callback(:GLFWmousebuttonfun) do |window_handle, button, action, mods|
-  if button == GLFW_MOUSE_BUTTON_LEFT && action == 0
+  if button == GLFW::MOUSE_BUTTON_LEFT && action == 0
     mx_buf = ' ' * 8
     my_buf = ' ' * 8
-    glfwGetCursorPos(window_handle, mx_buf, my_buf)
+    GLFW.GetCursorPos(window_handle, mx_buf, my_buf)
     mx = mx_buf.unpack('D')[0]
     my = my_buf.unpack('D')[0]
-    if (mods & GLFW_MOD_SHIFT) != 0
+    if (mods & GLFW::MOD_SHIFT) != 0
       $current_graph.remove_nearest_node(mx, my)
       if $current_graph.nodes.length <= 2
         $current_graph.clear
@@ -358,27 +358,31 @@ mouse = GLFW::create_callback(:GLFWmousebuttonfun) do |window_handle, button, ac
 end
 
 
-if __FILE__ == $0
+if __FILE__ == $PROGRAM_NAME
 
-  if glfwInit() == GL_FALSE
+  GLFW.load_lib(SampleUtil.glfw_library_path)
+
+  if GLFW.Init() == GL::FALSE
     puts("Failed to init GLFW.")
     exit
   end
 
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2)
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0)
-  glfwDefaultWindowHints()
+  GLFW.WindowHint(GLFW::CONTEXT_VERSION_MAJOR, 2)
+  GLFW.WindowHint(GLFW::CONTEXT_VERSION_MINOR, 0)
+  GLFW.DefaultWindowHints()
 
-  window = glfwCreateWindow( 1280, 720, "Triangulation", nil, nil )
+  window = GLFW.CreateWindow(1280, 720, "Triangulation", nil, nil)
   if window == 0
-    glfwTerminate()
+    GLFW.Terminate()
     exit
   end
 
-  glfwSetKeyCallback( window, key )
-  glfwSetMouseButtonCallback( window, mouse )
+  GLFW.SetKeyCallback(window, key)
+  GLFW.SetMouseButtonCallback(window, mouse)
 
-  glfwMakeContextCurrent( window )
+  GLFW.MakeContextCurrent(window)
+
+  GL.load_lib()
 
   nvgSetupGL2()
   vg = nvgCreateGL2(NVG_ANTIALIAS | NVG_STENCIL_STROKES)
@@ -387,28 +391,28 @@ if __FILE__ == $0
     exit
   end
 
-  winWidth_buf  = '        '
-  winHeight_buf = '        '
-  fbWidth_buf  = '        '
-  fbHeight_buf = '        '
+  winWidth_buf  = ' ' * 8
+  winHeight_buf = ' ' * 8
+  fbWidth_buf  = ' ' * 8
+  fbHeight_buf = ' ' * 8
 
   $font_plane.load(vg, "sans", "./jpfont/GenShinGothic-Normal.ttf")
 
-  glfwSwapInterval(0)
-  glfwSetTime(0)
+  GLFW.SwapInterval(0)
+  GLFW.SetTime(0)
 
   total_time = 0.0
 
-  prevt = glfwGetTime()
+  prevt = GLFW.GetTime()
 
-  while glfwWindowShouldClose( window ) == 0
-    t = glfwGetTime()
+  while GLFW.WindowShouldClose(window) == 0
+    t = GLFW.GetTime()
     dt = t - prevt # 1.0 / 60.0
     prevt = t
     total_time += dt
 
-    glfwGetWindowSize(window, winWidth_buf, winHeight_buf)
-    glfwGetFramebufferSize(window, fbWidth_buf, fbHeight_buf)
+    GLFW.GetWindowSize(window, winWidth_buf, winHeight_buf)
+    GLFW.GetFramebufferSize(window, fbWidth_buf, fbHeight_buf)
     winWidth = winWidth_buf.unpack('L')[0]
     winHeight = winHeight_buf.unpack('L')[0]
     fbWidth = fbWidth_buf.unpack('L')[0]
@@ -416,9 +420,9 @@ if __FILE__ == $0
 
     pxRatio = fbWidth.to_f / winWidth.to_f
 
-    glViewport(0, 0, fbWidth, fbHeight)
-    glClearColor(0.8, 0.8, 0.8, 1.0)
-    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT)
+    GL.Viewport(0, 0, fbWidth, fbHeight)
+    GL.ClearColor(0.8, 0.8, 0.8, 1.0)
+    GL.Clear(GL::COLOR_BUFFER_BIT|GL::DEPTH_BUFFER_BIT|GL::STENCIL_BUFFER_BIT)
 
     nvgBeginFrame(vg, winWidth, winHeight, pxRatio)
     nvgSave(vg)
@@ -432,8 +436,8 @@ if __FILE__ == $0
     nvgRestore(vg)
     nvgEndFrame(vg)
 
-    glfwSwapBuffers( window )
-    glfwPollEvents()
+    GLFW.SwapBuffers(window)
+    GLFW.PollEvents()
 
 =begin
     if total_time > 0.01
@@ -446,5 +450,5 @@ if __FILE__ == $0
 
   nvgDeleteGL2(vg)
 
-  glfwTerminate()
+  GLFW.Terminate()
 end

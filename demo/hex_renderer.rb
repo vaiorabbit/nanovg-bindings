@@ -4,30 +4,34 @@ require_relative 'lib/hex'
 
 # Press ESC to exit.
 key = GLFW::create_callback(:GLFWkeyfun) do |window, key, scancode, action, mods|
-  if key == GLFW_KEY_ESCAPE && action == GLFW_PRESS
-    glfwSetWindowShouldClose(window, GL_TRUE)
+  if key == GLFW::KEY_ESCAPE && action == GLFW::PRESS
+    GLFW.SetWindowShouldClose(window, GL::TRUE)
   end
 end
 
-if __FILE__ == $0
+if __FILE__ == $PROGRAM_NAME
 
-  if glfwInit() == GL_FALSE
+  GLFW.load_lib(SampleUtil.glfw_library_path)
+
+  if GLFW.Init() == GL::FALSE
     puts("Failed to init GLFW.")
     exit
   end
 
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2)
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0)
+  GLFW.WindowHint(GLFW::CONTEXT_VERSION_MAJOR, 2)
+  GLFW.WindowHint(GLFW::CONTEXT_VERSION_MINOR, 0)
 
-  window = glfwCreateWindow( 1280, 720, "Hex Grid Renderer", nil, nil )
+  window = GLFW.CreateWindow(1280, 720, "Hex Grid Renderer", nil, nil)
   if window == 0
-    glfwTerminate()
+    GLFW.Terminate()
     exit
   end
 
-  glfwSetKeyCallback( window, key )
+  GLFW.SetKeyCallback(window, key)
 
-  glfwMakeContextCurrent( window )
+  GLFW.MakeContextCurrent(window)
+
+  GL.load_lib()
 
   nvgSetupGL2()
   vg = nvgCreateGL2(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG)
@@ -36,13 +40,13 @@ if __FILE__ == $0
     exit
   end
 
-  glfwSwapInterval(0)
-  glfwSetTime(0)
+  GLFW.SwapInterval(0)
+  GLFW.SetTime(0)
 
-  winWidth_buf  = '        '
-  winHeight_buf = '        '
-  fbWidth_buf  = '        '
-  fbHeight_buf = '        '
+  winWidth_buf  = ' ' * 8
+  winHeight_buf = ' ' * 8
+  fbWidth_buf  = ' ' * 8
+  fbHeight_buf = ' ' * 8
 
   # Hex map rendering layout
   hex_grid_layout = Layout.new(Layout::FLAT, Point.new(28, 28), Point.new(1280/2.0, 720/2.0))
@@ -81,12 +85,12 @@ if __FILE__ == $0
     hex_target.neighbor(5),
   ]
 
-  prevt = glfwGetTime()
+  prevt = GLFW.GetTime()
 
   duration_threshold = 0.167
   current_duration = 0.0
-  while glfwWindowShouldClose( window ) == 0
-    t = glfwGetTime()
+  while GLFW.WindowShouldClose(window) == 0
+    t = GLFW.GetTime()
     dt = t - prevt
     prevt = t
 
@@ -114,8 +118,8 @@ if __FILE__ == $0
       hex_neighbors[i] = OffsetCoord.qoffset_to_cube(OffsetCoord::ODD, oc) if wraparound
     end
 
-    glfwGetWindowSize(window, winWidth_buf, winHeight_buf)
-    glfwGetFramebufferSize(window, fbWidth_buf, fbHeight_buf)
+    GLFW.GetWindowSize(window, winWidth_buf, winHeight_buf)
+    GLFW.GetFramebufferSize(window, fbWidth_buf, fbHeight_buf)
     winWidth = winWidth_buf.unpack('L')[0]
     winHeight = winHeight_buf.unpack('L')[0]
     fbWidth = fbWidth_buf.unpack('L')[0]
@@ -123,9 +127,9 @@ if __FILE__ == $0
 
     pxRatio = fbWidth.to_f / winWidth.to_f
 
-    glViewport(0, 0, fbWidth, fbHeight)
-    glClearColor(0.8, 0.8, 0.8, 1.0)
-    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT)
+    GL.Viewport(0, 0, fbWidth, fbHeight)
+    GL.ClearColor(0.8, 0.8, 0.8, 1.0)
+    GL.Clear(GL::COLOR_BUFFER_BIT|GL::DEPTH_BUFFER_BIT|GL::STENCIL_BUFFER_BIT)
 
     hex_grid_layout.origin.x = hex_grid_layout.size.x * 1.1 #fbWidth / 2.0
     hex_grid_layout.origin.y = hex_grid_layout.size.y * 1.1 #fbHeight / 2.0
@@ -169,8 +173,8 @@ if __FILE__ == $0
     nvgRestore(vg)
     nvgEndFrame(vg)
 
-    glfwSwapBuffers( window )
-    glfwPollEvents()
+    GLFW.SwapBuffers(window)
+    GLFW.PollEvents()
 
     current_duration += dt
     if current_duration > duration_threshold
@@ -183,5 +187,5 @@ if __FILE__ == $0
 
   nvgDeleteGL2(vg)
 
-  glfwTerminate()
+  GLFW.Terminate()
 end

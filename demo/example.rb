@@ -17,42 +17,46 @@ $screenshot = false
 
 # Press ESC to exit.
 key = GLFW::create_callback(:GLFWkeyfun) do |window, key, scancode, action, mods|
-  if key == GLFW_KEY_ESCAPE && action == GLFW_PRESS
-    glfwSetWindowShouldClose(window, GL_TRUE)
+  if key == GLFW::KEY_ESCAPE && action == GLFW::PRESS
+    GLFW.SetWindowShouldClose(window, GL::TRUE)
   end
-  if key == GLFW_KEY_SPACE && action == GLFW_PRESS
+  if key == GLFW::KEY_SPACE && action == GLFW::PRESS
     $blowup = !$blowup
   end
-  if key == GLFW_KEY_S && action == GLFW_PRESS
+  if key == GLFW::KEY_S && action == GLFW::PRESS
     $screenshot = true
   end
 end
 
-if __FILE__ == $0
+if __FILE__ == $PROGRAM_NAME
+
+  GLFW.load_lib(SampleUtil.glfw_library_path)
 
   data = DemoData.new
   fps = PerfGraph.new(PerfGraph::GRAPH_RENDER_FPS, "Frame Time")
   prevt = 0.0
 
-  if glfwInit() == GL_FALSE
+  if GLFW.Init() == GL::FALSE
     puts("Failed to init GLFW.")
     exit
   end
 
-  glfwSetErrorCallback(errorcb)
+  GLFW.SetErrorCallback(errorcb)
 
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2)
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0)
+  GLFW.WindowHint(GLFW::CONTEXT_VERSION_MAJOR, 2)
+  GLFW.WindowHint(GLFW::CONTEXT_VERSION_MINOR, 0)
 
-  window = glfwCreateWindow( 1000, 600, "NanoVG", nil, nil )
+  window = GLFW.CreateWindow(1000, 600, "NanoVG", nil, nil)
   if window == 0
-    glfwTerminate()
+    GLFW.Terminate()
     exit
   end
 
-  glfwSetKeyCallback( window, key )
+  GLFW.SetKeyCallback(window, key)
 
-  glfwMakeContextCurrent( window )
+  GLFW.MakeContextCurrent(window)
+
+  GL.load_lib()
 
   nvgSetupGL2()
   vg = nvgCreateGL2(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG)
@@ -65,25 +69,25 @@ if __FILE__ == $0
     exit
   end
 
-  glfwSwapInterval(0)
-  glfwSetTime(0)
-  prevt = glfwGetTime()
+  GLFW.SwapInterval(0)
+  GLFW.SetTime(0)
+  prevt = GLFW.GetTime()
 
-  mx_buf = '        '
-  my_buf = '        '
-  winWidth_buf  = '        '
-  winHeight_buf = '        '
-  fbWidth_buf  = '        '
-  fbHeight_buf = '        '
-  while glfwWindowShouldClose( window ) == 0
-    t = glfwGetTime()
+  mx_buf = ' ' * 8
+  my_buf = ' ' * 8
+  winWidth_buf  = ' ' * 8
+  winHeight_buf = ' ' * 8
+  fbWidth_buf  = ' ' * 8
+  fbHeight_buf = ' ' * 8
+  while GLFW.WindowShouldClose(window) == 0
+    t = GLFW.GetTime()
     dt = t - prevt
     prevt = t
     fps.update(dt)
 
-    glfwGetCursorPos(window, mx_buf, my_buf)
-    glfwGetWindowSize(window, winWidth_buf, winHeight_buf)
-    glfwGetFramebufferSize(window, fbWidth_buf, fbHeight_buf)
+    GLFW.GetCursorPos(window, mx_buf, my_buf)
+    GLFW.GetWindowSize(window, winWidth_buf, winHeight_buf)
+    GLFW.GetFramebufferSize(window, fbWidth_buf, fbHeight_buf)
     mx = mx_buf.unpack('D')[0]
     my = my_buf.unpack('D')[0]
     winWidth = winWidth_buf.unpack('L')[0]
@@ -93,9 +97,9 @@ if __FILE__ == $0
 
     pxRatio = fbWidth.to_f / winWidth.to_f
 
-    glViewport(0, 0, fbWidth, fbHeight)
-    glClearColor(0.3, 0.3, 0.32, 1.0)
-    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT)
+    GL.Viewport(0, 0, fbWidth, fbHeight)
+    GL.ClearColor(0.3, 0.3, 0.32, 1.0)
+    GL.Clear(GL::COLOR_BUFFER_BIT|GL::DEPTH_BUFFER_BIT|GL::STENCIL_BUFFER_BIT)
 
     nvgBeginFrame(vg, winWidth, winHeight, pxRatio)
 
@@ -105,16 +109,16 @@ if __FILE__ == $0
 
     if $screenshot
       $screenshot = false
-      data.save_screenshot(fbWidth, fbHeight, "dump.tga");
+      data.save_screenshot(fbWidth, fbHeight, "dump.tga")
     end
 
-    glfwSwapBuffers( window )
-    glfwPollEvents()
+    GLFW.SwapBuffers(window)
+    GLFW.PollEvents()
   end
 
   data.free(vg)
 
   nvgDeleteGL2(vg)
 
-  glfwTerminate()
+  GLFW.Terminate()
 end

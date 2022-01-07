@@ -6,14 +6,14 @@ $showcase = nil
 
 # Press ESC to exit.
 key = GLFW::create_callback(:GLFWkeyfun) do |window, key, scancode, action, mods|
-  glfwSetWindowShouldClose(window, GL_TRUE) if key == GLFW_KEY_ESCAPE && action == GLFW_PRESS
-  if key == GLFW_KEY_N && action == GLFW_PRESS
+  GLFW.SetWindowShouldClose(window, GL::TRUE) if key == GLFW::KEY_ESCAPE && action == GLFW::PRESS
+  if key == GLFW::KEY_N && action == GLFW::PRESS
     $showcase.next_scene
-    glfwSetWindowTitle(window, "Ruby-NanoVG : #{$showcase.scene_name}")
+    GLFW.SetWindowTitle(window, "Ruby-NanoVG : #{$showcase.scene_name}")
   end
-  if key == GLFW_KEY_P && action == GLFW_PRESS
+  if key == GLFW::KEY_P && action == GLFW::PRESS
     $showcase.prev_scene
-    glfwSetWindowTitle(window, "Ruby-NanoVG : #{$showcase.scene_name}")
+    GLFW.SetWindowTitle(window, "Ruby-NanoVG : #{$showcase.scene_name}")
   end
 end
 
@@ -24,9 +24,9 @@ def save_screenshot(w, h, name)
   image = FFI::MemoryPointer.new(:uint8, w*h*4)
   return if image == nil
 
-  glReadPixels(0, 0, w, h, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, image)
+  GL.ReadPixels(0, 0, w, h, GL::BGRA, GL::UNSIGNED_INT_8_8_8_8_REV, image)
 
-  File.open( name, 'wb' ) do |fout|
+  File.open(name, 'wb') do |fout|
     fout.write [0].pack('c')      # identsize
     fout.write [0].pack('c')      # colourmaptype
     fout.write [2].pack('c')      # imagetype
@@ -44,43 +44,48 @@ def save_screenshot(w, h, name)
   end
 end
 
-if __FILE__ == $0
+if __FILE__ == $PROGRAM_NAME
+
+  GLFW.load_lib(SampleUtil.glfw_library_path)
+
   prevt = 0.0
 
-  glfwInit()
+  GLFW.Init()
 
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2)
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0)
+  GLFW.WindowHint(GLFW::CONTEXT_VERSION_MAJOR, 2)
+  GLFW.WindowHint(GLFW::CONTEXT_VERSION_MINOR, 0)
 
-  window = glfwCreateWindow( 1000, 600, "NanoVG", nil, nil )
+  window = GLFW.CreateWindow(1000, 600, "NanoVG", nil, nil)
 
-  glfwSetKeyCallback( window, key )
-  glfwMakeContextCurrent( window )
+  GLFW.SetKeyCallback(window, key)
+  GLFW.MakeContextCurrent(window)
+
+  GL.load_lib()
 
   nvgSetupGL2()
   vg = nvgCreateGL2(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG)
 
   $showcase = Showcase.new
-  glfwSetWindowTitle(window, "Ruby-NanoVG : #{$showcase.scene_name}")
+  GLFW.SetWindowTitle(window, "Ruby-NanoVG : #{$showcase.scene_name}")
 
-  glfwSwapInterval(0)
-  glfwSetTime(0)
-  prevt = glfwGetTime()
+  GLFW.SwapInterval(0)
+  GLFW.SetTime(0)
+  prevt = GLFW.GetTime()
 
-  mx_buf = '        '
-  my_buf = '        '
-  winWidth_buf  = '        '
-  winHeight_buf = '        '
-  fbWidth_buf  = '        '
-  fbHeight_buf = '        '
-  while glfwWindowShouldClose( window ) == 0
-    t = glfwGetTime()
+  mx_buf = ' ' * 8
+  my_buf = ' ' * 8
+  winWidth_buf  = ' ' * 8
+  winHeight_buf = ' ' * 8
+  fbWidth_buf  = ' ' * 8
+  fbHeight_buf = ' ' * 8
+  while GLFW.WindowShouldClose(window) == 0
+    t = GLFW.GetTime()
     dt = t - prevt
     prevt = t
 
-    glfwGetCursorPos(window, mx_buf, my_buf)
-    glfwGetWindowSize(window, winWidth_buf, winHeight_buf)
-    glfwGetFramebufferSize(window, fbWidth_buf, fbHeight_buf)
+    GLFW.GetCursorPos(window, mx_buf, my_buf)
+    GLFW.GetWindowSize(window, winWidth_buf, winHeight_buf)
+    GLFW.GetFramebufferSize(window, fbWidth_buf, fbHeight_buf)
     mx = mx_buf.unpack('D')[0]
     my = my_buf.unpack('D')[0]
     winWidth = winWidth_buf.unpack('L')[0]
@@ -92,16 +97,16 @@ if __FILE__ == $0
 
     $showcase.set_viewport_size(fbWidth, fbHeight)
 
-    glViewport(0, 0, fbWidth, fbHeight)
-    glClearColor(0.3, 0.3, 0.32, 1.0)
-    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT)
+    GL.Viewport(0, 0, fbWidth, fbHeight)
+    GL.ClearColor(0.3, 0.3, 0.32, 1.0)
+    GL.Clear(GL::COLOR_BUFFER_BIT|GL::DEPTH_BUFFER_BIT|GL::STENCIL_BUFFER_BIT)
 
     nvgBeginFrame(vg, winWidth, winHeight, pxRatio)
     $showcase.render(vg, dt)
     nvgEndFrame(vg)
 
-    glfwSwapBuffers( window )
-    glfwPollEvents()
+    GLFW.SwapBuffers(window)
+    GLFW.PollEvents()
 
     # if $showcase.current_scene.should_save
     #   $ss_name = sprintf("ss%05d.tga", $ss_id)
@@ -114,5 +119,5 @@ if __FILE__ == $0
 
   nvgDeleteGL2(vg)
 
-  glfwTerminate()
+  GLFW.Terminate()
 end

@@ -6,33 +6,35 @@ require_relative 'util/setup_opengl_dll'
 
 # Press ESC to exit.
 key = GLFW::create_callback(:GLFWkeyfun) do |window, key, scancode, action, mods|
-  if key == GLFW_KEY_ESCAPE && action == GLFW_PRESS
-    glfwSetWindowShouldClose(window, GL_TRUE)
-  end
+  GLFW.SetWindowShouldClose(window, GL::TRUE) if key == GLFW::KEY_ESCAPE && action == GLFW::PRESS
 end
 
-$pixel_count = ARGV[0] == nil ? 100 : ARGV[0].to_i
+$pixel_count = ARGV[0]&.to_i || 100
 $pixel_table = nil
 
-if __FILE__ == $0
+if __FILE__ == $PROGRAM_NAME
 
-  if glfwInit() == GL_FALSE
+  GLFW.load_lib(SampleUtil.glfw_library_path)
+
+  if GLFW.Init() == GL::FALSE
     puts("Failed to init GLFW.")
     exit
   end
 
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2)
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0)
+  GLFW.WindowHint(GLFW::CONTEXT_VERSION_MAJOR, 2)
+  GLFW.WindowHint(GLFW::CONTEXT_VERSION_MINOR, 0)
 
-  window = glfwCreateWindow( 720, 720, "Mandelbrot set", nil, nil )
+  window = GLFW.CreateWindow(720, 720, "Mandelbrot set", nil, nil)
   if window == 0
-    glfwTerminate()
+    GLFW.Terminate()
     exit
   end
 
-  glfwSetKeyCallback( window, key )
+  GLFW.SetKeyCallback(window, key)
 
-  glfwMakeContextCurrent( window )
+  GLFW.MakeContextCurrent(window)
+
+  GL.load_lib()
 
   nvgSetupGL2()
   vg = nvgCreateGL2(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG)
@@ -41,20 +43,20 @@ if __FILE__ == $0
     exit
   end
 
-  glfwSwapInterval(0)
-  glfwSetTime(0)
+  GLFW.SwapInterval(0)
+  GLFW.SetTime(0)
 
-  winWidth_buf  = '        '
-  winHeight_buf = '        '
-  fbWidth_buf  = '        '
-  fbHeight_buf = '        '
+  winWidth_buf  = ' ' * 8
+  winHeight_buf = ' ' * 8
+  fbWidth_buf  = ' ' * 8
+  fbHeight_buf = ' ' * 8
 
   $pixel_table = Array.new($pixel_count) { Array.new($pixel_count) { nil } }
 
-  while glfwWindowShouldClose( window ) == 0
+  while GLFW.WindowShouldClose(window) == 0
 
-    glfwGetWindowSize(window, winWidth_buf, winHeight_buf)
-    glfwGetFramebufferSize(window, fbWidth_buf, fbHeight_buf)
+    GLFW.GetWindowSize(window, winWidth_buf, winHeight_buf)
+    GLFW.GetFramebufferSize(window, fbWidth_buf, fbHeight_buf)
     winWidth = winWidth_buf.unpack('L')[0]
     winHeight = winHeight_buf.unpack('L')[0]
     fbWidth = fbWidth_buf.unpack('L')[0]
@@ -62,9 +64,9 @@ if __FILE__ == $0
 
     pxRatio = fbWidth.to_f / winWidth.to_f
 
-    glViewport(0, 0, fbWidth, fbHeight)
-    glClearColor(0.1, 0.2, 0.3, 1.0)
-    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT)
+    GL.Viewport(0, 0, fbWidth, fbHeight)
+    GL.ClearColor(0.1, 0.2, 0.3, 1.0)
+    GL.Clear(GL::COLOR_BUFFER_BIT|GL::DEPTH_BUFFER_BIT|GL::STENCIL_BUFFER_BIT)
 
     nvgBeginFrame(vg, winWidth, winHeight, pxRatio)
     nvgSave(vg)
@@ -100,11 +102,11 @@ if __FILE__ == $0
                                  nvgRGBA((max_iter-iter),(max_iter-iter),(max_iter-iter)/4, 255)
                                end
 =begin
-          if c > 0
-            $pixel_table[r][c] = nvgLerpRGBA($pixel_table[r][c-1], $pixel_table[r][c], 0.5)
-          elsif r > 0
-            $pixel_table[r][c] = nvgLerpRGBA($pixel_table[r-1][c], $pixel_table[r][c], 0.5)
-          end
+           if c > 0
+             $pixel_table[r][c] = nvgLerpRGBA($pixel_table[r][c-1], $pixel_table[r][c], 0.5)
+           elsif r > 0
+             $pixel_table[r][c] = nvgLerpRGBA($pixel_table[r-1][c], $pixel_table[r][c], 0.5)
+           end
 =end
         end
 
@@ -124,11 +126,11 @@ if __FILE__ == $0
     nvgRestore(vg)
     nvgEndFrame(vg)
 
-    glfwSwapBuffers( window )
-    glfwPollEvents()
+    GLFW.SwapBuffers(window)
+    GLFW.PollEvents()
   end
 
   nvgDeleteGL2(vg)
 
-  glfwTerminate()
+  GLFW.Terminate()
 end
