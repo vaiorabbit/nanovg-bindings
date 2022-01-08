@@ -22,26 +22,26 @@ class GridScene < Scene
     lw = [1.5 * scale, 0.5].max
     nx = (width.to_i / div)
     ny = (height.to_i / div)
-    nvgSave(vg)
+    NVG.Save(vg)
     nx.times do |i|
       x = div * i
-      nvgStrokeWidth(vg, lw)
-      nvgStrokeColor(vg, nvgRGBA(255,255,255,255))
-      nvgBeginPath(vg)
-      nvgMoveTo(vg, x, 0.0)
-      nvgLineTo(vg, x, height)
-      nvgStroke(vg)
+      NVG.StrokeWidth(vg, lw)
+      NVG.StrokeColor(vg, NVG.RGBA(255,255,255,255))
+      NVG.BeginPath(vg)
+      NVG.MoveTo(vg, x, 0.0)
+      NVG.LineTo(vg, x, height)
+      NVG.Stroke(vg)
     end
     ny.times do |i|
       y = div * i
-      nvgStrokeWidth(vg, lw)
-      nvgStrokeColor(vg, nvgRGBA(255,255,255,255))
-      nvgBeginPath(vg)
-      nvgMoveTo(vg, 0, y)
-      nvgLineTo(vg, width, y)
-      nvgStroke(vg)
+      NVG.StrokeWidth(vg, lw)
+      NVG.StrokeColor(vg, NVG.RGBA(255,255,255,255))
+      NVG.BeginPath(vg)
+      NVG.MoveTo(vg, 0, y)
+      NVG.LineTo(vg, width, y)
+      NVG.Stroke(vg)
     end
-    nvgRestore(vg)
+    NVG.Restore(vg)
   end
 
 end
@@ -61,13 +61,13 @@ class TriangleScene < Scene
     x = width - width/2.0
     y = height - height/2.0
 
-    nvgSave(vg)
+    NVG.Save(vg)
 
-    nvgStrokeWidth(vg, 2.0)
-    nvgStrokeColor(vg, nvgRGBA(255,255,255,192))
+    NVG.StrokeWidth(vg, 2.0)
+    NVG.StrokeColor(vg, NVG.RGBA(255,255,255,192))
 
-    nvgTranslate(vg, x,y)
-    nvgRotate(vg, hue*Math::PI*2)
+    NVG.Translate(vg, x,y)
+    NVG.Rotate(vg, hue*Math::PI*2)
 
     r1 = (width < height ? width : height) * 0.5 - 5.0
     r0 = r1 - 20.0
@@ -77,21 +77,21 @@ class TriangleScene < Scene
     bx = Math.cos(-120.0/180.0*Math::PI) * r
     by = Math.sin(-120.0/180.0*Math::PI) * r
 
-    nvgBeginPath(vg)
-    nvgMoveTo(vg, r,0)
-    nvgLineTo(vg, ax,ay)
-    nvgLineTo(vg, bx,by)
-    nvgClosePath(vg)
-    paint = nvgLinearGradient(vg, r,0, ax,ay, nvgHSLA(hue,1.0,0.5,255), nvgRGBA(255,255,255,255))
-    nvgFillPaint(vg, paint)
-    nvgFill(vg)
-    paint = nvgLinearGradient(vg, (r+ax)*0.5,(0+ay)*0.5, bx,by, nvgRGBA(0,0,0,0), nvgRGBA(0,0,0,255))
-    nvgFillPaint(vg, paint)
-    nvgFill(vg)
-    nvgStrokeColor(vg, nvgRGBA(0,0,0,64))
-    nvgStroke(vg)
+    NVG.BeginPath(vg)
+    NVG.MoveTo(vg, r,0)
+    NVG.LineTo(vg, ax,ay)
+    NVG.LineTo(vg, bx,by)
+    NVG.ClosePath(vg)
+    paint = NVG.LinearGradient(vg, r,0, ax,ay, NVG.HSLA(hue,1.0,0.5,255), NVG.RGBA(255,255,255,255))
+    NVG.FillPaint(vg, paint)
+    NVG.Fill(vg)
+    paint = NVG.LinearGradient(vg, (r+ax)*0.5,(0+ay)*0.5, bx,by, NVG.RGBA(0,0,0,0), NVG.RGBA(0,0,0,255))
+    NVG.FillPaint(vg, paint)
+    NVG.Fill(vg)
+    NVG.StrokeColor(vg, NVG.RGBA(0,0,0,64))
+    NVG.Stroke(vg)
 
-    nvgRestore(vg)
+    NVG.Restore(vg)
   end
 
 end
@@ -101,7 +101,7 @@ end
 module Arrow
 
   def self.render_simple(vg, src_x, src_y, dst_x, dst_y, outer_line: true, inner_fill: true,
-                         color: nvgRGBA(255,255,255,255), gradient_start: color, gradient_end: color)
+                         color: NVG.RGBA(255,255,255,255), gradient_start: color, gradient_end: color)
     end_base_x = 0.0
     end_base_y = 0.0
     tip_base_x = 1.0
@@ -117,41 +117,41 @@ module Arrow
     scaling = arrow_length / arrow_length_base
     theta = Math.atan2( (dst_y - src_y)/arrow_length, (dst_x - src_x) / arrow_length )
 
-    nvgSave(vg)
-    nvgTranslate(vg, src_x,src_y)
-    nvgRotate(vg, theta)
-    nvgScale(vg, scaling, scaling)
+    NVG.Save(vg)
+    NVG.Translate(vg, src_x,src_y)
+    NVG.Rotate(vg, theta)
+    NVG.Scale(vg, scaling, scaling)
 
-    nvgBeginPath(vg)
-    nvgMoveTo(vg, end_base_x, end_base_y)
-    nvgLineTo(vg, end_base_x, end_base_y + bw / 2)
-    nvgLineTo(vg, end_base_x + bl, end_base_y + bw / 2)
-    nvgLineTo(vg, end_base_x + bl, end_base_y + hw / 2)
-    nvgLineTo(vg, end_base_x + l, end_base_y)
-    nvgLineTo(vg, end_base_x + bl, end_base_y - hw / 2)
-    nvgLineTo(vg, end_base_x + bl, end_base_y - bw / 2)
-    nvgLineTo(vg, end_base_x, end_base_y - bw / 2)
-    nvgClosePath(vg)
+    NVG.BeginPath(vg)
+    NVG.MoveTo(vg, end_base_x, end_base_y)
+    NVG.LineTo(vg, end_base_x, end_base_y + bw / 2)
+    NVG.LineTo(vg, end_base_x + bl, end_base_y + bw / 2)
+    NVG.LineTo(vg, end_base_x + bl, end_base_y + hw / 2)
+    NVG.LineTo(vg, end_base_x + l, end_base_y)
+    NVG.LineTo(vg, end_base_x + bl, end_base_y - hw / 2)
+    NVG.LineTo(vg, end_base_x + bl, end_base_y - bw / 2)
+    NVG.LineTo(vg, end_base_x, end_base_y - bw / 2)
+    NVG.ClosePath(vg)
 
     # Outer Line
     if outer_line
-      nvgStrokeWidth(vg, 5 / scaling)
-      nvgStrokeColor(vg, color)
-      nvgStroke(vg)
+      NVG.StrokeWidth(vg, 5 / scaling)
+      NVG.StrokeColor(vg, color)
+      NVG.Stroke(vg)
     end
 
     # Inner Area
     if inner_fill
-      paint = nvgLinearGradient(vg, end_base_x,end_base_y, end_base_x+l,end_base_y, gradient_start, gradient_end)
-      nvgFillPaint(vg, paint)
-      nvgFill(vg)
+      paint = NVG.LinearGradient(vg, end_base_x,end_base_y, end_base_x+l,end_base_y, gradient_start, gradient_end)
+      NVG.FillPaint(vg, paint)
+      NVG.Fill(vg)
     end
 
-    nvgRestore(vg)
+    NVG.Restore(vg)
   end
 
   def self.render(vg, src_x, src_y, dst_x, dst_y, head_length: 100.0, head_width: head_length/3, shaft_width: head_width/2,
-                  outer_line: true, inner_fill: true, outer_width: 2.5, outer_color: nvgRGBA(255,255,255,255), gradient_start: nvgRGBA(255,255,255,0), gradient_end: nvgRGBA(255,255,255,255))
+                  outer_line: true, inner_fill: true, outer_width: 2.5, outer_color: NVG.RGBA(255,255,255,255), gradient_start: NVG.RGBA(255,255,255,0), gradient_end: NVG.RGBA(255,255,255,255))
 
     arrow_length = Math.sqrt((dst_x - src_x)**2 + (dst_y - src_y)**2)
     bottom_x = 0.0
@@ -163,36 +163,36 @@ module Arrow
 
     theta = Math.atan2( (dst_y - src_y)/arrow_length, (dst_x - src_x) / arrow_length )
 
-    nvgSave(vg)
-    nvgTranslate(vg, src_x,src_y)
-    nvgRotate(vg, theta)
+    NVG.Save(vg)
+    NVG.Translate(vg, src_x,src_y)
+    NVG.Rotate(vg, theta)
 
-    nvgBeginPath(vg)
-    nvgMoveTo(vg, bottom_x, bottom_y)
-    nvgLineTo(vg, bottom_x, bottom_y + shaft_width / 2)
-    nvgLineTo(vg, bottom_x + shaft_length, bottom_y + shaft_width / 2)
-    nvgLineTo(vg, bottom_x + shaft_length, bottom_y + head_width / 2)
-    nvgLineTo(vg, bottom_x + arrow_length, bottom_y)
-    nvgLineTo(vg, bottom_x + shaft_length, bottom_y - head_width / 2)
-    nvgLineTo(vg, bottom_x + shaft_length, bottom_y - shaft_width / 2)
-    nvgLineTo(vg, bottom_x, bottom_y - shaft_width / 2)
-    nvgClosePath(vg)
+    NVG.BeginPath(vg)
+    NVG.MoveTo(vg, bottom_x, bottom_y)
+    NVG.LineTo(vg, bottom_x, bottom_y + shaft_width / 2)
+    NVG.LineTo(vg, bottom_x + shaft_length, bottom_y + shaft_width / 2)
+    NVG.LineTo(vg, bottom_x + shaft_length, bottom_y + head_width / 2)
+    NVG.LineTo(vg, bottom_x + arrow_length, bottom_y)
+    NVG.LineTo(vg, bottom_x + shaft_length, bottom_y - head_width / 2)
+    NVG.LineTo(vg, bottom_x + shaft_length, bottom_y - shaft_width / 2)
+    NVG.LineTo(vg, bottom_x, bottom_y - shaft_width / 2)
+    NVG.ClosePath(vg)
 
     # Outer Line
     if outer_line
-      nvgStrokeWidth(vg, outer_width)
-      nvgStrokeColor(vg, outer_color)
-      nvgStroke(vg)
+      NVG.StrokeWidth(vg, outer_width)
+      NVG.StrokeColor(vg, outer_color)
+      NVG.Stroke(vg)
     end
 
     # Inner Area
     if inner_fill
-      paint = nvgLinearGradient(vg, bottom_x,bottom_y, bottom_x+arrow_length,bottom_y, gradient_start, gradient_end)
-      nvgFillPaint(vg, paint)
-      nvgFill(vg)
+      paint = NVG.LinearGradient(vg, bottom_x,bottom_y, bottom_x+arrow_length,bottom_y, gradient_start, gradient_end)
+      NVG.FillPaint(vg, paint)
+      NVG.Fill(vg)
     end
 
-    nvgRestore(vg)
+    NVG.Restore(vg)
   end
 
 end
@@ -209,7 +209,7 @@ class ArrowScene < Scene
     x = width - width/2.0
     y = height - height/2.0
 
-    nvgSave(vg)
+    NVG.Save(vg)
 
     src_x = 100
     src_y = 500
@@ -218,19 +218,19 @@ class ArrowScene < Scene
   # Arrow.render_simple(vg, src_x, src_y, dst_x, dst_y)
     Arrow.render(vg, src_x, src_y, dst_x, dst_y)
 
-    nvgBeginPath(vg)
-    nvgCircle(vg, src_x,src_y, 10.0)
-    paint = nvgRadialGradient(vg, src_x,src_y, 0.1,10, nvgRGBA(0,255,0,192), nvgRGBA(0,255,0,0))
-    nvgFillPaint(vg, paint)
-    nvgFill(vg)
+    NVG.BeginPath(vg)
+    NVG.Circle(vg, src_x,src_y, 10.0)
+    paint = NVG.RadialGradient(vg, src_x,src_y, 0.1,10, NVG.RGBA(0,255,0,192), NVG.RGBA(0,255,0,0))
+    NVG.FillPaint(vg, paint)
+    NVG.Fill(vg)
 
-    nvgBeginPath(vg)
-    nvgCircle(vg, dst_x,dst_y, 10.0)
-    paint = nvgRadialGradient(vg, dst_x,dst_y, 0.1,10, nvgRGBA(255,0,0,192), nvgRGBA(255,0,0,0))
-    nvgFillPaint(vg, paint)
-    nvgFill(vg)
+    NVG.BeginPath(vg)
+    NVG.Circle(vg, dst_x,dst_y, 10.0)
+    paint = NVG.RadialGradient(vg, dst_x,dst_y, 0.1,10, NVG.RGBA(255,0,0,192), NVG.RGBA(255,0,0,0))
+    NVG.FillPaint(vg, paint)
+    NVG.Fill(vg)
 
-    nvgRestore(vg)
+    NVG.Restore(vg)
   end
 
 end
@@ -248,7 +248,7 @@ class DragonCurve
 
   def split(vg, order, dx, dy, sign)
     if order == 0
-      nvgLineTo(vg, @base_x+dx, @base_y+dy)
+      NVG.LineTo(vg, @base_x+dx, @base_y+dy)
       @base_x += dx
       @base_y += dy
     else
@@ -278,7 +278,7 @@ class DragonCurveScene < Scene
     x = width - width/2.0
     y = height - height/2.0
 
-    nvgSave(vg)
+    NVG.Save(vg)
 
     src_x = 250
     src_y = 200
@@ -301,8 +301,8 @@ class DragonCurveScene < Scene
     @dc.base_x = src_x
     @dc.base_y = src_y
 
-    nvgBeginPath(vg)
-    nvgMoveTo(vg, @dc.base_x, @dc.base_y)
+    NVG.BeginPath(vg)
+    NVG.MoveTo(vg, @dc.base_x, @dc.base_y)
     @dc.split(vg, @order, dx, dy, 1.0)
 
     # Outer Line
@@ -314,25 +314,25 @@ class DragonCurveScene < Scene
             else
               w_max
             end
-    nvgStrokeWidth(vg, width)
-    nvgStrokeColor(vg, nvgRGBA(160,192,255,255))
-    nvgStroke(vg)
+    NVG.StrokeWidth(vg, width)
+    NVG.StrokeColor(vg, NVG.RGBA(160,192,255,255))
+    NVG.Stroke(vg)
 
     # Start
-    nvgBeginPath(vg)
-    nvgCircle(vg, src_x,src_y, 10.0)
-    paint = nvgRadialGradient(vg, src_x,src_y, 0.1,10, nvgRGBA(0,255,0,192), nvgRGBA(0,255,0,0))
-    nvgFillPaint(vg, paint)
-    nvgFill(vg)
+    NVG.BeginPath(vg)
+    NVG.Circle(vg, src_x,src_y, 10.0)
+    paint = NVG.RadialGradient(vg, src_x,src_y, 0.1,10, NVG.RGBA(0,255,0,192), NVG.RGBA(0,255,0,0))
+    NVG.FillPaint(vg, paint)
+    NVG.Fill(vg)
 
     # End
-    nvgBeginPath(vg)
-    nvgCircle(vg, src_x+dx,src_y+dy, 10.0)
-    paint = nvgRadialGradient(vg, src_x+dx,src_y+dy, 0.1,10, nvgRGBA(255,0,0,192), nvgRGBA(255,0,0,0))
-    nvgFillPaint(vg, paint)
-    nvgFill(vg)
+    NVG.BeginPath(vg)
+    NVG.Circle(vg, src_x+dx,src_y+dy, 10.0)
+    paint = NVG.RadialGradient(vg, src_x+dx,src_y+dy, 0.1,10, NVG.RGBA(255,0,0,192), NVG.RGBA(255,0,0,0))
+    NVG.FillPaint(vg, paint)
+    NVG.Fill(vg)
 
-    nvgRestore(vg)
+    NVG.Restore(vg)
   end
 
 end
@@ -370,61 +370,61 @@ class HilbertCurve
         @current_x = @base_x + len*1.5
         @current_y = @base_y + len*1.5
       end
-      nvgMoveTo(vg, @current_x, @current_y)
+      NVG.MoveTo(vg, @current_x, @current_y)
     end
 
     if stack == 0
       case dir
       when DIR_LEFT
-        nvgLineTo(vg, @current_x+len, @current_y); @current_x += len # R
-        nvgLineTo(vg, @current_x, @current_y+len); @current_y += len # D
-        nvgLineTo(vg, @current_x-len, @current_y); @current_x -= len # L
+        NVG.LineTo(vg, @current_x+len, @current_y); @current_x += len # R
+        NVG.LineTo(vg, @current_x, @current_y+len); @current_y += len # D
+        NVG.LineTo(vg, @current_x-len, @current_y); @current_x -= len # L
       when DIR_RIGHT
-        nvgLineTo(vg, @current_x-len, @current_y); @current_x -= len # L
-        nvgLineTo(vg, @current_x, @current_y-len); @current_y -= len # U
-        nvgLineTo(vg, @current_x+len, @current_y); @current_x += len # R
+        NVG.LineTo(vg, @current_x-len, @current_y); @current_x -= len # L
+        NVG.LineTo(vg, @current_x, @current_y-len); @current_y -= len # U
+        NVG.LineTo(vg, @current_x+len, @current_y); @current_x += len # R
       when DIR_UP
-        nvgLineTo(vg, @current_x, @current_y+len); @current_y += len # D
-        nvgLineTo(vg, @current_x+len, @current_y); @current_x += len # R
-        nvgLineTo(vg, @current_x, @current_y-len); @current_y -= len # U
+        NVG.LineTo(vg, @current_x, @current_y+len); @current_y += len # D
+        NVG.LineTo(vg, @current_x+len, @current_y); @current_x += len # R
+        NVG.LineTo(vg, @current_x, @current_y-len); @current_y -= len # U
       when DIR_DOWN
-        nvgLineTo(vg, @current_x, @current_y-len); @current_y -= len # U
-        nvgLineTo(vg, @current_x-len, @current_y); @current_x -= len # L
-        nvgLineTo(vg, @current_x, @current_y+len); @current_y += len # D
+        NVG.LineTo(vg, @current_x, @current_y-len); @current_y -= len # U
+        NVG.LineTo(vg, @current_x-len, @current_y); @current_x -= len # L
+        NVG.LineTo(vg, @current_x, @current_y+len); @current_y += len # D
       end
     else
       case dir
       when DIR_LEFT
         split(vg, stack-1, DIR_UP)
-        nvgLineTo(vg, @current_x+len, @current_y); @current_x += len # R
+        NVG.LineTo(vg, @current_x+len, @current_y); @current_x += len # R
         split(vg, stack-1, DIR_LEFT)
-        nvgLineTo(vg, @current_x, @current_y+len); @current_y += len # D
+        NVG.LineTo(vg, @current_x, @current_y+len); @current_y += len # D
         split(vg, stack-1, DIR_LEFT)
-        nvgLineTo(vg, @current_x-len, @current_y); @current_x -= len # L
+        NVG.LineTo(vg, @current_x-len, @current_y); @current_x -= len # L
         split(vg, stack-1, DIR_DOWN)
       when DIR_RIGHT
         split(vg, stack-1, DIR_DOWN)
-        nvgLineTo(vg, @current_x-len, @current_y); @current_x -= len # L
+        NVG.LineTo(vg, @current_x-len, @current_y); @current_x -= len # L
         split(vg, stack-1, DIR_RIGHT)
-        nvgLineTo(vg, @current_x, @current_y-len); @current_y -= len # U
+        NVG.LineTo(vg, @current_x, @current_y-len); @current_y -= len # U
         split(vg, stack-1, DIR_RIGHT)
-        nvgLineTo(vg, @current_x+len, @current_y); @current_x += len # R
+        NVG.LineTo(vg, @current_x+len, @current_y); @current_x += len # R
         split(vg, stack-1, DIR_UP)
       when DIR_UP
         split(vg, stack-1, DIR_LEFT)
-        nvgLineTo(vg, @current_x, @current_y+len); @current_y += len # D
+        NVG.LineTo(vg, @current_x, @current_y+len); @current_y += len # D
         split(vg, stack-1, DIR_UP)
-        nvgLineTo(vg, @current_x+len, @current_y); @current_x += len # R
+        NVG.LineTo(vg, @current_x+len, @current_y); @current_x += len # R
         split(vg, stack-1, DIR_UP)
-        nvgLineTo(vg, @current_x, @current_y-len); @current_y -= len # U
+        NVG.LineTo(vg, @current_x, @current_y-len); @current_y -= len # U
         split(vg, stack-1, DIR_RIGHT)
       when DIR_DOWN
         split(vg, stack-1, DIR_RIGHT)
-        nvgLineTo(vg, @current_x, @current_y-len); @current_y -= len # U
+        NVG.LineTo(vg, @current_x, @current_y-len); @current_y -= len # U
         split(vg, stack-1, DIR_DOWN)
-        nvgLineTo(vg, @current_x-len, @current_y); @current_x -= len # L
+        NVG.LineTo(vg, @current_x-len, @current_y); @current_x -= len # L
         split(vg, stack-1, DIR_DOWN)
-        nvgLineTo(vg, @current_x, @current_y+len); @current_y += len # D
+        NVG.LineTo(vg, @current_x, @current_y+len); @current_y += len # D
         split(vg, stack-1, DIR_LEFT)
       end
     end
@@ -471,9 +471,9 @@ class HilbertCurveScene < Scene
     @hc.order = @order
     @hc.width = wh
 
-    nvgSave(vg)
+    NVG.Save(vg)
 
-    nvgBeginPath(vg)
+    NVG.BeginPath(vg)
     @hc.split(vg)
 
     # Outer Line
@@ -485,32 +485,32 @@ class HilbertCurveScene < Scene
             else
               w_max
             end
-    nvgStrokeWidth(vg, width)
-    nvgLineCap(vg, NVG_SQUARE)
-    nvgStrokeColor(vg, nvgRGBA(160,192,255,255))
-    nvgStroke(vg)
+    NVG.StrokeWidth(vg, width)
+    NVG.LineCap(vg, NVG::SQUARE)
+    NVG.StrokeColor(vg, NVG.RGBA(160,192,255,255))
+    NVG.Stroke(vg)
 
     # Filling area
-    nvgBeginPath(vg)
-    nvgRect(vg, @hc.base_x,@hc.base_y, @hc.width, @hc.width)
-    nvgFillColor(vg, nvgRGBA(255,255,255,16))
-    nvgFill(vg)
+    NVG.BeginPath(vg)
+    NVG.Rect(vg, @hc.base_x,@hc.base_y, @hc.width, @hc.width)
+    NVG.FillColor(vg, NVG.RGBA(255,255,255,16))
+    NVG.Fill(vg)
 
     # Start
-    nvgBeginPath(vg)
-    nvgCircle(vg, @hc.base_x,@hc.base_y, 10.0)
-    paint = nvgRadialGradient(vg, @hc.base_x,@hc.base_y, 0.1,10, nvgRGBA(0,255,0,192), nvgRGBA(0,255,0,0))
-    nvgFillPaint(vg, paint)
-    nvgFill(vg)
+    NVG.BeginPath(vg)
+    NVG.Circle(vg, @hc.base_x,@hc.base_y, 10.0)
+    paint = NVG.RadialGradient(vg, @hc.base_x,@hc.base_y, 0.1,10, NVG.RGBA(0,255,0,192), NVG.RGBA(0,255,0,0))
+    NVG.FillPaint(vg, paint)
+    NVG.Fill(vg)
 
     # End
-    nvgBeginPath(vg)
-    nvgCircle(vg, @hc.base_x+@hc.width,@hc.base_y+@hc.width, 10.0)
-    paint = nvgRadialGradient(vg, @hc.base_x+@hc.width,@hc.base_y+@hc.width, 0.1,10, nvgRGBA(255,0,0,192), nvgRGBA(255,0,0,0))
-    nvgFillPaint(vg, paint)
-    nvgFill(vg)
+    NVG.BeginPath(vg)
+    NVG.Circle(vg, @hc.base_x+@hc.width,@hc.base_y+@hc.width, 10.0)
+    paint = NVG.RadialGradient(vg, @hc.base_x+@hc.width,@hc.base_y+@hc.width, 0.1,10, NVG.RGBA(255,0,0,192), NVG.RGBA(255,0,0,0))
+    NVG.FillPaint(vg, paint)
+    NVG.Fill(vg)
 
-    nvgRestore(vg)
+    NVG.Restore(vg)
   end
 
 end
@@ -560,11 +560,11 @@ class ZOrderCurve
     segment_wh = width / @cell_count.to_f
     @line_base_x = base_x + segment_wh/2
     @line_base_y = base_y + segment_wh/2
-    nvgMoveTo(vg, @line_base_x, @line_base_y)
+    NVG.MoveTo(vg, @line_base_x, @line_base_y)
     n = (4 ** Math.log2(@cell_count).to_i).to_i # ex.) @cell_count==3 -> log2(2**3)==3 -> 4**3 -> n==64
     n.times do |m|
       x, y = morton_decode_2d(m)
-      nvgLineTo(vg, @line_base_x+x*segment_wh, @line_base_y+y*segment_wh)
+      NVG.LineTo(vg, @line_base_x+x*segment_wh, @line_base_y+y*segment_wh)
     end
 
   end
@@ -610,9 +610,9 @@ class ZOrderCurveScene < Scene
     @zc.cell_count = 2**@cell_order
     @zc.width = wh
 
-    nvgSave(vg)
+    NVG.Save(vg)
 
-    nvgBeginPath(vg)
+    NVG.BeginPath(vg)
     @zc.split(vg)
 
     # Outer Line
@@ -621,32 +621,32 @@ class ZOrderCurveScene < Scene
     w_min = 1.0
     width = @cell_order >= cell_order_crit ? w_min : w_max
 
-    nvgStrokeWidth(vg, width)
-    nvgLineCap(vg, NVG_SQUARE)
-    nvgStrokeColor(vg, nvgRGBA(160,192,255,255))
-    nvgStroke(vg)
+    NVG.StrokeWidth(vg, width)
+    NVG.LineCap(vg, NVG::SQUARE)
+    NVG.StrokeColor(vg, NVG.RGBA(160,192,255,255))
+    NVG.Stroke(vg)
 
     # Filling area
-    nvgBeginPath(vg)
-    nvgRect(vg, @zc.base_x,@zc.base_y, @zc.width, @zc.width)
-    nvgFillColor(vg, nvgRGBA(255,255,255,16))
-    nvgFill(vg)
+    NVG.BeginPath(vg)
+    NVG.Rect(vg, @zc.base_x,@zc.base_y, @zc.width, @zc.width)
+    NVG.FillColor(vg, NVG.RGBA(255,255,255,16))
+    NVG.Fill(vg)
 
     # Start
-    nvgBeginPath(vg)
-    nvgCircle(vg, @zc.base_x,@zc.base_y, 10.0)
-    paint = nvgRadialGradient(vg, @zc.base_x,@zc.base_y, 0.1,10, nvgRGBA(0,255,0,192), nvgRGBA(0,255,0,0))
-    nvgFillPaint(vg, paint)
-    nvgFill(vg)
+    NVG.BeginPath(vg)
+    NVG.Circle(vg, @zc.base_x,@zc.base_y, 10.0)
+    paint = NVG.RadialGradient(vg, @zc.base_x,@zc.base_y, 0.1,10, NVG.RGBA(0,255,0,192), NVG.RGBA(0,255,0,0))
+    NVG.FillPaint(vg, paint)
+    NVG.Fill(vg)
 
     # End
-    nvgBeginPath(vg)
-    nvgCircle(vg, @zc.base_x+@zc.width,@zc.base_y+@zc.width, 10.0)
-    paint = nvgRadialGradient(vg, @zc.base_x+@zc.width,@zc.base_y+@zc.width, 0.1,10, nvgRGBA(255,0,0,192), nvgRGBA(255,0,0,0))
-    nvgFillPaint(vg, paint)
-    nvgFill(vg)
+    NVG.BeginPath(vg)
+    NVG.Circle(vg, @zc.base_x+@zc.width,@zc.base_y+@zc.width, 10.0)
+    paint = NVG.RadialGradient(vg, @zc.base_x+@zc.width,@zc.base_y+@zc.width, 0.1,10, NVG.RGBA(255,0,0,192), NVG.RGBA(255,0,0,0))
+    NVG.FillPaint(vg, paint)
+    NVG.Fill(vg)
 
-    nvgRestore(vg)
+    NVG.Restore(vg)
   end
 
 end

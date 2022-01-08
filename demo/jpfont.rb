@@ -9,15 +9,13 @@ end
 
 # Press ESC to exit.
 key = GLFW::create_callback(:GLFWkeyfun) do |window, key, scancode, action, mods|
-  if key == GLFW::KEY_ESCAPE && action == GLFW::PRESS
-    GLFW.SetWindowShouldClose(window, GL::TRUE)
-  end
+  GLFW.SetWindowShouldClose(window, GL::TRUE) if key == GLFW::KEY_ESCAPE && action == GLFW::PRESS
 end
 
 $fonts = []
 
 def font_load(vg, name="sans", ttf="./jpfont/GenShinGothic-Bold.ttf")
-  font_handle = nvgCreateFont(vg, name, ttf)
+  font_handle = NVG.CreateFont(vg, name, ttf)
   if font_handle == -1
     puts "Could not add font."
     return -1
@@ -26,35 +24,35 @@ def font_load(vg, name="sans", ttf="./jpfont/GenShinGothic-Bold.ttf")
 end
 
 def draw_paragraph(vg, x, y, width, height, text, name="sans")
-  rows_buf = FFI::MemoryPointer.new(NVGtextRow, 3)
-  glyphs_buf = FFI::MemoryPointer.new(NVGglyphPosition, 100)
+  rows_buf = FFI::MemoryPointer.new(NVG::TextRow, 3)
+  glyphs_buf = FFI::MemoryPointer.new(NVG::GlyphPosition, 100)
   lineh_buf = ' ' * 8
   lineh = 0.0
 
-  nvgSave(vg)
+  NVG.Save(vg)
 
-  nvgFontSize(vg, 38.0)
-  nvgFontFace(vg, name)
-  nvgTextAlign(vg, NVG_ALIGN_LEFT|NVG_ALIGN_TOP)
-  nvgTextMetrics(vg, nil, nil, lineh_buf)
+  NVG.FontSize(vg, 38.0)
+  NVG.FontFace(vg, name)
+  NVG.TextAlign(vg, NVG::ALIGN_LEFT|NVG::ALIGN_TOP)
+  NVG.TextMetrics(vg, nil, nil, lineh_buf)
   lineh = lineh_buf.unpack('F')[0]
 
   text_start = text
   text_end = nil
-  while (nrows = nvgTextBreakLines(vg, text_start, text_end, width, rows_buf, 3))
+  while (nrows = NVG.TextBreakLines(vg, text_start, text_end, width, rows_buf, 3))
     rows = nrows.times.collect do |i|
-      NVGtextRow.new(rows_buf + i * NVGtextRow.size)
+      NVG::TextRow.new(rows_buf + i * NVG::TextRow.size)
     end
     nrows.times do |i|
       row = rows[i]
 
-      nvgBeginPath(vg)
-      nvgFillColor(vg, nvgRGBA(255,255,255, 0))
-      nvgRect(vg, x, y, row[:width], lineh)
-      nvgFill(vg)
+      NVG.BeginPath(vg)
+      NVG.FillColor(vg, NVG.RGBA(255,255,255, 0))
+      NVG.Rect(vg, x, y, row[:width], lineh)
+      NVG.Fill(vg)
 
-      nvgFillColor(vg, nvgRGBA(255,255,255,255))
-      nvgText(vg, x, y, row[:start], row[:end])
+      NVG.FillColor(vg, NVG.RGBA(255,255,255,255))
+      NVG.Text(vg, x, y, row[:start], row[:end])
 
       y += lineh
     end
@@ -65,7 +63,7 @@ def draw_paragraph(vg, x, y, width, height, text, name="sans")
     end
   end
 
-  nvgRestore(vg)
+  NVG.Restore(vg)
 end
 
 if __FILE__ == $PROGRAM_NAME
@@ -98,8 +96,8 @@ if __FILE__ == $PROGRAM_NAME
 
   GL.load_lib()
 
-  nvgSetupGL2()
-  vg = nvgCreateGL2(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG)
+  NVG.SetupGL2()
+  vg = NVG.CreateGL2(NVG::ANTIALIAS | NVG::STENCIL_STROKES | NVG::DEBUG)
   if vg == nil
     puts("Could not init nanovg.")
     exit
@@ -136,16 +134,16 @@ if __FILE__ == $PROGRAM_NAME
     GL.ClearColor(0.3, 0.3, 0.32, 1.0)
     GL.Clear(GL::COLOR_BUFFER_BIT|GL::DEPTH_BUFFER_BIT|GL::STENCIL_BUFFER_BIT)
 
-    nvgBeginFrame(vg, winWidth, winHeight, pxRatio)
+    NVG.BeginFrame(vg, winWidth, winHeight, pxRatio)
 
     draw_paragraph(vg, winWidth - 1200, 10, 1150, 700, text)
-    nvgEndFrame(vg)
+    NVG.EndFrame(vg)
 
     GLFW.SwapBuffers(window)
     GLFW.PollEvents()
   end
 
-  nvgDeleteGL2(vg)
+  NVG.DeleteGL2(vg)
 
   GLFW.Terminate()
 end

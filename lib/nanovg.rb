@@ -1,6 +1,6 @@
 require 'ffi'
 
-module NanoVG
+module NVG
   extend FFI::Library
 
   #
@@ -8,93 +8,93 @@ module NanoVG
   #
 
   # NVGwinding
-  NVG_CCW = 1
-  NVG_CW  = 2
+  CCW = 1
+  CW  = 2
 
   # NVGsolidity
-  NVG_SOLID = 1
-  NVG_HOLE  = 2
+  SOLID = 1
+  HOLE  = 2
 
   # NVGlineCap
-  NVG_BUTT   = 0
-  NVG_ROUND  = 1
-  NVG_SQUARE = 2
-  NVG_BEVEL  = 3
-  NVG_MITER  = 4
+  BUTT   = 0
+  ROUND  = 1
+  SQUARE = 2
+  BEVEL  = 3
+  MITER  = 4
 
   # NVGalign
   #  Horizontal align
-  NVG_ALIGN_LEFT     = 1
-  NVG_ALIGN_CENTER   = 2
-  NVG_ALIGN_RIGHT    = 4
+  ALIGN_LEFT     = 1
+  ALIGN_CENTER   = 2
+  ALIGN_RIGHT    = 4
   #  Vertical align
-  NVG_ALIGN_TOP      = 8
-  NVG_ALIGN_MIDDLE   = 16
-  NVG_ALIGN_BOTTOM   = 32
-  NVG_ALIGN_BASELINE = 64
+  ALIGN_TOP      = 8
+  ALIGN_MIDDLE   = 16
+  ALIGN_BOTTOM   = 32
+  ALIGN_BASELINE = 64
 
   # NVGblendFactor
-  NVG_ZERO                = 1 << 0
-  NVG_ONE                 = 1 << 1
-  NVG_SRC_COLOR           = 1 << 2
-  NVG_ONE_MINUS_SRC_COLOR = 1 << 3
-  NVG_DST_COLOR           = 1 << 4
-  NVG_ONE_MINUS_DST_COLOR = 1 << 5
-  NVG_SRC_ALPHA           = 1 << 6
-  NVG_ONE_MINUS_SRC_ALPHA = 1 << 7
-  NVG_DST_ALPHA           = 1 << 8
-  NVG_ONE_MINUS_DST_ALPHA = 1 << 9
-  NVG_SRC_ALPHA_SATURATE  = 1 << 10
+  ZERO                = 1 << 0
+  ONE                 = 1 << 1
+  SRC_COLOR           = 1 << 2
+  ONE_MINUS_SRC_COLOR = 1 << 3
+  DST_COLOR           = 1 << 4
+  ONE_MINUS_DST_COLOR = 1 << 5
+  SRC_ALPHA           = 1 << 6
+  ONE_MINUS_SRC_ALPHA = 1 << 7
+  DST_ALPHA           = 1 << 8
+  ONE_MINUS_DST_ALPHA = 1 << 9
+  SRC_ALPHA_SATURATE  = 1 << 10
 
   # NVGcompositeOperation
-  NVG_SOURCE_OVER      = 0
-  NVG_SOURCE_IN        = 1
-  NVG_SOURCE_OUT       = 2
-  NVG_ATOP             = 3
-  NVG_DESTINATION_OVER = 4
-  NVG_DESTINATION_IN   = 5
-  NVG_DESTINATION_OUT  = 6
-  NVG_DESTINATION_ATOP = 7
-  NVG_LIGHTER          = 8
-  NVG_COPY             = 9
-  NVG_XOR              = 10
+  SOURCE_OVER      = 0
+  SOURCE_IN        = 1
+  SOURCE_OUT       = 2
+  ATOP             = 3
+  DESTINATION_OVER = 4
+  DESTINATION_IN   = 5
+  DESTINATION_OUT  = 6
+  DESTINATION_ATOP = 7
+  LIGHTER          = 8
+  COPY             = 9
+  XOR              = 10
 
   # NVGimageFlags
-  NVG_IMAGE_GENERATE_MIPMAPS  = 1
-  NVG_IMAGE_REPEATX           = 2
-  NVG_IMAGE_REPEATY           = 4
-  NVG_IMAGE_FLIPY             = 8
-  NVG_IMAGE_PREMULTIPLIED     = 16
-  NVG_IMAGE_NEAREST           = 32
+  IMAGE_GENERATE_MIPMAPS  = 1
+  IMAGE_REPEATX           = 2
+  IMAGE_REPEATY           = 4
+  IMAGE_FLIPY             = 8
+  IMAGE_PREMULTIPLIED     = 16
+  IMAGE_NEAREST           = 32
 
   # NVGcreateFlags
-  NVG_ANTIALIAS         = 1
-  NVG_STENCIL_STROKES   = 2
-  NVG_DEBUG             = 4
+  ANTIALIAS         = 1
+  STENCIL_STROKES   = 2
+  DEBUG             = 4
 
   #
   # struct
   #
 
-  class NVGcolor < FFI::Struct
+  class Color < FFI::Struct
     layout(
       :rgba, [:float, 4]
     )
   end
 
-  class NVGpaint < FFI::Struct
+  class Paint < FFI::Struct
     layout(
       :xform,       [:float, 6],
       :extent,      [:float, 2],
       :radius,      :float,
       :feather,     :float,
-      :innerColor,  NVGcolor,
-      :outerColor,  NVGcolor,
+      :innerColor,  Color,
+      :outerColor,  Color,
       :image,       :int32
     )
   end
 
-  class NVGcompositeOperationState < FFI::Struct
+  class CompositeOperationState < FFI::Struct
     layout(
       :srcRGB,   :int32,
       :dstRGB,   :int32,
@@ -103,7 +103,7 @@ module NanoVG
     )
   end
 
-  class NVGglyphPosition < FFI::Struct
+  class GlyphPosition < FFI::Struct
     layout(
       :str,  :pointer,
       :x,    :float,
@@ -112,7 +112,7 @@ module NanoVG
     )
   end
 
-  class NVGtextRow < FFI::Struct
+  class TextRow < FFI::Struct
     layout(
       :start, :pointer,
       :end,   :pointer,
@@ -138,132 +138,132 @@ module NanoVG
     #
     # Common API
     #
-    attach_function :nvgBeginFrame, :nvgBeginFrame, [:pointer, :float, :float, :float], :void
-    attach_function :nvgCancelFrame, :nvgCancelFrame, [:pointer], :void
-    attach_function :nvgEndFrame, :nvgEndFrame, [:pointer], :void
+    attach_function :BeginFrame, :nvgBeginFrame, [:pointer, :float, :float, :float], :void
+    attach_function :CancelFrame, :nvgCancelFrame, [:pointer], :void
+    attach_function :EndFrame, :nvgEndFrame, [:pointer], :void
 
-    attach_function :nvgGlobalCompositeOperation, [:pointer,  :int32], :void
-    attach_function :nvgGlobalCompositeBlendFunc, [:pointer, :int32, :int32], :void
-    attach_function :nvgGlobalCompositeBlendFuncSeparate, [:pointer, :int32, :int32, :int32, :int32], :void
+    attach_function :GlobalCompositeOperation, :nvgGlobalCompositeOperation, [:pointer,  :int32], :void
+    attach_function :GlobalCompositeBlendFunc, :nvgGlobalCompositeBlendFunc, [:pointer, :int32, :int32], :void
+    attach_function :GlobalCompositeBlendFuncSeparate, :nvgGlobalCompositeBlendFuncSeparate, [:pointer, :int32, :int32, :int32, :int32], :void
 
-    attach_function :nvgRGB, :nvgRGB, [:uint8, :uint8, :uint8], NVGcolor.by_value
-    attach_function :nvgRGBf, :nvgRGBf, [:float, :float, :float], NVGcolor.by_value
-    attach_function :nvgRGBA, :nvgRGBA, [:uint8, :uint8, :uint8, :uint8], NVGcolor.by_value
-    attach_function :nvgRGBAf, :nvgRGBAf, [:float, :float, :float, :float], NVGcolor.by_value
+    attach_function :RGB, :nvgRGB, [:uint8, :uint8, :uint8], Color.by_value
+    attach_function :RGBf, :nvgRGBf, [:float, :float, :float], Color.by_value
+    attach_function :RGBA, :nvgRGBA, [:uint8, :uint8, :uint8, :uint8], Color.by_value
+    attach_function :RGBAf, :nvgRGBAf, [:float, :float, :float, :float], Color.by_value
 
-    attach_function :nvgLerpRGBA, :nvgLerpRGBA, [NVGcolor.by_value, NVGcolor.by_value, :float], NVGcolor.by_value
-    attach_function :nvgTransRGBA, :nvgTransRGBA, [NVGcolor.by_value, :uint8], NVGcolor.by_value
-    attach_function :nvgTransRGBAf, :nvgTransRGBAf, [NVGcolor.by_value, :float], NVGcolor.by_value
-    attach_function :nvgHSL, :nvgHSL, [:float, :float, :float], NVGcolor.by_value
-    attach_function :nvgHSLA, :nvgHSLA, [:float, :float, :float, :uint8], NVGcolor.by_value
+    attach_function :LerpRGBA, :nvgLerpRGBA, [Color.by_value, Color.by_value, :float], Color.by_value
+    attach_function :TransRGBA, :nvgTransRGBA, [Color.by_value, :uint8], Color.by_value
+    attach_function :TransRGBAf, :nvgTransRGBAf, [Color.by_value, :float], Color.by_value
+    attach_function :HSL, :nvgHSL, [:float, :float, :float], Color.by_value
+    attach_function :HSLA, :nvgHSLA, [:float, :float, :float, :uint8], Color.by_value
 
-    attach_function :nvgSave, :nvgSave, [:pointer], :void
-    attach_function :nvgRestore, :nvgRestore, [:pointer], :void
-    attach_function :nvgReset, :nvgReset, [:pointer], :void
+    attach_function :Save, :nvgSave, [:pointer], :void
+    attach_function :Restore, :nvgRestore, [:pointer], :void
+    attach_function :Reset, :nvgReset, [:pointer], :void
 
-    attach_function :nvgShapeAntiAlias, :nvgShapeAntiAlias, [:pointer, NVGcolor.by_value], :void
-    attach_function :nvgStrokeColor, :nvgStrokeColor, [:pointer, NVGcolor.by_value], :void
-    attach_function :nvgStrokePaint, [:pointer, NVGpaint.by_value], :void
-    attach_function :nvgFillColor, [:pointer, NVGcolor.by_value], :void
-    attach_function :nvgFillPaint, [:pointer, NVGpaint.by_value], :void
-    attach_function :nvgMiterLimit, [:pointer, :float], :void
-    attach_function :nvgStrokeWidth, [:pointer, :float], :void
-    attach_function :nvgLineCap, [:pointer, :int32], :void
-    attach_function :nvgLineJoin, [:pointer, :int32], :void
-    attach_function :nvgGlobalAlpha, [:pointer, :float], :void
+    attach_function :ShapeAntiAlias, :nvgShapeAntiAlias, [:pointer, Color.by_value], :void
+    attach_function :StrokeColor, :nvgStrokeColor, [:pointer, Color.by_value], :void
+    attach_function :StrokePaint, :nvgStrokePaint, [:pointer, Paint.by_value], :void
+    attach_function :FillColor, :nvgFillColor, [:pointer, Color.by_value], :void
+    attach_function :FillPaint, :nvgFillPaint, [:pointer, Paint.by_value], :void
+    attach_function :MiterLimit, :nvgMiterLimit, [:pointer, :float], :void
+    attach_function :StrokeWidth, :nvgStrokeWidth, [:pointer, :float], :void
+    attach_function :LineCap, :nvgLineCap, [:pointer, :int32], :void
+    attach_function :LineJoin, :nvgLineJoin, [:pointer, :int32], :void
+    attach_function :GlobalAlpha, :nvgGlobalAlpha, [:pointer, :float], :void
 
-    attach_function :nvgResetTransform, :nvgResetTransform, [:pointer], :void
-    attach_function :nvgTransform, :nvgTransform, [:pointer, :float, :float, :float, :float, :float, :float], :void
-    attach_function :nvgTranslate, :nvgTranslate, [:pointer, :float, :float], :void
-    attach_function :nvgRotate, :nvgRotate, [:pointer, :float], :void
-    attach_function :nvgSkewX, :nvgSkewX, [:pointer, :float], :void
-    attach_function :nvgSkewY, :nvgSkewY, [:pointer, :float], :void
-    attach_function :nvgScale, :nvgScale, [:pointer, :float, :float], :void
-    attach_function :nvgCurrentTransform, :nvgCurrentTransform, [:pointer, :pointer], :void
+    attach_function :ResetTransform, :nvgResetTransform, [:pointer], :void
+    attach_function :Transform, :nvgTransform, [:pointer, :float, :float, :float, :float, :float, :float], :void
+    attach_function :Translate, :nvgTranslate, [:pointer, :float, :float], :void
+    attach_function :Rotate, :nvgRotate, [:pointer, :float], :void
+    attach_function :SkewX, :nvgSkewX, [:pointer, :float], :void
+    attach_function :SkewY, :nvgSkewY, [:pointer, :float], :void
+    attach_function :Scale, :nvgScale, [:pointer, :float, :float], :void
+    attach_function :CurrentTransform, :nvgCurrentTransform, [:pointer, :pointer], :void
 
-    attach_function :nvgTransformIdentity, :nvgTransformIdentity, [:pointer], :void
-    attach_function :nvgTransformTranslate, :nvgTransformTranslate, [:pointer, :float, :float], :void
-    attach_function :nvgTransformScale, :nvgTransformScale, [:pointer, :float, :float], :void
-    attach_function :nvgTransformRotate, :nvgTransformRotate, [:pointer, :float], :void
-    attach_function :nvgTransformSkewX, :nvgTransformSkewX, [:pointer, :float], :void
-    attach_function :nvgTransformSkewY, :nvgTransformSkewY, [:pointer, :float], :void
-    attach_function :nvgTransformMultiply, :nvgTransformMultiply, [:pointer, :pointer], :void
-    attach_function :nvgTransformPremultiply, :nvgTransformPremultiply, [:pointer, :pointer], :void
-    attach_function :nvgTransformInverse, :nvgTransformInverse, [:pointer, :pointer], :int32
-    attach_function :nvgTransformPoint, :nvgTransformPoint, [:pointer, :pointer, :pointer, :float, :float], :void
+    attach_function :TransformIdentity, :nvgTransformIdentity, [:pointer], :void
+    attach_function :TransformTranslate, :nvgTransformTranslate, [:pointer, :float, :float], :void
+    attach_function :TransformScale, :nvgTransformScale, [:pointer, :float, :float], :void
+    attach_function :TransformRotate, :nvgTransformRotate, [:pointer, :float], :void
+    attach_function :TransformSkewX, :nvgTransformSkewX, [:pointer, :float], :void
+    attach_function :TransformSkewY, :nvgTransformSkewY, [:pointer, :float], :void
+    attach_function :TransformMultiply, :nvgTransformMultiply, [:pointer, :pointer], :void
+    attach_function :TransformPremultiply, :nvgTransformPremultiply, [:pointer, :pointer], :void
+    attach_function :TransformInverse, :nvgTransformInverse, [:pointer, :pointer], :int32
+    attach_function :TransformPoint, :nvgTransformPoint, [:pointer, :pointer, :pointer, :float, :float], :void
 
-    attach_function :nvgDegToRad, :nvgDegToRad, [:float], :float
-    attach_function :nvgRadToDeg, :nvgRadToDeg, [:float], :float
+    attach_function :DegToRad, :nvgDegToRad, [:float], :float
+    attach_function :RadToDeg, :nvgRadToDeg, [:float], :float
 
-    attach_function :nvgCreateImage, :nvgCreateImage, [:pointer, :pointer, :int32], :int32
-    attach_function :nvgCreateImageMem, :nvgCreateImageMem, [:pointer, :int32, :pointer, :int32], :int32
-    attach_function :nvgCreateImageRGBA, :nvgCreateImageRGBA, [:pointer, :int32, :int32, :int32, :pointer], :int32
-    attach_function :nvgUpdateImage, :nvgUpdateImage, [:pointer, :int32, :pointer], :void
-    attach_function :nvgImageSize, :nvgImageSize, [:pointer, :int32, :pointer, :pointer], :void
-    attach_function :nvgDeleteImage, :nvgDeleteImage, [:pointer, :int32], :void
+    attach_function :CreateImage, :nvgCreateImage, [:pointer, :pointer, :int32], :int32
+    attach_function :CreateImageMem, :nvgCreateImageMem, [:pointer, :int32, :pointer, :int32], :int32
+    attach_function :CreateImageRGBA, :nvgCreateImageRGBA, [:pointer, :int32, :int32, :int32, :pointer], :int32
+    attach_function :UpdateImage, :nvgUpdateImage, [:pointer, :int32, :pointer], :void
+    attach_function :ImageSize, :nvgImageSize, [:pointer, :int32, :pointer, :pointer], :void
+    attach_function :DeleteImage, :nvgDeleteImage, [:pointer, :int32], :void
 
-    attach_function :nvgLinearGradient, :nvgLinearGradient, [:pointer, :float, :float, :float, :float, NVGcolor.by_value, NVGcolor.by_value], NVGpaint.by_value
-    attach_function :nvgBoxGradient, :nvgBoxGradient, [:pointer, :float, :float, :float, :float, :float, :float, NVGcolor.by_value, NVGcolor.by_value], NVGpaint.by_value
-    attach_function :nvgRadialGradient, :nvgRadialGradient, [:pointer, :float, :float, :float, :float, NVGcolor.by_value, NVGcolor.by_value], NVGpaint.by_value
-    attach_function :nvgImagePattern, :nvgImagePattern, [:pointer, :float, :float, :float, :float, :float, :int32, :float], NVGpaint.by_value
+    attach_function :LinearGradient, :nvgLinearGradient, [:pointer, :float, :float, :float, :float, Color.by_value, Color.by_value], Paint.by_value
+    attach_function :BoxGradient, :nvgBoxGradient, [:pointer, :float, :float, :float, :float, :float, :float, Color.by_value, Color.by_value], Paint.by_value
+    attach_function :RadialGradient, :nvgRadialGradient, [:pointer, :float, :float, :float, :float, Color.by_value, Color.by_value], Paint.by_value
+    attach_function :ImagePattern, :nvgImagePattern, [:pointer, :float, :float, :float, :float, :float, :int32, :float], Paint.by_value
 
-    attach_function :nvgScissor, :nvgScissor, [:pointer, :float, :float, :float, :float], :void
-    attach_function :nvgIntersectScissor, :nvgIntersectScissor, [:pointer, :float, :float, :float, :float], :void
-    attach_function :nvgResetScissor, :nvgResetScissor, [:pointer], :void
+    attach_function :Scissor, :nvgScissor, [:pointer, :float, :float, :float, :float], :void
+    attach_function :IntersectScissor, :nvgIntersectScissor, [:pointer, :float, :float, :float, :float], :void
+    attach_function :ResetScissor, :nvgResetScissor, [:pointer], :void
 
-    attach_function :nvgBeginPath, :nvgBeginPath, [:pointer], :void
-    attach_function :nvgMoveTo, :nvgMoveTo, [:pointer, :float, :float], :void
-    attach_function :nvgLineTo, :nvgLineTo, [:pointer, :float, :float], :void
-    attach_function :nvgBezierTo, :nvgBezierTo, [:pointer, :float, :float, :float, :float, :float, :float], :void
-    attach_function :nvgQuadTo, :nvgQuadTo, [:pointer, :float, :float, :float, :float], :void
-    attach_function :nvgArcTo, :nvgArcTo, [:pointer, :float, :float, :float, :float, :float], :void
-    attach_function :nvgClosePath, :nvgClosePath, [:pointer], :void
-    attach_function :nvgPathWinding, :nvgPathWinding, [:pointer, :int32], :void
-    attach_function :nvgArc, :nvgArc, [:pointer, :float, :float, :float, :float, :float, :int32], :void
-    attach_function :nvgRect, :nvgRect, [:pointer, :float, :float, :float, :float], :void
-    attach_function :nvgRoundedRect, :nvgRoundedRect, [:pointer, :float, :float, :float, :float, :float], :void
-    attach_function :nvgRoundedRectVarying, :nvgRoundedRectVarying, [:pointer, :float, :float, :float, :float, :float, :float, :float, :float], :void
-    attach_function :nvgEllipse, :nvgEllipse, [:pointer, :float, :float, :float, :float], :void
-    attach_function :nvgCircle, :nvgCircle, [:pointer, :float, :float, :float], :void
-    attach_function :nvgFill, :nvgFill, [:pointer], :void
-    attach_function :nvgStroke, :nvgStroke, [:pointer], :void
+    attach_function :BeginPath, :nvgBeginPath, [:pointer], :void
+    attach_function :MoveTo, :nvgMoveTo, [:pointer, :float, :float], :void
+    attach_function :LineTo, :nvgLineTo, [:pointer, :float, :float], :void
+    attach_function :BezierTo, :nvgBezierTo, [:pointer, :float, :float, :float, :float, :float, :float], :void
+    attach_function :QuadTo, :nvgQuadTo, [:pointer, :float, :float, :float, :float], :void
+    attach_function :ArcTo, :nvgArcTo, [:pointer, :float, :float, :float, :float, :float], :void
+    attach_function :ClosePath, :nvgClosePath, [:pointer], :void
+    attach_function :PathWinding, :nvgPathWinding, [:pointer, :int32], :void
+    attach_function :Arc, :nvgArc, [:pointer, :float, :float, :float, :float, :float, :int32], :void
+    attach_function :Rect, :nvgRect, [:pointer, :float, :float, :float, :float], :void
+    attach_function :RoundedRect, :nvgRoundedRect, [:pointer, :float, :float, :float, :float, :float], :void
+    attach_function :RoundedRectVarying, :nvgRoundedRectVarying, [:pointer, :float, :float, :float, :float, :float, :float, :float, :float], :void
+    attach_function :Ellipse, :nvgEllipse, [:pointer, :float, :float, :float, :float], :void
+    attach_function :Circle, :nvgCircle, [:pointer, :float, :float, :float], :void
+    attach_function :Fill, :nvgFill, [:pointer], :void
+    attach_function :Stroke, :nvgStroke, [:pointer], :void
 
-    attach_function :nvgCreateFont, :nvgCreateFont, [:pointer, :pointer, :pointer], :int32
-    attach_function :nvgCreateFontMem, :nvgCreateFontMem, [:pointer, :pointer, :pointer, :int32, :int32], :int32
-    attach_function :nvgFindFont, :nvgFindFont, [:pointer, :pointer], :int32
-    attach_function :nvgAddFallbackFontId, :nvgAddFallbackFontId, [:pointer, :int32, :int32], :int32
-    attach_function :nvgAddFallbackFont, :nvgAddFallbackFont, [:pointer, :pointer, :pointer], :int32
-    attach_function :nvgFontSize, :nvgFontSize, [:pointer, :float], :void
-    attach_function :nvgFontBlur, :nvgFontBlur, [:pointer, :float], :void
-    attach_function :nvgTextLetterSpacing, :nvgTextLetterSpacing, [:pointer, :float], :void
-    attach_function :nvgTextLineHeight, :nvgTextLineHeight, [:pointer, :float], :void
-    attach_function :nvgTextAlign, :nvgTextAlign, [:pointer, :int32], :void
-    attach_function :nvgFontFaceId, :nvgFontFaceId, [:pointer, :int32], :void
-    attach_function :nvgFontFace, :nvgFontFace, [:pointer, :pointer], :void
-    attach_function :nvgText, :nvgText, [:pointer, :float, :float, :pointer, :pointer], :float
-    attach_function :nvgTextBox, :nvgTextBox, [:pointer, :float, :float, :float, :pointer, :pointer], :void
-    attach_function :nvgTextBounds, :nvgTextBounds, [:pointer, :float, :float, :pointer, :pointer, :pointer], :float
-    attach_function :nvgTextBoxBounds, :nvgTextBoxBounds, [:pointer, :float, :float, :float, :pointer, :pointer, :pointer], :void
-    attach_function :nvgTextGlyphPositions, :nvgTextGlyphPositions, [:pointer, :float, :float, :pointer, :pointer, :pointer, :int32], :int32
-    attach_function :nvgTextMetrics, :nvgTextMetrics, [:pointer, :pointer, :pointer, :pointer], :void
-    attach_function :nvgTextBreakLines, :nvgTextBreakLines, [:pointer, :pointer, :pointer, :float, :pointer, :int32], :int32
+    attach_function :CreateFont, :nvgCreateFont, [:pointer, :pointer, :pointer], :int32
+    attach_function :CreateFontMem, :nvgCreateFontMem, [:pointer, :pointer, :pointer, :int32, :int32], :int32
+    attach_function :FindFont, :nvgFindFont, [:pointer, :pointer], :int32
+    attach_function :AddFallbackFontId, :nvgAddFallbackFontId, [:pointer, :int32, :int32], :int32
+    attach_function :AddFallbackFont, :nvgAddFallbackFont, [:pointer, :pointer, :pointer], :int32
+    attach_function :FontSize, :nvgFontSize, [:pointer, :float], :void
+    attach_function :FontBlur, :nvgFontBlur, [:pointer, :float], :void
+    attach_function :TextLetterSpacing, :nvgTextLetterSpacing, [:pointer, :float], :void
+    attach_function :TextLineHeight, :nvgTextLineHeight, [:pointer, :float], :void
+    attach_function :TextAlign, :nvgTextAlign, [:pointer, :int32], :void
+    attach_function :FontFaceId, :nvgFontFaceId, [:pointer, :int32], :void
+    attach_function :FontFace, :nvgFontFace, [:pointer, :pointer], :void
+    attach_function :Text, :nvgText, [:pointer, :float, :float, :pointer, :pointer], :float
+    attach_function :TextBox, :nvgTextBox, [:pointer, :float, :float, :float, :pointer, :pointer], :void
+    attach_function :TextBounds, :nvgTextBounds, [:pointer, :float, :float, :pointer, :pointer, :pointer], :float
+    attach_function :TextBoxBounds, :nvgTextBoxBounds, [:pointer, :float, :float, :float, :pointer, :pointer, :pointer], :void
+    attach_function :TextGlyphPositions, :nvgTextGlyphPositions, [:pointer, :float, :float, :pointer, :pointer, :pointer, :int32], :int32
+    attach_function :TextMetrics, :nvgTextMetrics, [:pointer, :pointer, :pointer, :pointer], :void
+    attach_function :TextBreakLines, :nvgTextBreakLines, [:pointer, :pointer, :pointer, :float, :pointer, :int32], :int32
 
     #
     # GL2-specific API (nanovg_gl)
     #
     if render_backend == :gl2
-      attach_function :nvgCreateGL2, :nvgCreateGL2, [:int32], :pointer
-      attach_function :nvgDeleteGL2, :nvgDeleteGL2, [:pointer], :void
-      attach_function :nvgSetupGL2, :nvgSetupGL2, [], :void
+      attach_function :CreateGL2, :nvgCreateGL2, [:int32], :pointer
+      attach_function :DeleteGL2, :nvgDeleteGL2, [:pointer], :void
+      attach_function :SetupGL2, :nvgSetupGL2, [], :void
     end
 
     #
     # GL3-specific API (nanovg_gl)
     #
     if render_backend == :gl3
-      attach_function :nvgCreateGL3, :nvgCreateGL3, [:int32], :pointer
-      attach_function :nvgDeleteGL3, :nvgDeleteGL3, [:pointer], :void
-      attach_function :nvgSetupGL3, :nvgSetupGL3, [], :void
+      attach_function :CreateGL3, :nvgCreateGL3, [:int32], :pointer
+      attach_function :DeleteGL3, :nvgDeleteGL3, [:pointer], :void
+      attach_function :SetupGL3, :nvgSetupGL3, [], :void
     end
 
     @@nanovg_import_done = true

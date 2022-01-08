@@ -36,8 +36,8 @@ if __FILE__ == $PROGRAM_NAME
 
   GL.load_lib()
 
-  nvgSetupGL2()
-  vg = nvgCreateGL2(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG)
+  NVG.SetupGL2()
+  vg = NVG.CreateGL2(NVG::ANTIALIAS | NVG::STENCIL_STROKES | NVG::DEBUG)
   if vg == nil
     puts("Could not init nanovg.")
     exit
@@ -68,8 +68,8 @@ if __FILE__ == $PROGRAM_NAME
     GL.ClearColor(0.1, 0.2, 0.3, 1.0)
     GL.Clear(GL::COLOR_BUFFER_BIT|GL::DEPTH_BUFFER_BIT|GL::STENCIL_BUFFER_BIT)
 
-    nvgBeginFrame(vg, winWidth, winHeight, pxRatio)
-    nvgSave(vg)
+    NVG.BeginFrame(vg, winWidth, winHeight, pxRatio)
+    NVG.Save(vg)
 
     cell_wh = 0.8 * [winWidth, winHeight].min / $pixel_count.to_f
     x_base = winWidth * 0.5  - (cell_wh * $pixel_count * 0.5) + cell_wh/2
@@ -93,29 +93,29 @@ if __FILE__ == $PROGRAM_NAME
             iter += 1
           end
           $pixel_table[r][c] = if iter < 4
-                                 nvgRGBA(128,128,255, 255)
+                                 NVG.RGBA(128,128,255, 255)
                                elsif iter < 8
-                                 nvgRGBA(128,192,192, 255)
+                                 NVG.RGBA(128,192,192, 255)
                                elsif iter < 12
-                                 nvgRGBA(128,255,128, 255)
+                                 NVG.RGBA(128,255,128, 255)
                                else
-                                 nvgRGBA((max_iter-iter),(max_iter-iter),(max_iter-iter)/4, 255)
+                                 NVG.RGBA((max_iter-iter),(max_iter-iter),(max_iter-iter)/4, 255)
                                end
 =begin
            if c > 0
-             $pixel_table[r][c] = nvgLerpRGBA($pixel_table[r][c-1], $pixel_table[r][c], 0.5)
+             $pixel_table[r][c] = NVG.LerpRGBA($pixel_table[r][c-1], $pixel_table[r][c], 0.5)
            elsif r > 0
-             $pixel_table[r][c] = nvgLerpRGBA($pixel_table[r-1][c], $pixel_table[r][c], 0.5)
+             $pixel_table[r][c] = NVG.LerpRGBA($pixel_table[r-1][c], $pixel_table[r][c], 0.5)
            end
 =end
         end
 
         color = $pixel_table[r][c]
-        nvgBeginPath(vg)
-        nvgCircle(vg, x, y, cell_wh/2)
-        paint = nvgRadialGradient(vg, x,y, 0.0,cell_wh/2, color, nvgRGBA(0,0,0,0))
-        nvgFillPaint(vg, paint)
-        nvgFill(vg)
+        NVG.BeginPath(vg)
+        NVG.Circle(vg, x, y, cell_wh/2)
+        paint = NVG.RadialGradient(vg, x,y, 0.0,cell_wh/2, color, NVG.RGBA(0,0,0,0))
+        NVG.FillPaint(vg, paint)
+        NVG.Fill(vg)
 
         x += cell_wh
       end
@@ -123,14 +123,14 @@ if __FILE__ == $PROGRAM_NAME
       y += cell_wh
     end
 
-    nvgRestore(vg)
-    nvgEndFrame(vg)
+    NVG.Restore(vg)
+    NVG.EndFrame(vg)
 
     GLFW.SwapBuffers(window)
     GLFW.PollEvents()
   end
 
-  nvgDeleteGL2(vg)
+  NVG.DeleteGL2(vg)
 
   GLFW.Terminate()
 end

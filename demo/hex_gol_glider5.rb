@@ -16,9 +16,7 @@ $state = :render
 
 # Press ESC to exit.
 key = GLFW::create_callback(:GLFWkeyfun) do |window, key, scancode, action, mods|
-  if key == GLFW::KEY_ESCAPE && action == GLFW::PRESS
-    GLFW.SetWindowShouldClose(window, GL::TRUE)
-  end
+  GLFW.SetWindowShouldClose(window, GL::TRUE) if key == GLFW::KEY_ESCAPE && action == GLFW::PRESS
 end
 
 if __FILE__ == $PROGRAM_NAME
@@ -45,8 +43,8 @@ if __FILE__ == $PROGRAM_NAME
 
   GL.load_lib()
 
-  nvgSetupGL2()
-  vg = nvgCreateGL2(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG)
+  NVG.SetupGL2()
+  vg = NVG.CreateGL2(NVG::ANTIALIAS | NVG::STENCIL_STROKES | NVG::DEBUG)
   if vg == nil
     puts("Could not init nanovg.")
     exit
@@ -121,9 +119,9 @@ if __FILE__ == $PROGRAM_NAME
 
   hex_map = hex_maps[current_hex_map_idx]
 
-  CELL_COLOR_ALIVE = nvgRGBA(20, 120, 220, 255)
-  CELL_COLOR_EMPTY = nvgRGBA(164, 180, 224, 255)
-  CELL_COLOR_END   = nvgRGBA(224,255,255,255)
+  CELL_COLOR_ALIVE = NVG.RGBA(20, 120, 220, 255)
+  CELL_COLOR_EMPTY = NVG.RGBA(164, 180, 224, 255)
+  CELL_COLOR_END   = NVG.RGBA(224,255,255,255)
 
   GLFW.SwapInterval(0)
   GLFW.SetTime(0)
@@ -162,11 +160,11 @@ if __FILE__ == $PROGRAM_NAME
     hex_grid_layout.origin.x = hex_grid_layout.size.x * 1.1 #fbWidth / 2.0
     hex_grid_layout.origin.y = hex_grid_layout.size.y * 1.1 #fbHeight / 2.0
 
-    nvgBeginFrame(vg, winWidth, winHeight, pxRatio)
-    nvgSave(vg)
+    NVG.BeginFrame(vg, winWidth, winHeight, pxRatio)
+    NVG.Save(vg)
 
-    nvgStrokeColor(vg, nvgRGBA(32, 64, 128, 255))
-    nvgStrokeWidth(vg, 1.5)
+    NVG.StrokeColor(vg, NVG.RGBA(32, 64, 128, 255))
+    NVG.StrokeWidth(vg, 1.5)
     hex_map.each_with_index do |hex_current, hex_idx|
       # Draw edges
       center = hex_grid_layout.hex_to_pixel(hex_current)
@@ -176,12 +174,12 @@ if __FILE__ == $PROGRAM_NAME
         y = (corner.y - center.y) * 0.9 + center.y
         Point.new(x, y)
       }
-      nvgBeginPath(vg)
-      nvgMoveTo(vg, corners[0].x, corners[0].y)
+      NVG.BeginPath(vg)
+      NVG.MoveTo(vg, corners[0].x, corners[0].y)
       (1..5).each do |i|
-        nvgLineTo(vg, corners[i].x, corners[i].y)
+        NVG.LineTo(vg, corners[i].x, corners[i].y)
       end
-      nvgClosePath(vg)
+      NVG.ClosePath(vg)
 
       # Select inner color
       gradient_start = hex_current.data == true ? CELL_COLOR_ALIVE : CELL_COLOR_EMPTY
@@ -190,18 +188,18 @@ if __FILE__ == $PROGRAM_NAME
         hex_next = hex_maps[1 - current_hex_map_idx][hex_idx]
         if hex_current.data != hex_next.data # Check dead -> alive or alive -> dead
           gradient_start_next = hex_next.data == true ? CELL_COLOR_ALIVE : CELL_COLOR_EMPTY
-          gradient_start = nvgLerpRGBA(gradient_start, gradient_start_next, alpha_rate)
+          gradient_start = NVG.LerpRGBA(gradient_start, gradient_start_next, alpha_rate)
         end
       end
-      paint = nvgLinearGradient(vg, center.x-10.0,center.y-10.0, center.x+10.0,center.y+10.0, gradient_start, CELL_COLOR_END)
-      nvgFillPaint(vg, paint)
-      nvgFill(vg) # Fill inner area
+      paint = NVG.LinearGradient(vg, center.x-10.0,center.y-10.0, center.x+10.0,center.y+10.0, gradient_start, CELL_COLOR_END)
+      NVG.FillPaint(vg, paint)
+      NVG.Fill(vg) # Fill inner area
 
-      nvgStroke(vg) # Fill edges
+      NVG.Stroke(vg) # Fill edges
     end # hex_map.each_with_index do |hex_current, hex_idx|
 
-    nvgRestore(vg)
-    nvgEndFrame(vg)
+    NVG.Restore(vg)
+    NVG.EndFrame(vg)
 
     GLFW.SwapBuffers(window)
     GLFW.PollEvents()
@@ -246,7 +244,7 @@ if __FILE__ == $PROGRAM_NAME
 
   end
 
-  nvgDeleteGL2(vg)
+  NVG.DeleteGL2(vg)
 
   GLFW.Terminate()
 end

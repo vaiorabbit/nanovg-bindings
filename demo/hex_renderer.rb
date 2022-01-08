@@ -4,9 +4,7 @@ require_relative 'lib/hex'
 
 # Press ESC to exit.
 key = GLFW::create_callback(:GLFWkeyfun) do |window, key, scancode, action, mods|
-  if key == GLFW::KEY_ESCAPE && action == GLFW::PRESS
-    GLFW.SetWindowShouldClose(window, GL::TRUE)
-  end
+  GLFW.SetWindowShouldClose(window, GL::TRUE) if key == GLFW::KEY_ESCAPE && action == GLFW::PRESS
 end
 
 if __FILE__ == $PROGRAM_NAME
@@ -33,8 +31,8 @@ if __FILE__ == $PROGRAM_NAME
 
   GL.load_lib()
 
-  nvgSetupGL2()
-  vg = nvgCreateGL2(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG)
+  NVG.SetupGL2()
+  vg = NVG.CreateGL2(NVG::ANTIALIAS | NVG::STENCIL_STROKES | NVG::DEBUG)
   if vg == nil
     puts("Could not init nanovg.")
     exit
@@ -134,11 +132,11 @@ if __FILE__ == $PROGRAM_NAME
     hex_grid_layout.origin.x = hex_grid_layout.size.x * 1.1 #fbWidth / 2.0
     hex_grid_layout.origin.y = hex_grid_layout.size.y * 1.1 #fbHeight / 2.0
 
-    nvgBeginFrame(vg, winWidth, winHeight, pxRatio)
-    nvgSave(vg)
+    NVG.BeginFrame(vg, winWidth, winHeight, pxRatio)
+    NVG.Save(vg)
 
-    nvgStrokeColor(vg, nvgRGBA(32, 64, 128, 255))
-    nvgStrokeWidth(vg, 1.5)
+    NVG.StrokeColor(vg, NVG.RGBA(32, 64, 128, 255))
+    NVG.StrokeWidth(vg, 1.5)
     hex_map.each do |h|
       center = hex_grid_layout.hex_to_pixel(h)
       corners = hex_grid_layout.polygon_corners(h)
@@ -147,31 +145,31 @@ if __FILE__ == $PROGRAM_NAME
         y = (corner.y - center.y) * 0.9 + center.y
         Point.new(x, y)
       }
-      nvgBeginPath(vg)
-      nvgMoveTo(vg, corners[0].x, corners[0].y)
+      NVG.BeginPath(vg)
+      NVG.MoveTo(vg, corners[0].x, corners[0].y)
       (1..5).each do |i|
-        nvgLineTo(vg, corners[i].x, corners[i].y)
+        NVG.LineTo(vg, corners[i].x, corners[i].y)
       end
       b = 64 * (center.x >= 0 ? center.x / fbWidth : 0)
-      nvgClosePath(vg)
+      NVG.ClosePath(vg)
       neighbor = hex_neighbors.find {|neighbor| neighbor.q == h.q && neighbor.r == h.r}
       if h.q == hex_target.q and h.r == hex_target.r # target itself
-        gradient_start = nvgRGBA(255, 64, 0, 255)
-        gradient_end = nvgRGBA(224,255,255,255)
+        gradient_start = NVG.RGBA(255, 64, 0, 255)
+        gradient_end = NVG.RGBA(224,255,255,255)
       elsif neighbor != nil # neighbor of target
-        gradient_start = nvgRGBA(128, 255, 0, 255)
-        gradient_end = nvgRGBA(224,255,255,255)
+        gradient_start = NVG.RGBA(128, 255, 0, 255)
+        gradient_end = NVG.RGBA(224,255,255,255)
       else
-        gradient_start = nvgRGBA(164, 180, 192 + b, 255)
-        gradient_end = nvgRGBA(224,255,255,255)
+        gradient_start = NVG.RGBA(164, 180, 192 + b, 255)
+        gradient_end = NVG.RGBA(224,255,255,255)
       end
-      paint = nvgLinearGradient(vg, center.x-10.0,center.y-10.0, center.x+10.0,center.y+10.0, gradient_start, gradient_end)
-      nvgFillPaint(vg, paint)
-      nvgFill(vg)
-      nvgStroke(vg)
+      paint = NVG.LinearGradient(vg, center.x-10.0,center.y-10.0, center.x+10.0,center.y+10.0, gradient_start, gradient_end)
+      NVG.FillPaint(vg, paint)
+      NVG.Fill(vg)
+      NVG.Stroke(vg)
     end
-    nvgRestore(vg)
-    nvgEndFrame(vg)
+    NVG.Restore(vg)
+    NVG.EndFrame(vg)
 
     GLFW.SwapBuffers(window)
     GLFW.PollEvents()
@@ -185,7 +183,7 @@ if __FILE__ == $PROGRAM_NAME
     end
   end
 
-  nvgDeleteGL2(vg)
+  NVG.DeleteGL2(vg)
 
   GLFW.Terminate()
 end

@@ -58,8 +58,8 @@ if __FILE__ == $PROGRAM_NAME
 
   GL.load_lib()
 
-  nvgSetupGL2()
-  vg = nvgCreateGL2(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG)
+  NVG.SetupGL2()
+  vg = NVG.CreateGL2(NVG::ANTIALIAS | NVG::STENCIL_STROKES | NVG::DEBUG)
   if vg == nil
     puts("Could not init nanovg.")
     exit
@@ -101,11 +101,11 @@ if __FILE__ == $PROGRAM_NAME
     GL.ClearColor(0.3, 0.3, 0.32, 1.0)
     GL.Clear(GL::COLOR_BUFFER_BIT|GL::DEPTH_BUFFER_BIT|GL::STENCIL_BUFFER_BIT)
 
-    nvgBeginFrame(vg, winWidth, winHeight, pxRatio)
+    NVG.BeginFrame(vg, winWidth, winHeight, pxRatio)
 
     data.render(vg, mx, my, winWidth, winHeight, t, $blowup)
     fps.render(vg, 5, 5)
-    nvgEndFrame(vg)
+    NVG.EndFrame(vg)
 
     if $screenshot
       $screenshot = false
@@ -118,7 +118,7 @@ if __FILE__ == $PROGRAM_NAME
 
   data.free(vg)
 
-  nvgDeleteGL2(vg)
+  NVG.DeleteGL2(vg)
 
   GLFW.Terminate()
 end

@@ -41,7 +41,7 @@ class FontPlane
   end
 
   def load(vg, name="sans", ttf="./jpfont/GenShinGothic-Bold.ttf")
-    font_handle = nvgCreateFont(vg, name, ttf)
+    font_handle = NVG.CreateFont(vg, name, ttf)
     if font_handle == -1
       puts "Could not add font."
       return -1
@@ -49,36 +49,36 @@ class FontPlane
     @fonts << font_handle
   end
 
-  def render(vg, x, y, width, height, text, name: "sans", color: nvgRGBA(255,255,255,255))
-    rows_buf = FFI::MemoryPointer.new(NVGtextRow, 3)
-    glyphs_buf = FFI::MemoryPointer.new(NVGglyphPosition, 100)
+  def render(vg, x, y, width, height, text, name: "sans", color: NVG.RGBA(255,255,255,255))
+    rows_buf = FFI::MemoryPointer.new(NVG::TextRow, 3)
+    glyphs_buf = FFI::MemoryPointer.new(NVG::GlyphPosition, 100)
     lineh_buf = ' ' * 8
     lineh = 0.0
 
-    nvgSave(vg)
+    NVG.Save(vg)
 
-    nvgFontSize(vg, 44.0)
-    nvgFontFace(vg, name)
-    nvgTextAlign(vg, NVG_ALIGN_LEFT|NVG_ALIGN_TOP)
-    nvgTextMetrics(vg, nil, nil, lineh_buf)
+    NVG.FontSize(vg, 44.0)
+    NVG.FontFace(vg, name)
+    NVG.TextAlign(vg, NVG::ALIGN_LEFT|NVG::ALIGN_TOP)
+    NVG.TextMetrics(vg, nil, nil, lineh_buf)
     lineh = lineh_buf.unpack('F')[0]
 
     text_start = text
     text_end = nil
-    while ((nrows = nvgTextBreakLines(vg, text_start, text_end, width, rows_buf, 3)))
+    while ((nrows = NVG.TextBreakLines(vg, text_start, text_end, width, rows_buf, 3)))
       rows = nrows.times.collect do |i|
-        NVGtextRow.new(rows_buf + i * NVGtextRow.size)
+        NVG::TextRow.new(rows_buf + i * NVG::TextRow.size)
       end
       nrows.times do |i|
         row = rows[i]
 
-        nvgBeginPath(vg)
-#        nvgFillColor(vg, nvgRGBA(255,255,255, 0))
-#        nvgRect(vg, x, y, row[:width], lineh)
-#        nvgFill(vg)
+        NVG.BeginPath(vg)
+#        NVG.FillColor(vg, NVG.RGBA(255,255,255, 0))
+#        NVG.Rect(vg, x, y, row[:width], lineh)
+#        NVG.Fill(vg)
 
-        nvgFillColor(vg, color)
-        nvgText(vg, x, y, row[:start], row[:end])
+        NVG.FillColor(vg, color)
+        NVG.Text(vg, x, y, row[:start], row[:end])
 
         y += lineh
       end
@@ -89,7 +89,7 @@ class FontPlane
       end
     end
 
-    nvgRestore(vg)
+    NVG.Restore(vg)
   end
 end
 
@@ -261,55 +261,55 @@ class Graph
   def render(vg, render_edge: true, render_node: true, color_scheme: :outer)
     # Triangles
     if @triangle_indices.length > 0
-      color = nvgRGBA(0,255,0, 255)
+      color = NVG.RGBA(0,255,0, 255)
       lw = @node_radius * 0.5
       @triangle_indices.each do |indices|
-        nvgLineCap(vg, NVG_ROUND)
-        nvgLineJoin(vg, NVG_ROUND)
-        nvgBeginPath(vg)
-        nvgMoveTo(vg, @nodes[indices[0]].x, @nodes[indices[0]].y)
-        nvgLineTo(vg, @nodes[indices[1]].x, @nodes[indices[1]].y)
-        nvgLineTo(vg, @nodes[indices[2]].x, @nodes[indices[2]].y)
-        nvgClosePath(vg)
-        color = nvgRGBA(0,255,0, 64)
-        nvgFillColor(vg, color)
-        nvgFill(vg)
-        color = nvgRGBA(255,128,0, 255)
-        nvgStrokeColor(vg, color)
-        nvgStrokeWidth(vg, lw)
-        nvgStroke(vg)
+        NVG.LineCap(vg, NVG::ROUND)
+        NVG.LineJoin(vg, NVG::ROUND)
+        NVG.BeginPath(vg)
+        NVG.MoveTo(vg, @nodes[indices[0]].x, @nodes[indices[0]].y)
+        NVG.LineTo(vg, @nodes[indices[1]].x, @nodes[indices[1]].y)
+        NVG.LineTo(vg, @nodes[indices[2]].x, @nodes[indices[2]].y)
+        NVG.ClosePath(vg)
+        color = NVG.RGBA(0,255,0, 64)
+        NVG.FillColor(vg, color)
+        NVG.Fill(vg)
+        color = NVG.RGBA(255,128,0, 255)
+        NVG.StrokeColor(vg, color)
+        NVG.StrokeWidth(vg, lw)
+        NVG.Stroke(vg)
       end
     end
 
     # Edges
     if render_edge and @nodes.length >= 2
-      color = color_scheme == :outer ? nvgRGBA(0,0,255, 255) : nvgRGBA(255,0,0, 255)
+      color = color_scheme == :outer ? NVG.RGBA(0,0,255, 255) : NVG.RGBA(255,0,0, 255)
       lw = @node_radius * 0.5
-      nvgLineCap(vg, NVG_ROUND)
-      nvgLineJoin(vg, NVG_ROUND)
-      nvgBeginPath(vg)
+      NVG.LineCap(vg, NVG::ROUND)
+      NVG.LineJoin(vg, NVG::ROUND)
+      NVG.BeginPath(vg)
       @nodes.length.times do |i|
         if i == 0
-          nvgMoveTo(vg, @nodes[0].x, @nodes[0].y)
+          NVG.MoveTo(vg, @nodes[0].x, @nodes[0].y)
         else
-          nvgLineTo(vg, @nodes[i].x, @nodes[i].y)
+          NVG.LineTo(vg, @nodes[i].x, @nodes[i].y)
         end
       end
-      nvgClosePath(vg)
-      nvgStrokeColor(vg, color)
-      nvgStrokeWidth(vg, lw)
-      nvgStroke(vg)
+      NVG.ClosePath(vg)
+      NVG.StrokeColor(vg, color)
+      NVG.StrokeWidth(vg, lw)
+      NVG.Stroke(vg)
     end
 
     # Nodes
     if render_node and @nodes.length > 0
-      color = color_scheme == :outer ? nvgRGBA(0,192,255, 255) : nvgRGBA(255,192,0, 255)
-      nvgBeginPath(vg)
+      color = color_scheme == :outer ? NVG.RGBA(0,192,255, 255) : NVG.RGBA(255,192,0, 255)
+      NVG.BeginPath(vg)
       @nodes.each do |node|
-        nvgCircle(vg, node.x, node.y, @node_radius)
-        nvgFillColor(vg, color)
+        NVG.Circle(vg, node.x, node.y, @node_radius)
+        NVG.FillColor(vg, color)
       end
-      nvgFill(vg)
+      NVG.Fill(vg)
     end
 
   end
@@ -384,8 +384,8 @@ if __FILE__ == $PROGRAM_NAME
 
   GL.load_lib()
 
-  nvgSetupGL2()
-  vg = nvgCreateGL2(NVG_ANTIALIAS | NVG_STENCIL_STROKES)
+  NVG.SetupGL2()
+  vg = NVG.CreateGL2(NVG::ANTIALIAS | NVG::STENCIL_STROKES)
   if vg == nil
     puts("Could not init nanovg.")
     exit
@@ -424,17 +424,17 @@ if __FILE__ == $PROGRAM_NAME
     GL.ClearColor(0.8, 0.8, 0.8, 1.0)
     GL.Clear(GL::COLOR_BUFFER_BIT|GL::DEPTH_BUFFER_BIT|GL::STENCIL_BUFFER_BIT)
 
-    nvgBeginFrame(vg, winWidth, winHeight, pxRatio)
-    nvgSave(vg)
+    NVG.BeginFrame(vg, winWidth, winHeight, pxRatio)
+    NVG.Save(vg)
 
     $outer_graph.render(vg, color_scheme: :outer)
     $inner_graph.render(vg, color_scheme: :inner)
 
-    $font_plane.render(vg, winWidth - 1200, 10, 1150, 700, "[MODE] #{$current_graph==$outer_graph ? 'Making Outer Polygon' : 'Making Inner Polygon'}", color: nvgRGBA(32,128,64,255))
-    $font_plane.render(vg, winWidth - 1200, 60, 1150, 700, "[TRIANGULATION] #{$outer_graph.triangle_indices.length > 0 ? 'Done' : 'Not Yet'}", color: nvgRGBA(32,128,64,255))
+    $font_plane.render(vg, winWidth - 1200, 10, 1150, 700, "[MODE] #{$current_graph==$outer_graph ? 'Making Outer Polygon' : 'Making Inner Polygon'}", color: NVG.RGBA(32,128,64,255))
+    $font_plane.render(vg, winWidth - 1200, 60, 1150, 700, "[TRIANGULATION] #{$outer_graph.triangle_indices.length > 0 ? 'Done' : 'Not Yet'}", color: NVG.RGBA(32,128,64,255))
 
-    nvgRestore(vg)
-    nvgEndFrame(vg)
+    NVG.Restore(vg)
+    NVG.EndFrame(vg)
 
     GLFW.SwapBuffers(window)
     GLFW.PollEvents()
@@ -448,7 +448,7 @@ if __FILE__ == $PROGRAM_NAME
 =end
   end
 
-  nvgDeleteGL2(vg)
+  NVG.DeleteGL2(vg)
 
   GLFW.Terminate()
 end

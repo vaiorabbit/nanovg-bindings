@@ -3,7 +3,7 @@
 Provides NanoVG ( https://github.com/memononen/nanovg ) interfaces for ruby (MRI).
 
 *   Created : 2015-07-12
-*   Last modified : 2022-01-07
+*   Last modified : 2022-01-08
 
 <img src="https://raw.githubusercontent.com/vaiorabbit/nanovg-bindings/master/doc/example_rb.png" width="150"> <img src="https://raw.githubusercontent.com/vaiorabbit/nanovg-bindings/master/doc/emojifont_rb.png" width="150"> <img src="https://raw.githubusercontent.com/vaiorabbit/nanovg-bindings/master/doc/hex_gol_glider5_rb.png" width="150"> <img src="https://raw.githubusercontent.com/vaiorabbit/nanovg-bindings/master/doc/jpfont_rb.png" width="150"> <img src="https://raw.githubusercontent.com/vaiorabbit/nanovg-bindings/master/doc/mandelbrot_rb.png" width="150">
 

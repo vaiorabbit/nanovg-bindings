@@ -39,8 +39,8 @@ if __FILE__ == $PROGRAM_NAME
 
   GL.load_lib()
 
-  nvgSetupGL2()
-  vg = nvgCreateGL2(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG)
+  NVG.SetupGL2()
+  vg = NVG.CreateGL2(NVG::ANTIALIAS | NVG::STENCIL_STROKES | NVG::DEBUG)
   if vg == nil
     puts("Could not init nanovg.")
     exit
@@ -70,8 +70,8 @@ if __FILE__ == $PROGRAM_NAME
     GL.ClearColor(1.0, 1.0, 1.0, 1.0)
     GL.Clear(GL::COLOR_BUFFER_BIT|GL::DEPTH_BUFFER_BIT|GL::STENCIL_BUFFER_BIT)
 
-    nvgBeginFrame(vg, winWidth, winHeight, pxRatio)
-    nvgSave(vg)
+    NVG.BeginFrame(vg, winWidth, winHeight, pxRatio)
+    NVG.Save(vg)
 
     cell_wh = 0.8 * [winWidth, winHeight].min / qrc.modules.size.to_f
     x_base = winWidth * 0.5  - (cell_wh * qrc.modules.size * 0.5)
@@ -80,25 +80,25 @@ if __FILE__ == $PROGRAM_NAME
     y = y_base
     qrc.modules.each_index do |r|
       qrc.modules.each_index do |c|
-        color = qrc.qrcode.checked?(r, c) ? nvgRGBA(0,0,0, 255) : nvgRGBA(255,255,255, 255)
-        nvgBeginPath(vg)
-        nvgFillColor(vg, color)
-        nvgRect(vg, x, y, cell_wh, cell_wh)
-        nvgFill(vg)
+        color = qrc.qrcode.checked?(r, c) ? NVG.RGBA(0,0,0, 255) : NVG.RGBA(255,255,255, 255)
+        NVG.BeginPath(vg)
+        NVG.FillColor(vg, color)
+        NVG.Rect(vg, x, y, cell_wh, cell_wh)
+        NVG.Fill(vg)
         x += cell_wh
       end
       x = x_base
       y += cell_wh
     end
 
-    nvgRestore(vg)
-    nvgEndFrame(vg)
+    NVG.Restore(vg)
+    NVG.EndFrame(vg)
 
     GLFW.SwapBuffers(window)
     GLFW.PollEvents()
   end
 
-  nvgDeleteGL2(vg)
+  NVG.DeleteGL2(vg)
 
   GLFW.Terminate()
 
