@@ -2,22 +2,24 @@
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
-Gem::Specification.new do |gem|
-  gem.name          = "nanovg-bindings"
-  gem.version       = "0.0.2"
-  gem.authors       = ["vaiorabbit"]
-  gem.email         = ["vaiorabbit@gmail.com"]
-  gem.summary       = %q{Bindings for NanoVG}
-  gem.homepage      = "https://github.com/vaiorabbit/nanovg-bindings"
-  gem.require_paths = ["lib"]
-  gem.license       = "Zlib"
-  gem.description   = <<-DESC
-Ruby bindings for NanoVG.
+Gem::Specification.new do |spec|
+  spec.name          = "nanovg-bindings"
+  spec.version       = "0.0.2"
+  spec.authors       = ["vaiorabbit"]
+  spec.email         = ["vaiorabbit@gmail.com"]
+  spec.summary       = %q{Bindings for NanoVG}
+  spec.homepage      = "https://github.com/vaiorabbit/nanovg-bindings"
+  spec.require_paths = ["lib"]
+  spec.license       = "Zlib"
+  spec.description   = <<-DESC
+Ruby bindings for NanoVG ( https://github.com/memononen/nanovg ).
   DESC
 
-  gem.required_ruby_version = '>= 2.6.0'
+  spec.required_ruby_version = '>= 2.6.0'
 
-  gem.files = Dir.glob("lib/*.rb") +
-              Dir.glob("lib/*.dll") + Dir.glob("lib/*.dylib") +
-              ["README.md", "LICENSE.txt", "ChangeLog"]
+  spec.add_runtime_dependency 'ffi', '~> 1.15'
+  spec.add_runtime_dependency 'opengl-bindings2', '~> 2'
+
+  spec.files = Dir.glob("lib/*") +
+               ["README.md", "LICENSE.txt", "ChangeLog"]
 end
