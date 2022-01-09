@@ -772,7 +772,7 @@ class DemoData
           px = x
           nglyphs = NVG.TextGlyphPositions(vg, x, y, row[:start], row[:end], glyphs_buf, 100)
           glyphs = nglyphs.times.collect do |i|
-            NVG.glyphPosition.new(glyphs_buf + i * NVG::GlyphPosition.size)
+            NVG::GlyphPosition.new(glyphs_buf + i * NVG::GlyphPosition.size)
           end
           nglyphs.times do |j|
             x0 = glyphs[j][:x]
