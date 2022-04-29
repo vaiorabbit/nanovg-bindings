@@ -1,3 +1,7 @@
+2022-04-29  vaiorabbit  <http://twitter.com/vaiorabbit>
+
+	* Updated using the latest nanovg ( https://github.com/memononen/nanovg/commit/397f3300bc14bdb856ec429c71c345ab0340b0a6 )
+
 2022-01-08  vaiorabbit  <http://twitter.com/vaiorabbit>
 
 	* Changed API
