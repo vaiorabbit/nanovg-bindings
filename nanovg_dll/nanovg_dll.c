@@ -9,6 +9,9 @@
 # include "windows.h"
 # include <GL/gl.h>
 # include "glext.h"
+#elif defined(__linux__)
+# include <GL/gl.h>
+# include "glext.h"
 #endif
 
 #if defined(_WIN32)

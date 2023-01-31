@@ -6,7 +6,8 @@ when /mswin|msys|mingw|cygwin/
 when /darwin/
   NVG.load_lib(Dir.pwd + '/../lib/' + 'libnanovg_gl2.dylib')
 when /linux/
-  NVG.load_lib(Dir.pwd + '/../lib/' + 'libnanovg_gl2.so')
+  arch = RUBY_PLATFORM.split('-')[0]
+  NVG.load_lib(Dir.pwd + '/../lib/' + "libnanovg_gl2.#{arch}.so")
 else
   raise RuntimeError, "setup_dll.rb : Unknown OS: #{RUBY_PLATFORM}"
 end
