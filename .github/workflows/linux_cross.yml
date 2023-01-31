@@ -57,7 +57,7 @@ jobs:
 
     - name: Run rebuild script
       run: |
-        cd ${GITHUB_WORKSPACE}/script
+        cd ${GITHUB_WORKSPACE}/nanovg_dll
         bash ./build_gl2_linux_cross.sh
         bash ./build_gl3_linux_cross.sh
         cd ${GITHUB_WORKSPACE}
