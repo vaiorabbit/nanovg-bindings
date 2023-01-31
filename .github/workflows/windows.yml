@@ -1,0 +1,41 @@
+name: Build (Windows)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    permissions:
+      contents: write
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        ref: 'update'
+        fetch-depth: 1
+        submodules: recursive
+
+    # - name: Update submodules
+    #   id: update
+    #   run: git submodule update --remote --recursive
+
+    - name: Run rebuild script
+      shell: cmd
+      run: |
+        cd nanovg_dll
+        build_gl2_windows.cmd cmake
+        build_gl3_windows.cmd cmake
+
+    - name: Commit new libraries
+      continue-on-error: true
+      run: |
+        git config user.name "bot"
+        git config user.email "bot"
+        git add lib/*
+        git commit -a -m "commit by bot"
+        git push --force-with-lease -u origin update

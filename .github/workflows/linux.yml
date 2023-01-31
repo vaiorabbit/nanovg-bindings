@@ -1,0 +1,44 @@
+name: Build (Linux)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        ref: 'update'
+        fetch-depth: 1
+        submodules: recursive
+
+    # - name: Update submodules
+    #   id: update
+    #   run: git submodule update --remote --recursive
+
+    - name: Setup OpenGL
+      run: sudo apt -y install libopengl-dev libxrandr-dev mesa-common-dev libxinerama-dev libxcursor-dev libxi-dev
+
+    - name: Run rebuild script
+      run: |
+        cd ${GITHUB_WORKSPACE}/nanovg_dll
+        bash ./build_gl2_linux.sh
+        bash ./build_gl3_linux.sh
+        cd ${GITHUB_WORKSPACE}
+
+    - name: Commit new libraries
+      continue-on-error: true
+      run: |
+        git config user.name "bot"
+        git config user.email "bot"
+        git add lib/*
+        git commit -a -m "commit by bot"
+        git push --force-with-lease -u origin update
