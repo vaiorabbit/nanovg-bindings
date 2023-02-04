@@ -8,6 +8,7 @@ add_definitions("-DGL_SILENCE_DEPRECATION=1")
 
 include_directories( ${CMAKE_CURRENT_LIST_DIR}/../nanovg/src )
 include_directories( ${OPENGL_INCLUDE_DIR} )
+message(STATUS "OPENGL_INCLUDE_DIR=${OPENGL_INCLUDE_DIR}")
 
 set(NANOVG_SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/../nanovg_dll.c
@@ -22,6 +23,7 @@ endif (APPLE)
 add_library(nanovg_gl2 SHARED ${NANOVG_SOURCES})
 
 target_link_libraries( nanovg_gl2 ${OPENGL_LIBRARIES} )
+message(STATUS "OPENGL_LIBRARIES=${OPENGL_LIBRARIES}")
 
 if (APPLE)
     set_target_properties(nanovg_gl2 PROPERTIES
