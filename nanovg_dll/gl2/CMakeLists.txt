@@ -1,7 +1,14 @@
 project(nanovg_gl2)
 cmake_minimum_required(VERSION 3.0)
 
-find_package(OpenGL)
+if (NOT ${CMAKE_SYSTEM_PROCESSOR} MATCHES "ARM")
+    message(STATUS "Configuring for Windows/macOS/Linux(x86_64)")
+    find_package(OpenGL)
+else()
+    message(STATUS "Configuring for Linux(aarch64)")
+    find_path(OPENGL_INCLUDE_DIR GL/gl.h /usr/include)
+    find_library(OPENGL_LIBRARIES NAMES libGL libGLX PATH /lib/aarch64-linux-gnu)
+endif()
 
 add_definitions("-DNANOVG_GL2_IMPLEMENTATION=1")
 add_definitions("-DGL_SILENCE_DEPRECATION=1")
