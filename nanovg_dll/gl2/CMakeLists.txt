@@ -4,6 +4,7 @@ cmake_minimum_required(VERSION 3.0)
 message(STATUS "CMAKE_HOST_SYSTEM_PROCESSOR=${CMAKE_HOST_SYSTEM_PROCESSOR}")
 message(STATUS "CMAKE_SYSTEM_PROCESSOR=${CMAKE_SYSTEM_PROCESSOR}")
 message(STATUS "CMAKE_C_COMPILER_TARGET=${CMAKE_C_COMPILER_TARGET}")
+
 if (NOT ${CMAKE_C_COMPILER_TARGET} MATCHES "aarch64-linux-gnu")
     message(STATUS "aConfiguring for Windows/macOS/Linux(x86_64)")
     find_package(OpenGL)

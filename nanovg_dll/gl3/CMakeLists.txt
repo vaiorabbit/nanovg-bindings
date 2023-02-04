@@ -1,7 +1,18 @@
 project(nanovg_gl3)
 cmake_minimum_required(VERSION 3.0)
 
-find_package(OpenGL)
+message(STATUS "CMAKE_HOST_SYSTEM_PROCESSOR=${CMAKE_HOST_SYSTEM_PROCESSOR}")
+message(STATUS "CMAKE_SYSTEM_PROCESSOR=${CMAKE_SYSTEM_PROCESSOR}")
+message(STATUS "CMAKE_C_COMPILER_TARGET=${CMAKE_C_COMPILER_TARGET}")
+
+if (NOT ${CMAKE_C_COMPILER_TARGET} MATCHES "aarch64-linux-gnu")
+    message(STATUS "aConfiguring for Windows/macOS/Linux(x86_64)")
+    find_package(OpenGL)
+else()
+    message(STATUS "Configuring for Linux(aarch64)")
+    find_path(OPENGL_INCLUDE_DIR GL/gl.h /usr/include)
+    find_library(OPENGL_LIBRARIES NAMES GL GLX PATHS /lib/aarch64-linux-gnu)
+endif()
 
 add_definitions("-DNANOVG_GL3_IMPLEMENTATION=1")
 add_definitions("-DGL_SILENCE_DEPRECATION=1")
