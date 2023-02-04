@@ -10,7 +10,7 @@ if (NOT ${CMAKE_C_COMPILER_TARGET} MATCHES "aarch64-linux-gnu")
 else()
     message(STATUS "Configuring for Linux(aarch64)")
     find_path(OPENGL_INCLUDE_DIR GL/gl.h /usr/include)
-    find_library(OPENGL_LIBRARIES NAMES libGL libGLX PATH /lib/aarch64-linux-gnu)
+    find_library(OPENGL_LIBRARIES NAMES GL GLX PATHS /lib/aarch64-linux-gnu)
 endif()
 
 add_definitions("-DNANOVG_GL2_IMPLEMENTATION=1")
