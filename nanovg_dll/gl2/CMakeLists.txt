@@ -1,11 +1,11 @@
 project(nanovg_gl2)
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.7)
 
 message(STATUS "CMAKE_HOST_SYSTEM_PROCESSOR=${CMAKE_HOST_SYSTEM_PROCESSOR}")
 message(STATUS "CMAKE_SYSTEM_PROCESSOR=${CMAKE_SYSTEM_PROCESSOR}")
 message(STATUS "CMAKE_C_COMPILER_TARGET=${CMAKE_C_COMPILER_TARGET}")
 
-if (DEFINED CMAKE_C_COMPILER_TARGET AND ${CMAKE_C_COMPILER_TARGET} STREQUAL "aarch64-linux-gnu")
+if((DEFINED CMAKE_C_COMPILER_TARGET) AND ("${CMAKE_C_COMPILER_TARGET}" STREQUAL "aarch64-linux-gnu"))
     message(STATUS "Configuring for Linux(aarch64)")
     find_path(OPENGL_INCLUDE_DIR GL/gl.h /usr/include)
     find_library(OPENGL_LIBRARIES NAMES GL GLX PATHS /lib/aarch64-linux-gnu)
