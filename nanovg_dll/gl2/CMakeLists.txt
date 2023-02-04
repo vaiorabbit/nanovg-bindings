@@ -1,8 +1,10 @@
 project(nanovg_gl2)
 cmake_minimum_required(VERSION 3.0)
 
+message(STATUS "CMAKE_HOST_SYSTEM_PROCESSOR=${CMAKE_HOST_SYSTEM_PROCESSOR}")
+message(STATUS "CMAKE_SYSTEM_PROCESSOR=${CMAKE_SYSTEM_PROCESSOR}")
 if (NOT ${CMAKE_SYSTEM_PROCESSOR} MATCHES "ARM")
-    message(STATUS "Configuring for Windows/macOS/Linux(x86_64)")
+    message(STATUS "aConfiguring for Windows/macOS/Linux(x86_64)")
     find_package(OpenGL)
 else()
     message(STATUS "Configuring for Linux(aarch64)")
