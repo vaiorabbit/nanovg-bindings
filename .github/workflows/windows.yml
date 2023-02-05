@@ -24,8 +24,16 @@ jobs:
       shell: cmd
       run: |
         cd nanovg_dll
+        echo %cd%
+        echo "build_gl2_windows.cmd running"
         build_gl2_windows.cmd cmake
+        echo %cd%
+        echo "build_gl2_windows.cmd done"
+        echo %cd%
+        echo "build_gl3_windows.cmd running"
         build_gl3_windows.cmd cmake
+        echo %cd%
+        echo "build_gl3_windows.cmd done"
 
     - name: Commit new libraries
       continue-on-error: true
