@@ -1,3 +1,8 @@
+2024-01-05  vaiorabbit  <http://twitter.com/vaiorabbit>
+
+	* macOS : Generate libraries for each platform
+	* Updated using the latest nanovg ( https://github.com/memononen/nanovg/commit/f93799c078fa11ed61c078c65a53914c8782c00b )
+
 2023-02-01  vaiorabbit  <http://twitter.com/vaiorabbit>
 
 	* Updated using the latest nanovg ( https://github.com/memononen/nanovg/commit/7544c114e83db7cf67bd1c9e012349b70caacc2f )

@@ -1,0 +1,6 @@
+nanovg_dll/build_gl2/*
+nanovg_dll/build_gl3/*
+nanovg_dll/build_gl2_arm64/*
+nanovg_dll/build_gl3_arm64/*
+nanovg_dll/build_gl2_x86_64/*
+nanovg_dll/build_gl3_x86_64/*
