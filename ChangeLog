@@ -1,3 +1,8 @@
+2025-01-01  vaiorabbit  <http://twitter.com/vaiorabbit>
+
+	* Build libraries for each platform
+	* Updated scripts for publishing
+
 2024-01-05  vaiorabbit  <http://twitter.com/vaiorabbit>
 
 	* macOS : Generate libraries for each platform

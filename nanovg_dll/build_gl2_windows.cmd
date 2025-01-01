@@ -11,7 +11,7 @@
 setlocal enabledelayedexpansion
 set TARGET=gl2
 set CMAKE_EXE=%1
-if %CMAKE_EXE% == "" (
+if "%CMAKE_EXE%"=="" (
     set CMAKE_EXE="%PROGRAMFILES%\CMake\bin\cmake"
 )
 
@@ -27,7 +27,7 @@ if not exist build_%TARGET% (
 cd build_%TARGET%
 
 %CMAKE_EXE% -G "MSYS Makefiles" -D CMAKE_BUILD_TYPE=Release -D BUILD_SHARED_LIBS=ON -D CMAKE_C_COMPILER=gcc ../%TARGET%
-make
+%CMAKE_EXE% --build .
 copy libnanovg_%TARGET%.dll ..\..\lib
 
 popd

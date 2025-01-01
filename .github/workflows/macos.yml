@@ -15,9 +15,9 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
-        ref: 'update'
+        ref: ${{github.ref}}
         fetch-depth: 1
         submodules: recursive
 
@@ -35,4 +35,4 @@ jobs:
         git config user.email "${GITHUB_ACTOR}"
         git add lib/*
         git commit -a -m "commit by ${GITHUB_ACTOR} via GitHub Actions"
-        git push --force-with-lease -u origin update
+        git push --force-with-lease -u origin ${{github.ref}}
