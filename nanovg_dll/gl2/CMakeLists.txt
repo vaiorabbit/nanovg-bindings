@@ -1,5 +1,5 @@
-project(nanovg_gl2)
 cmake_minimum_required(VERSION 3.7)
+project(nanovg_gl2)
 
 message(STATUS "CMAKE_HOST_SYSTEM_PROCESSOR=${CMAKE_HOST_SYSTEM_PROCESSOR}")
 message(STATUS "CMAKE_SYSTEM_PROCESSOR=${CMAKE_SYSTEM_PROCESSOR}")
@@ -16,7 +16,9 @@ endif()
 
 add_definitions("-DNANOVG_GL2_IMPLEMENTATION=1")
 add_definitions("-DGL_SILENCE_DEPRECATION=1")
+add_definitions("-DGL_GLEXT_PROTOTYPES=1")
 
+include_directories( ${CMAKE_CURRENT_LIST_DIR}/.. )
 include_directories( ${CMAKE_CURRENT_LIST_DIR}/../nanovg/src )
 include_directories( ${OPENGL_INCLUDE_DIR} )
 message(STATUS "OPENGL_INCLUDE_DIR=${OPENGL_INCLUDE_DIR}")
