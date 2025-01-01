@@ -16,7 +16,9 @@ endif()
 
 add_definitions("-DNANOVG_GL2_IMPLEMENTATION=1")
 add_definitions("-DGL_SILENCE_DEPRECATION=1")
-add_definitions("-DGL_GLEXT_PROTOTYPES=1")
+if (NOT WIN32)
+    add_definitions("-DGL_GLEXT_PROTOTYPES=1")
+endif()
 
 include_directories( ${CMAKE_CURRENT_LIST_DIR}/.. )
 include_directories( ${CMAKE_CURRENT_LIST_DIR}/../nanovg/src )
