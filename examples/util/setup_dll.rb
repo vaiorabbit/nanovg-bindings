@@ -15,13 +15,13 @@ if nanovg_bindings_gem_available?
 
   case RUBY_PLATFORM
   when /mswin|msys|mingw|cygwin/
-    NVG.load_lib(shared_lib_path + 'libnanovg_gl2.dll')
+    NVG.load_lib(shared_lib_path + 'libnanovg_gl3.dll', render_backend: :gl3)
   when /darwin/
     arch = RUBY_PLATFORM.split('-')[0]
-    NVG.load_lib(shared_lib_path + "libnanovg_gl2.#{arch}.dylib")
+    NVG.load_lib(shared_lib_path + "libnanovg_gl3.#{arch}.dylib", render_backend: :gl3)
   when /linux/
     arch = RUBY_PLATFORM.split('-')[0]
-    NVG.load_lib(shared_lib_path + "libnanovg_gl2.#{arch}.so")
+    NVG.load_lib(shared_lib_path + "libnanovg_gl3.#{arch}.so", render_backend: :gl3)
   else
     raise RuntimeError, "setup_dll.rb : Unknown OS: #{RUBY_PLATFORM}"
   end
@@ -31,13 +31,13 @@ else
 
   case RUBY_PLATFORM
   when /mswin|msys|mingw|cygwin/
-    NVG.load_lib(Dir.pwd + '/../lib/' + 'libnanovg_gl2.dll')
+    NVG.load_lib(Dir.pwd + '/../lib/' + 'libnanovg_gl3.dll', render_backend: :gl3)
   when /darwin/
     arch = RUBY_PLATFORM.split('-')[0]
-    NVG.load_lib(Dir.pwd + '/../lib/' + "libnanovg_gl2.#{arch}.dylib")
+    NVG.load_lib(Dir.pwd + '/../lib/' + "libnanovg_gl3.#{arch}.dylib", render_backend: :gl3)
   when /linux/
     arch = RUBY_PLATFORM.split('-')[0]
-    NVG.load_lib(Dir.pwd + '/../lib/' + "libnanovg_gl2.#{arch}.so")
+    NVG.load_lib(Dir.pwd + '/../lib/' + "libnanovg_gl3.#{arch}.so", render_backend: :gl3)
   else
     raise RuntimeError, "setup_dll.rb : Unknown OS: #{RUBY_PLATFORM}"
   end

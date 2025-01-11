@@ -62,8 +62,8 @@ if __FILE__ == $PROGRAM_NAME
 
   GL.load_lib()
 
-  NVG.SetupGL2()
-  vg = NVG.CreateGL2(NVG::ANTIALIAS | NVG::STENCIL_STROKES | NVG::DEBUG)
+  NVG.SetupGL()
+  vg = NVG.CreateGL(NVG::ANTIALIAS | NVG::STENCIL_STROKES | NVG::DEBUG)
 
   $showcase = Showcase.new
   GLFW.SetWindowTitle(window, "Ruby-NanoVG : #{$showcase.scene_name}")
@@ -117,7 +117,7 @@ if __FILE__ == $PROGRAM_NAME
 
   end
 
-  NVG.DeleteGL2(vg)
+  NVG.DeleteGL3(vg)
 
   GLFW.Terminate()
 end

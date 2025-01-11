@@ -261,9 +261,9 @@ module NVG
     # GL3-specific API (nanovg_gl)
     #
     if render_backend == :gl3
-      attach_function :CreateGL3, :nvgCreateGL3, [:int32], :pointer
-      attach_function :DeleteGL3, :nvgDeleteGL3, [:pointer], :void
-      attach_function :SetupGL3, :nvgSetupGL3, [], :void
+      attach_function :CreateGL, :nvglCreate, [:int32], :pointer
+      attach_function :DeleteGL, :nvglDelete, [:pointer], :void
+      attach_function :SetupGL, :nvgSetupGL3, [], :void
     end
 
     @@nanovg_import_done = true
