@@ -8,12 +8,17 @@ module NVG
   #
 
   # NVGwinding
+  AUTOW = 0 # nanovgXC
   CCW = 1
   CW  = 2
 
   # NVGsolidity
-  SOLID = 1
-  HOLE  = 2
+  SOLID = CCW
+  HOLE  = CW
+
+  # NVGfillRule
+  NONZERO = 0
+  EVENODD = 1
 
   # NVGlineCap
   BUTT   = 0
@@ -24,14 +29,14 @@ module NVG
 
   # NVGalign
   #  Horizontal align
-  ALIGN_LEFT     = 1
-  ALIGN_CENTER   = 2
-  ALIGN_RIGHT    = 4
+  ALIGN_LEFT     = 1 << 0
+  ALIGN_CENTER   = 1 << 1
+  ALIGN_RIGHT    = 1 << 2
   #  Vertical align
-  ALIGN_TOP      = 8
-  ALIGN_MIDDLE   = 16
-  ALIGN_BOTTOM   = 32
-  ALIGN_BASELINE = 64
+  ALIGN_TOP      = 1 << 3
+  ALIGN_MIDDLE   = 1 << 4
+  ALIGN_BOTTOM   = 1 << 5
+  ALIGN_BASELINE = 1 << 6
 
   # NVGblendFactor
   ZERO                = 1 << 0
@@ -60,12 +65,15 @@ module NVG
   XOR              = 10
 
   # NVGimageFlags
-  IMAGE_GENERATE_MIPMAPS  = 1
-  IMAGE_REPEATX           = 2
-  IMAGE_REPEATY           = 4
-  IMAGE_FLIPY             = 8
-  IMAGE_PREMULTIPLIED     = 16
-  IMAGE_NEAREST           = 32
+  IMAGE_GENERATE_MIPMAPS  = 1 << 0
+  IMAGE_REPEATX           = 1 << 1
+  IMAGE_REPEATY           = 1 << 2
+  IMAGE_FLIPY             = 1 << 3
+  IMAGE_PREMULTIPLIED     = 1 << 4
+  IMAGE_NEAREST           = 1 << 5
+  IMAGE_SRGB              = 1 << 6 # nanovgXC
+  IMAGE_NOCOPY            = 1 << 7 # nanovgXC
+  IMAGE_DISCARD           = 1 << 8 # nanovgXC
 
   # NVGcreateFlags
   ANTIALIAS         = 1
@@ -128,7 +136,7 @@ module NVG
   #
   @@nanovg_import_done = false
 
-  def self.load_lib(libpath = './libnanovg.dylib', render_backend: :gl2)
+  def self.load_lib(libpath = './libnanovg.dylib', render_backend: :gl3)
     ffi_lib_flags :now, :global # to force FFI to access nvgCreateInternal from nvgCreateGL2
     ffi_lib libpath
     import_symbols(render_backend) unless @@nanovg_import_done
@@ -156,6 +164,7 @@ module NVG
     attach_function :TransRGBAf, :nvgTransRGBAf, [Color.by_value, :float], Color.by_value
     attach_function :HSL, :nvgHSL, [:float, :float, :float], Color.by_value
     attach_function :HSLA, :nvgHSLA, [:float, :float, :float, :uint8], Color.by_value
+    attach_function :SRGBtoLinear, :nvgSRGBtoLinear, [:uint8], :float # nanovgXC
 
     attach_function :Save, :nvgSave, [:pointer], :void
     attach_function :Restore, :nvgRestore, [:pointer], :void
@@ -163,6 +172,7 @@ module NVG
 
     attach_function :ShapeAntiAlias, :nvgShapeAntiAlias, [:pointer, Color.by_value], :void
     attach_function :StrokeColor, :nvgStrokeColor, [:pointer, Color.by_value], :void
+    attach_function :FillRule, :nvgFillRule, [:pointer, :int32], :void # nanovgXC
     attach_function :StrokePaint, :nvgStrokePaint, [:pointer, Paint.by_value], :void
     attach_function :FillColor, :nvgFillColor, [:pointer, Color.by_value], :void
     attach_function :FillPaint, :nvgFillPaint, [:pointer, Paint.by_value], :void
@@ -170,6 +180,8 @@ module NVG
     attach_function :StrokeWidth, :nvgStrokeWidth, [:pointer, :float], :void
     attach_function :LineCap, :nvgLineCap, [:pointer, :int32], :void
     attach_function :LineJoin, :nvgLineJoin, [:pointer, :int32], :void
+    attach_function :DashArray, :nvgDashArray, [:pointer, :pointer], :void # nanovgXC
+    attach_function :DashOffset, :nvgDashOffset, [:pointer, :float], :void # nanovgXC
     attach_function :GlobalAlpha, :nvgGlobalAlpha, [:pointer, :float], :void
 
     attach_function :ResetTransform, :nvgResetTransform, [:pointer], :void
@@ -206,6 +218,7 @@ module NVG
     attach_function :BoxGradient, :nvgBoxGradient, [:pointer, :float, :float, :float, :float, :float, :float, Color.by_value, Color.by_value], Paint.by_value
     attach_function :RadialGradient, :nvgRadialGradient, [:pointer, :float, :float, :float, :float, Color.by_value, Color.by_value], Paint.by_value
     attach_function :ImagePattern, :nvgImagePattern, [:pointer, :float, :float, :float, :float, :float, :int32, :float], Paint.by_value
+    attach_function :MultiGradient, :nvgMultiGradient, [:pointer, :int32, :pointer, :pointer, :int32], :int32 # nanovgXC
 
     attach_function :Scissor, :nvgScissor, [:pointer, :float, :float, :float, :float], :void
     attach_function :IntersectScissor, :nvgIntersectScissor, [:pointer, :float, :float, :float, :float], :void
@@ -229,10 +242,14 @@ module NVG
     attach_function :Stroke, :nvgStroke, [:pointer], :void
 
     attach_function :CreateFont, :nvgCreateFont, [:pointer, :pointer, :pointer], :int32
+    # attach_function :CreateFontAtIndex, :nvgCreateFontAtIndex, [:pointer, :pointer, :pointer, :int32], :int32 # nanovg only
     attach_function :CreateFontMem, :nvgCreateFontMem, [:pointer, :pointer, :pointer, :int32, :int32], :int32
+    # attach_function :CreateFontMemAtIndex, :nvgCreateFontAtIndex, [:pointer, :pointer, :pointer, :int32, :int32, :int32], :int32 # nanovg only
     attach_function :FindFont, :nvgFindFont, [:pointer, :pointer], :int32
     attach_function :AddFallbackFontId, :nvgAddFallbackFontId, [:pointer, :int32, :int32], :int32
     attach_function :AddFallbackFont, :nvgAddFallbackFont, [:pointer, :pointer, :pointer], :int32
+    # attach_function :ResetFallbackFontsId, :nvgResetFallbackFontsId, [:pointer, :int32], :void # nanovg only
+    # attach_function :ResetFallbackFonts, :nvgResetFallbackFonts, [:pointer, :pointer], :void # nanovg only
     attach_function :FontSize, :nvgFontSize, [:pointer, :float], :void
     attach_function :FontBlur, :nvgFontBlur, [:pointer, :float], :void
     attach_function :TextLetterSpacing, :nvgTextLetterSpacing, [:pointer, :float], :void
@@ -240,7 +257,9 @@ module NVG
     attach_function :TextAlign, :nvgTextAlign, [:pointer, :int32], :void
     attach_function :FontFaceId, :nvgFontFaceId, [:pointer, :int32], :void
     attach_function :FontFace, :nvgFontFace, [:pointer, :pointer], :void
+    attach_function :AtlasTextThreshold, :nvgAtlasTextThreshold, [:pointer, :float], :void # nanovgXC
     attach_function :Text, :nvgText, [:pointer, :float, :float, :pointer, :pointer], :float
+    attach_function :TextAsPaths, :nvgTextAsPaths, [:pointer, :float, :float, :pointer, :pointer], :float # nanovgXC
     attach_function :TextBox, :nvgTextBox, [:pointer, :float, :float, :float, :pointer, :pointer], :void
     attach_function :TextBounds, :nvgTextBounds, [:pointer, :float, :float, :pointer, :pointer, :pointer], :float
     attach_function :TextBoxBounds, :nvgTextBoxBounds, [:pointer, :float, :float, :float, :pointer, :pointer, :pointer], :void
