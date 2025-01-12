@@ -84,9 +84,10 @@ module NVG
   # struct
   #
 
-  class Color < FFI::Struct
+  class Color < FFI::Union # nanovgXC
     layout(
-      :rgba, [:float, 4]
+      :c, :uint32,
+      :rgba, [:uint8, 4],
     )
   end
 
