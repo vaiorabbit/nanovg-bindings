@@ -26,7 +26,6 @@ end
 
 def draw_paragraph(vg, x, y, width, height, text, font_size=44.0, name="sans")
   rows_buf = FFI::MemoryPointer.new(NVG::TextRow, 3)
-  glyphs_buf = FFI::MemoryPointer.new(NVG::GlyphPosition, 100)
   lineh_buf = ' ' * 8
   lineh = 0.0
 
@@ -73,7 +72,7 @@ if __FILE__ == $0
 
   prevt = 0.0
 
-  ttf = ARGV[0]
+  ## ttf = ARGV[0]
 
   if GLFW.Init() == GL::FALSE
     puts("Failed to init GLFW.")
@@ -82,8 +81,8 @@ if __FILE__ == $0
 
   GLFW.SetErrorCallback(errorcb)
 
-  GLFW.WindowHint(GLFW::CONTEXT_VERSION_MAJOR, 2)
-  GLFW.WindowHint(GLFW::CONTEXT_VERSION_MINOR, 0)
+  # GLFW.WindowHint(GLFW::CONTEXT_VERSION_MAJOR, 2)
+  # GLFW.WindowHint(GLFW::CONTEXT_VERSION_MINOR, 0)
 
   window = GLFW.CreateWindow(800, 500, "Emoji(絵文字) on NanoVG", nil, nil)
   if window == 0
@@ -97,8 +96,8 @@ if __FILE__ == $0
 
   GL.load_lib()
 
-  NVG.SetupGL2()
-  vg = NVG.CreateGL2(NVG::ANTIALIAS | NVG::STENCIL_STROKES | NVG::DEBUG)
+  NVG.SetupGL()
+  vg = NVG.CreateGL(NVG::ANTIALIAS | NVG::STENCIL_STROKES | NVG::DEBUG)
   if vg == nil
     puts("Could not init nanovg.")
     exit
@@ -120,7 +119,7 @@ if __FILE__ == $0
 
   while GLFW.WindowShouldClose(window) == 0
     t = GLFW.GetTime()
-    dt = t - prevt
+    # dt = t - prevt
     prevt = t
 
     GLFW.GetWindowSize(window, winWidth_buf, winHeight_buf)
@@ -145,7 +144,7 @@ if __FILE__ == $0
     GLFW.PollEvents()
   end
 
-  NVG.DeleteGL2(vg)
+  NVG.DeleteGL3(vg)
 
   GLFW.Terminate()
 end

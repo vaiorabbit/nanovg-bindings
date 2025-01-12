@@ -52,8 +52,11 @@ if __FILE__ == $PROGRAM_NAME
 
   GLFW.Init()
 
-  GLFW.WindowHint(GLFW::CONTEXT_VERSION_MAJOR, 2)
-  GLFW.WindowHint(GLFW::CONTEXT_VERSION_MINOR, 0)
+  # GLFW.DefaultWindowHints()
+  # GLFW.WindowHint(GLFW::OPENGL_FORWARD_COMPAT, GLFW::TRUE)
+  # GLFW.WindowHint(GLFW::OPENGL_PROFILE, GLFW::OPENGL_ANY_PROFILE)
+  # GLFW.WindowHint(GLFW::CONTEXT_VERSION_MAJOR, 4)
+  # GLFW.WindowHint(GLFW::CONTEXT_VERSION_MINOR, 5)
 
   window = GLFW.CreateWindow(1000, 600, "NanoVG", nil, nil)
 
@@ -117,7 +120,7 @@ if __FILE__ == $PROGRAM_NAME
 
   end
 
-  NVG.DeleteGL3(vg)
+  NVG.DeleteGL(vg)
 
   GLFW.Terminate()
 end
