@@ -75,10 +75,18 @@ module NVG
   IMAGE_NOCOPY            = 1 << 7 # nanovgXC
   IMAGE_DISCARD           = 1 << 8 # nanovgXC
 
-  # NVGcreateFlags
-  ANTIALIAS         = 1
-  STENCIL_STROKES   = 2
+  # NVGLcreateFlags
+  # ANTIALIAS         = 1
+  # STENCIL_STROKES   = 2
   DEBUG             = 4
+
+  # NVGcreateFlags
+  IS_GPU                = 1 << 0  # nanovgXC
+  NO_FONTSTASH          = 1 << 11 # nanovgXC
+  SDF_TEXT              = 1 << 12 # nanovgXC
+  ROTATED_TEXT_AS_PATHS = 1 << 13 # nanovgXC
+  AUTOW_DEFAULT         = 1 << 14 # nanovgXC
+  SRGB                  = 1 << 15 # nanovgXC
 
   #
   # struct
@@ -128,7 +136,9 @@ module NVG
       :next,  :pointer,
       :width, :float,
       :minx,  :float,
-      :maxx,  :float
+      :maxx,  :float,
+      :miny,  :float, # nanovgXC
+      :maxy,  :float  # nanovgXC
     )
   end
 
